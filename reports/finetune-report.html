@@ -41,27 +41,59 @@ tailwind.config = {
   <p class="text-muted text-sm mt-1">15개 연속 파라미터 &middot; 5단계 최적화 &middot; ~480K simulations</p>
 </div>
 
+<!-- What is this? -->
+<div class="card mb-6 bg-blue-50 border-blue-200">
+  <h2 class="text-lg font-semibold mb-2 text-blue-900">이 보고서는 무엇인가요?</h2>
+  <div class="text-sm text-blue-800 space-y-2">
+    <p><strong>목표:</strong> 294,912건 전체 조합 시뮬레이션에서 1위로 확정된 <strong>#13 전략</strong>의 15개 연속 파라미터(익절 이익률/비율, 트레일링, 손절, 2차매수)를 <strong>0.1% / 1% 단위</strong>로 정밀 조정하여 추가 수익을 확보합니다.</p>
+    <p><strong>방법:</strong> 15개 파라미터를 한 번에 전부 조합하면 10<sup>15</sup>개라 불가능합니다. 대신 <strong>상호작용이 강한 파라미터끼리 4개 클러스터</strong>로 묶어 클러스터 내 전체 조합(~420K) + 클러스터 간 교차 검증(40K) + 좌표 하강 정제(~20K)를 수행했습니다.</p>
+    <p><strong>데이터:</strong> 2026-02-04~13 기간, 69개 조건진입 신호, 61개 종목-날짜별 1분봉 캔들 세트. 시간필터 적용 후 <strong>30건 거래</strong>에 대해 총 <strong>~480,000회 시뮬레이션</strong>을 실행했습니다.</p>
+  </div>
+  <div class="mt-3 p-3 bg-white rounded-lg border border-blue-100">
+    <h3 class="text-xs font-semibold text-blue-900 uppercase mb-2">5단계 최적화 과정</h3>
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-2 text-xs text-blue-700">
+      <div><strong>Phase 1</strong><br>1D 민감도 스윕<br><span class="text-muted">590 sims, 2초</span></div>
+      <div><strong>Phase 2</strong><br>클러스터별 전체 조합<br><span class="text-muted">~420K sims, 28분</span></div>
+      <div><strong>Phase 3</strong><br>교차 검증<br><span class="text-muted">40K sims, 3분</span></div>
+      <div><strong>Phase 4</strong><br>좌표 하강 정제<br><span class="text-muted">~20K sims, 1분</span></div>
+      <div><strong>Phase 5</strong><br>복리 수익률<br><span class="text-muted">TOP 10 검증</span></div>
+    </div>
+  </div>
+  <div class="mt-3 p-3 bg-white rounded-lg border border-blue-100">
+    <h3 class="text-xs font-semibold text-blue-900 uppercase mb-2">4개 클러스터 구성</h3>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-xs text-blue-700">
+      <div><strong>A: TP First-Only</strong><br>1차매수만 상태의 3단계 익절<br>이익률 3개 + 비율 2개</div>
+      <div><strong>B: TP After-Second</strong><br>2차매수 후 3단계 익절<br>이익률 3개 + 비율 2개</div>
+      <div><strong>C: Trailing Stop</strong><br>트레일링 스탑 조건<br>진입 이익률 + 하락폭</div>
+      <div><strong>D: SL + SB</strong><br>손절 + 2차매수<br>손절률 + 트리거 + 수량배수</div>
+    </div>
+  </div>
+</div>
+
 <!-- Summary Cards -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8" id="summary-cards"></div>
 
 <!-- Phase 1: Sensitivity -->
 <div class="card mb-6">
   <h2 class="text-lg font-semibold mb-1">Phase 1: 1D 민감도 분석</h2>
-  <p class="text-sm text-muted mb-4">각 파라미터를 독립적으로 변동시켜 결과 민감도 측정 (590 sims)</p>
+  <p class="text-sm text-muted mb-2">각 파라미터를 독립적으로 변동시켜 결과 민감도 측정 (590 sims)</p>
+  <p class="text-xs text-gray-400 mb-4">읽는 법: 그래프가 <strong>평탄</strong>하면 해당 파라미터는 결과에 영향이 적음. <strong>급경사</strong>면 민감함. <span class="text-red-500 font-bold">빨간 점</span>=현재값, <span class="text-green-600 font-bold">초록 점</span>=최적값. d값이 클수록 튜닝 여지가 큼.</p>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="sensitivity-charts"></div>
 </div>
 
 <!-- Phase 2: Cluster Results -->
 <div class="card mb-6">
   <h2 class="text-lg font-semibold mb-1">Phase 2: 클러스터별 최적화</h2>
-  <p class="text-sm text-muted mb-4">4개 클러스터 내 전체 조합 탐색 (~420K sims)</p>
+  <p class="text-sm text-muted mb-2">4개 클러스터 내 전체 조합 탐색 (~420K sims)</p>
+  <p class="text-xs text-gray-400 mb-4">각 클러스터의 파라미터를 ±5단계(0.1%/1% 단위)씩 전체 조합하여 최적 조합을 찾음. 다른 클러스터 파라미터는 #13 기본값 고정.</p>
   <div id="cluster-tables"></div>
 </div>
 
 <!-- Phase 3+4: Cross & Refinement -->
 <div class="card mb-6">
   <h2 class="text-lg font-semibold mb-1">Phase 3+4: 교차 검증 & 좌표 하강</h2>
-  <p class="text-sm text-muted mb-4">클러스터 간 상호작용 검증 (40K) + 좌표 하강 정제 (~20K sims)</p>
+  <p class="text-sm text-muted mb-2">클러스터 간 상호작용 검증 (40K) + 좌표 하강 정제 (~20K sims)</p>
+  <p class="text-xs text-gray-400 mb-4">Phase 2 각 클러스터 TOP 20/10을 교차 조합하여 클러스터 간 시너지 검증. 이후 좌표 하강법으로 한 클러스터씩 재탐색하여 수렴 확인. 행 R = 좌표 하강 최종 결과.</p>
   <div class="overflow-x-auto">
     <table id="cross-table">
       <thead><tr>
