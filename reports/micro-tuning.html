@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마이크로 튜닝 분석 | 2026-02-04~13</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{accent:'#3b82f6',win:'#22c55e',lose:'#ef4444',warn:'#f59e0b'}}}}</script>
+<style>
+body{font-family:'Pretendard',system-ui,sans-serif;background:#0f172a;color:#e2e8f0}
+.card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155}
+table{width:100%;border-collapse:collapse}
+th{background:#334155;padding:8px 10px;text-align:left;font-size:12px;font-weight:600;color:#94a3b8;white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid #334155;font-size:13px;white-space:nowrap}
+tr:hover td{background:#334155}
+.pct-pos{color:#22c55e}.pct-neg{color:#ef4444}.pct-zero{color:#94a3b8}
+.bar{height:22px;border-radius:4px;display:flex;align-items:center;padding:0 8px;font-size:11px;font-weight:600;min-width:2px}
+.rank-gold{background:linear-gradient(135deg,#fbbf2420,#f59e0b10);border:1px solid #f59e0b40}
+.rank-silver{background:linear-gradient(135deg,#94a3b820,#64748b10);border:1px solid #64748b40}
+.rank-bronze{background:linear-gradient(135deg,#cd7f3220,#b4540010);border:1px solid #b4540040}
+.baseline{border:2px solid #ef4444}
+.tag{display:inline-block;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600}
+.insight-card{background:#1e293b;border-left:4px solid;border-radius:0 12px 12px 0;padding:16px 20px}
+.insight-bad{border-color:#ef4444}.insight-good{border-color:#22c55e}.insight-warn{border-color:#f59e0b}
+</style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+<div class="max-w-7xl mx-auto">
+
+<!-- Header -->
+<div class="mb-8">
+<div class="flex items-center gap-3 mb-2">
+<a href="/" class="text-sm text-accent hover:underline">&larr; 대시보드</a>
+<span class="text-slate-600">|</span>
+<a href="/reports/full-backtest" class="text-sm text-accent hover:underline">전면 백테스트</a>
+<span class="text-slate-600">|</span>
+<a href="/reports/combo-backtest" class="text-sm text-accent hover:underline">조합별 백테스트</a>
+</div>
+<h1 class="text-2xl md:text-3xl font-bold text-white">마이크로 튜닝 분석</h1>
+<p class="text-slate-400 mt-1">83건 전체 신호 기반 파라미터 최적화 | 2026-02-04~13 | 시간 필터 없음</p>
+</div>
+
+<!-- Key Insight Cards -->
+<div id="insight-cards" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"></div>
+
+<!-- Loss Root Cause Analysis -->
+<div class="card mb-6">
+<h2 class="text-lg font-bold text-white mb-4">손실 원인 분석 (현행 -25.61%)</h2>
+<div id="root-cause" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+</div>
+
+<!-- Parameter Sweep Ranking -->
+<div class="card mb-6">
+<h2 class="text-lg font-bold text-white mb-4">파라미터 스윕 랭킹 (19가지 조합)</h2>
+<div class="overflow-x-auto">
+<table id="ranking-table">
+<thead><tr>
+<th>#</th><th>조합</th><th>설명</th><th class="text-right">거래수</th>
+<th class="text-right">승률</th><th class="text-right">누적수익</th>
+<th class="text-right">손절수</th><th>수익 바</th>
+</tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+
+<!-- Bar Chart -->
+<div class="card mb-6">
+<h2 class="text-lg font-bold text-white mb-4">누적 수익률 비교</h2>
+<div id="bar-chart"></div>
+</div>
+
+<!-- Retracement_1 Deep Dive -->
+<div class="card mb-6">
+<h2 class="text-lg font-bold text-white mb-4">TP1 되돌림 규칙 심층 분석</h2>
+<p class="text-slate-400 text-sm mb-3">retracement_rules."1": 0.0 — TP1 달성 후 평단가로 복귀하면 잔량 전부 매도</p>
+<div class="overflow-x-auto">
+<table id="ret1-table">
+<thead><tr>
+<th>날짜</th><th>종목</th><th>전략</th>
+<th class="text-right">청산수익</th><th class="text-right">당일종가</th>
+<th class="text-right">당일최고</th><th class="text-right">손실갭</th>
+</tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+
+<!-- Second Buy Analysis -->
+<div class="card mb-6">
+<h2 class="text-lg font-bold text-white mb-4">2차매수 효과 분석</h2>
+<div id="sb-analysis" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"></div>
+<div id="sb-regret-section"></div>
+</div>
+
+<!-- Trailing Stop Analysis -->
+<div class="card mb-6">
+<h2 class="text-lg font-bold text-white mb-4">트레일링 스탑 분석</h2>
+<p class="text-slate-400 text-sm mb-3">현행: 7% 트리거 / -2.5% 드롭 → 제안: 10% 트리거 / -3% 드롭</p>
+<div class="overflow-x-auto">
+<table id="trail-table">
+<thead><tr>
+<th>날짜</th><th>종목</th><th>전략</th>
+<th class="text-right">결과</th><th class="text-right">당일최고</th>
+<th>청산방식</th><th class="text-right">미실현</th>
+</tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+
+<!-- Time Bucket Heatmap -->
+<div class="card mb-6">
+<h2 class="text-lg font-bold text-white mb-4">시간대별 수익률</h2>
+<div id="time-heatmap" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2"></div>
+</div>
+
+<!-- Exit Type Analysis -->
+<div class="card mb-6">
+<h2 class="text-lg font-bold text-white mb-4">청산 유형별 수익 기여</h2>
+<div id="exit-chart"></div>
+</div>
+
+<!-- Recommendation -->
+<div class="card mb-6 rank-gold">
+<h2 class="text-lg font-bold text-yellow-400 mb-4">최적 마이크로 튜닝 제안</h2>
+<div id="recommendation"></div>
+</div>
+
+</div>
+
+<script>
+const REPORT_DATA = {"variants": [{"name": "NR1+AS4+T10/3", "desc": "되돌림1 제거 + 2차손절-4% + 트레일링10/-3", "total": 83, "wins": 39, "win_rate": 47.0, "total_pnl": 6.44, "stop_losses": 21, "by_strat": {"세력감지": {"n": 11, "wins": 5, "pnl": 3.63, "sl": 0}, "굿모닝": {"n": 24, "wins": 9, "pnl": 4.29, "sl": 7}, "골든10분v1": {"n": 24, "wins": 13, "pnl": 2.68, "sl": 10}, "골든10분v2": {"n": 24, "wins": 12, "pnl": -4.16, "sl": 4}}, "by_exit": {"force_sell": {"n": 39, "pnl": 45.24}, "retracement_3": {"n": 19, "pnl": 36.61}, "stop_loss": {"n": 21, "pnl": -97.15}, "trailing_stop": {"n": 3, "pnl": 19.13}, "take_profit_4": {"n": 1, "pnl": 2.61}}}, {"name": "NORET+AS3", "desc": "전체 되돌림 제거 + 2차손절-3%", "total": 83, "wins": 38, "win_rate": 45.8, "total_pnl": 4.39, "stop_losses": 27, "by_strat": {"세력감지": {"n": 11, "wins": 5, "pnl": 3.63, "sl": 0}, "굿모닝": {"n": 24, "wins": 9, "pnl": -10.69, "sl": 8}, "골든10분v1": {"n": 24, "wins": 11, "pnl": 6.66, "sl": 12}, "골든10분v2": {"n": 24, "wins": 13, "pnl": 4.79, "sl": 7}}, "by_exit": {"force_sell": {"n": 39, "pnl": 23.68}, "trailing_stop": {"n": 16, "pnl": 86.91}, "stop_loss": {"n": 27, "pnl": -108.81}, "take_profit_4": {"n": 1, "pnl": 2.61}}}, {"name": "NR1+AS3+T10/3", "desc": "되돌림1 제거 + 2차손절-3% + 트레일링10/-3", "total": 83, "wins": 38, "win_rate": 45.8, "total_pnl": 2.45, "stop_losses": 24, "by_strat": {"세력감지": {"n": 11, "wins": 5, "pnl": 3.63, "sl": 0}, "굿모닝": {"n": 24, "wins": 9, "pnl": 6.43, "sl": 8}, "골든10분v1": {"n": 24, "wins": 12, "pnl": -4.21, "sl": 11}, "골든10분v2": {"n": 24, "wins": 12, "pnl": -3.4, "sl": 5}}, "by_exit": {"force_sell": {"n": 38, "pnl": 38.94}, "retracement_3": {"n": 17, "pnl": 38.52}, "stop_loss": {"n": 24, "pnl": -96.75}, "trailing_stop": {"n": 3, "pnl": 19.13}, "take_profit_4": {"n": 1, "pnl": 2.61}}}, {"name": "NR1+AS3+FO4+T10/3", "desc": "되돌림1 제거 + 2차손절-3% + 1차손절-4% + 트레일링10/-3", "total": 83, "wins": 38, "win_rate": 45.8, "total_pnl": 2.01, "stop_losses": 22, "by_strat": {"세력감지": {"n": 11, "wins": 5, "pnl": 3.63, "sl": 0}, "굿모닝": {"n": 24, "wins": 9, "pnl": 6.43, "sl": 8}, "골든10분v1": {"n": 24, "wins": 12, "pnl": -4.65, "sl": 9}, "골든10분v2": {"n": 24, "wins": 12, "pnl": -3.4, "sl": 5}}, "by_exit": {"force_sell": {"n": 40, "pnl": 36.32}, "retracement_3": {"n": 17, "pnl": 38.52}, "stop_loss": {"n": 22, "pnl": -94.57}, "trailing_stop": {"n": 3, "pnl": 19.13}, "take_profit_4": {"n": 1, "pnl": 2.61}}}, {"name": "NORET+NO_SB", "desc": "전체 되돌림 제거 + 2차매수 제거", "total": 83, "wins": 39, "win_rate": 47.0, "total_pnl": -3.79, "stop_losses": 14, "by_strat": {"세력감지": {"n": 11, "wins": 4, "pnl": -4.58, "sl": 3}, "굿모닝": {"n": 24, "wins": 9, "pnl": -15.05, "sl": 0}, "골든10분v1": {"n": 24, "wins": 12, "pnl": 12.24, "sl": 11}, "골든10분v2": {"n": 24, "wins": 14, "pnl": 3.6, "sl": 0}}, "by_exit": {"force_sell": {"n": 52, "pnl": -64.98}, "trailing_stop": {"n": 17, "pnl": 104.72}, "stop_loss": {"n": 14, "pnl": -43.53}}}, {"name": "NR1+AS4+FO4", "desc": "되돌림1 제거 + 2차손절-4% + 1차손절-4%", "total": 83, "wins": 40, "win_rate": 48.2, "total_pnl": -4.15, "stop_losses": 19, "by_strat": {"세력감지": {"n": 11, "wins": 5, "pnl": 3.63, "sl": 0}, "굿모닝": {"n": 24, "wins": 9, "pnl": -8.51, "sl": 7}, "골든10분v1": {"n": 24, "wins": 14, "pnl": 4.89, "sl": 8}, "골든10분v2": {"n": 24, "wins": 12, "pnl": -4.16, "sl": 4}}, "by_exit": {"force_sell": {"n": 37, "pnl": 21.2}, "retracement_3": {"n": 19, "pnl": 36.61}, "stop_loss": {"n": 19, "pnl": -95.98}, "trailing_stop": {"n": 7, "pnl": 31.41}, "take_profit_4": {"n": 1, "pnl": 2.61}}}, {"name": "NR1+AS3+FO4", "desc": "되돌림1 제거 + 2차손절-3% + 1차손절-4%", "total": 83, "wins": 39, "win_rate": 47.0, "total_pnl": -5.22, "stop_losses": 22, "by_strat": {"세력감지": {"n": 11, "wins": 5, "pnl": 3.63, "sl": 0}, "굿모닝": {"n": 24, "wins": 9, "pnl": -6.37, "sl": 8}, "골든10분v1": {"n": 24, "wins": 13, "pnl": 0.92, "sl": 9}, "골든10분v2": {"n": 24, "wins": 12, "pnl": -3.4, "sl": 5}}, "by_exit": {"force_sell": {"n": 37, "pnl": 21.2}, "retracement_3": {"n": 17, "pnl": 38.52}, "stop_loss": {"n": 22, "pnl": -94.57}, "trailing_stop": {"n": 6, "pnl": 27.02}, "take_profit_4": {"n": 1, "pnl": 2.61}}}, {"name": "NR1+AS4", "desc": "되돌림1 제거 + 2차손절 -4%", "total": 83, "wins": 39, "win_rate": 47.0, "total_pnl": -8.27, "stop_losses": 21, "by_strat": {"세력감지": {"n": 11, "wins": 5, "pnl": 3.63, "sl": 0}, "굿모닝": {"n": 24, "wins": 9, "pnl": -8.51, "sl": 7}, "골든10분v1": {"n": 24, "wins": 13, "pnl": 0.77, "sl": 10}, "골든10분v2": {"n": 24, "wins": 12, "pnl": -4.16, "sl": 4}}, "by_exit": {"force_sell": {"n": 36, "pnl": 23.82}, "retracement_3": {"n": 19, "pnl": 36.61}, "stop_loss": {"n": 21, "pnl": -97.15}, "trailing_stop": {"n": 6, "pnl": 25.84}, "take_profit_4": {"n": 1, "pnl": 2.61}}}, {"name": "NR1+AS3", "desc": "되돌림1 제거 + 2차손절 -3%", "total": 83, "wins": 38, "win_rate": 45.8, "total_pnl": -10.35, "stop_losses": 24, "by_strat": {"세력감지": {"n": 11, "wins": 5, "pnl": 3.63, "sl": 0}, "굿모닝": {"n": 24, "wins": 9, "pnl": -6.37, "sl": 8}, "골든10분v1": {"n": 24, "wins": 12, "pnl": -4.21, "sl": 11}, "골든10분v2": {"n": 24, "wins": 12, "pnl": -3.4, "sl": 5}}, "by_exit": {"force_sell": {"n": 36, "pnl": 23.82}, "retracement_3": {"n": 17, "pnl": 38.52}, "stop_loss": {"n": 24, "pnl": -96.75}, "trailing_stop": {"n": 5, "pnl": 21.45}, "take_profit_4": {"n": 1, "pnl": 2.61}}}, {"name": "NO_2ND_BUY", "desc": "2차매수 비활성화", "total": 83, "wins": 32, "win_rate": 38.6, "total_pnl": -16.21, "stop_losses": 13, "by_strat": {"세력감지": {"n": 11, "wins": 3, "pnl": -4.08, "sl": 3}, "굿모닝": {"n": 24, "wins": 8, "pnl": -1.79, "sl": 0}, "골든10분v1": {"n": 24, "wins": 10, "pnl": -2.94, "sl": 10}, "골든10분v2": {"n": 24, "wins": 11, "pnl": -7.4, "sl": 0}}, "by_exit": {"force_sell": {"n": 38, "pnl": -39.75}, "retracement_3": {"n": 12, "pnl": 46.93}, "stop_loss": {"n": 13, "pnl": -40.43}, "trailing_stop": {"n": 4, "pnl": 22.09}, "retracement_1": {"n": 16, "pnl": -5.05}}}, {"name": "AS_SL4", "desc": "2차매수 후 손절 -2.1%→-4.0%", "total": 83, "wins": 31, "win_rate": 37.3, "total_pnl": -16.7, "stop_losses": 17, "by_strat": {"세력감지": {"n": 11, "wins": 3, "pnl": -0.49, "sl": 0}, "굿모닝": {"n": 24, "wins": 7, "pnl": -8.09, "sl": 4}, "골든10분v1": {"n": 24, "wins": 11, "pnl": -3.54, "sl": 10}, "골든10분v2": {"n": 24, "wins": 10, "pnl": -4.58, "sl": 3}}, "by_exit": {"force_sell": {"n": 27, "pnl": 19.02}, "retracement_3": {"n": 16, "pnl": 32.64}, "stop_loss": {"n": 17, "pnl": -73.63}, "retracement_1": {"n": 18, "pnl": -18.23}, "trailing_stop": {"n": 5, "pnl": 23.5}}}, {"name": "NO_RET1", "desc": "TP1 되돌림 비활성화", "total": 83, "wins": 36, "win_rate": 43.4, "total_pnl": -17.82, "stop_losses": 33, "by_strat": {"세력감지": {"n": 11, "wins": 4, "pnl": -5.66, "sl": 3}, "굿모닝": {"n": 24, "wins": 9, "pnl": -7.29, "sl": 11}, "골든10분v1": {"n": 24, "wins": 11, "pnl": -4.84, "sl": 12}, "골든10분v2": {"n": 24, "wins": 12, "pnl": -0.03, "sl": 7}}, "by_exit": {"force_sell": {"n": 31, "pnl": 37.43}, "retracement_3": {"n": 14, "pnl": 37.67}, "stop_loss": {"n": 33, "pnl": -114.37}, "trailing_stop": {"n": 5, "pnl": 21.45}}}, {"name": "AS_SL3", "desc": "2차매수 후 손절 -2.1%→-3.0%", "total": 83, "wins": 30, "win_rate": 36.1, "total_pnl": -17.99, "stop_losses": 19, "by_strat": {"세력감지": {"n": 11, "wins": 3, "pnl": -0.49, "sl": 0}, "굿모닝": {"n": 24, "wins": 7, "pnl": -4.17, "sl": 4}, "골든10분v1": {"n": 24, "wins": 10, "pnl": -8.52, "sl": 11}, "골든10분v2": {"n": 24, "wins": 10, "pnl": -4.81, "sl": 4}}, "by_exit": {"force_sell": {"n": 27, "pnl": 19.02}, "retracement_3": {"n": 15, "pnl": 34.37}, "stop_loss": {"n": 19, "pnl": -72.26}, "retracement_1": {"n": 18, "pnl": -18.23}, "trailing_stop": {"n": 4, "pnl": 19.11}}}, {"name": "TRAIL_10_3", "desc": "트레일링 10%/-3%", "total": 83, "wins": 29, "win_rate": 34.9, "total_pnl": -18.8, "stop_losses": 29, "by_strat": {"세력감지": {"n": 11, "wins": 3, "pnl": -3.76, "sl": 2}, "굿모닝": {"n": 24, "wins": 7, "pnl": -2.19, "sl": 8}, "골든10분v1": {"n": 24, "wins": 9, "pnl": -9.15, "sl": 12}, "골든10분v2": {"n": 24, "wins": 10, "pnl": -3.7, "sl": 7}}, "by_exit": {"force_sell": {"n": 24, "pnl": 47.75}, "retracement_3": {"n": 13, "pnl": 32.85}, "stop_loss": {"n": 29, "pnl": -98.95}, "trailing_stop": {"n": 2, "pnl": 10.8}, "retracement_1": {"n": 15, "pnl": -11.25}}}, {"name": "FO_SL4", "desc": "1차매수 손절 -3.1%→-4.0%", "total": 83, "wins": 30, "win_rate": 36.1, "total_pnl": -19.58, "stop_losses": 27, "by_strat": {"세력감지": {"n": 11, "wins": 3, "pnl": -3.76, "sl": 2}, "굿모닝": {"n": 24, "wins": 7, "pnl": -9.0, "sl": 8}, "골든10분v1": {"n": 24, "wins": 10, "pnl": -3.12, "sl": 10}, "골든10분v2": {"n": 24, "wins": 10, "pnl": -3.7, "sl": 7}}, "by_exit": {"force_sell": {"n": 23, "pnl": 30.01}, "retracement_3": {"n": 13, "pnl": 32.85}, "stop_loss": {"n": 27, "pnl": -95.87}, "trailing_stop": {"n": 5, "pnl": 24.68}, "retracement_1": {"n": 15, "pnl": -11.25}}}, {"name": "NR1+NO_SB", "desc": "되돌림1 제거 + 2차매수 제거", "total": 83, "wins": 40, "win_rate": 48.2, "total_pnl": -21.13, "stop_losses": 14, "by_strat": {"세력감지": {"n": 11, "wins": 4, "pnl": -4.58, "sl": 3}, "굿모닝": {"n": 24, "wins": 10, "pnl": -6.61, "sl": 0}, "골든10분v1": {"n": 24, "wins": 12, "pnl": -0.65, "sl": 11}, "골든10분v2": {"n": 24, "wins": 14, "pnl": -9.29, "sl": 0}}, "by_exit": {"force_sell": {"n": 50, "pnl": -66.39}, "retracement_3": {"n": 13, "pnl": 51.75}, "stop_loss": {"n": 14, "pnl": -43.53}, "trailing_stop": {"n": 6, "pnl": 37.04}}}, {"name": "FO_SL_NONE", "desc": "1차매수 손절 비활성화", "total": 83, "wins": 30, "win_rate": 36.1, "total_pnl": -21.87, "stop_losses": 25, "by_strat": {"세력감지": {"n": 11, "wins": 3, "pnl": -3.76, "sl": 2}, "굿모닝": {"n": 24, "wins": 7, "pnl": -9.0, "sl": 8}, "골든10분v1": {"n": 24, "wins": 10, "pnl": -5.41, "sl": 8}, "골든10분v2": {"n": 24, "wins": 10, "pnl": -3.7, "sl": 7}}, "by_exit": {"force_sell": {"n": 25, "pnl": 17.09}, "retracement_3": {"n": 13, "pnl": 32.85}, "stop_loss": {"n": 25, "pnl": -85.24}, "trailing_stop": {"n": 5, "pnl": 24.68}, "retracement_1": {"n": 15, "pnl": -11.25}}}, {"name": "CURRENT", "desc": "현행 전략", "total": 83, "wins": 29, "win_rate": 34.9, "total_pnl": -25.61, "stop_losses": 29, "by_strat": {"세력감지": {"n": 11, "wins": 3, "pnl": -3.76, "sl": 2}, "굿모닝": {"n": 24, "wins": 7, "pnl": -9.0, "sl": 8}, "골든10분v1": {"n": 24, "wins": 9, "pnl": -9.15, "sl": 12}, "골든10분v2": {"n": 24, "wins": 10, "pnl": -3.7, "sl": 7}}, "by_exit": {"force_sell": {"n": 22, "pnl": 32.63}, "retracement_3": {"n": 13, "pnl": 32.85}, "stop_loss": {"n": 29, "pnl": -98.95}, "trailing_stop": {"n": 4, "pnl": 19.11}, "retracement_1": {"n": 15, "pnl": -11.25}}}, {"name": "TRAIL_5pct", "desc": "트레일링 트리거 7%→5%", "total": 83, "wins": 31, "win_rate": 37.3, "total_pnl": -30.32, "stop_losses": 28, "by_strat": {"세력감지": {"n": 11, "wins": 3, "pnl": -3.76, "sl": 2}, "굿모닝": {"n": 24, "wins": 7, "pnl": -18.29, "sl": 8}, "골든10분v1": {"n": 24, "wins": 9, "pnl": -9.39, "sl": 12}, "골든10분v2": {"n": 24, "wins": 12, "pnl": 1.12, "sl": 6}}, "by_exit": {"force_sell": {"n": 20, "pnl": 25.81}, "retracement_3": {"n": 9, "pnl": 20.98}, "stop_loss": {"n": 28, "pnl": -94.93}, "trailing_stop": {"n": 11, "pnl": 29.07}, "retracement_1": {"n": 15, "pnl": -11.25}}}], "insights": {"retracement_1": {"count": 15, "sum_pnl": -11.25, "trades": [{"date": "2026-02-06", "name": "야스", "strat": "세력감지", "result": -2.01, "day_close": 0.7, "day_high": 8.54}, {"date": "2026-02-09", "name": "한신공영", "strat": "세력감지", "result": 0.0, "day_close": -1.56, "day_high": 3.5}, {"date": "2026-02-09", "name": "코아시아", "strat": "골든10분v1", "result": -0.16, "day_close": 3.15, "day_high": 3.15}, {"date": "2026-02-09", "name": "코아시아", "strat": "골든10분v2", "result": -0.16, "day_close": 3.15, "day_high": 3.15}, {"date": "2026-02-09", "name": "와이제이링크", "strat": "굿모닝", "result": -0.1, "day_close": -0.51, "day_high": 6.46}, {"date": "2026-02-09", "name": "자람테크놀로지", "strat": "골든10분v1", "result": 0.0, "day_close": 1.0, "day_high": 3.34}, {"date": "2026-02-09", "name": "자람테크놀로지", "strat": "골든10분v2", "result": 0.0, "day_close": 1.0, "day_high": 3.34}, {"date": "2026-02-10", "name": "뉴로핏", "strat": "굿모닝", "result": -2.76, "day_close": -5.68, "day_high": 3.07}, {"date": "2026-02-11", "name": "서남", "strat": "굿모닝", "result": -0.15, "day_close": 12.57, "day_high": 19.15}, {"date": "2026-02-11", "name": "오르비텍", "strat": "굿모닝", "result": -2.86, "day_close": -0.36, "day_high": 3.04}, {"date": "2026-02-11", "name": "코스텍시스", "strat": "세력감지", "result": -0.38, "day_close": -0.32, "day_high": 2.05}, {"date": "2026-02-11", "name": "라이콤", "strat": "세력감지", "result": 0.0, "day_close": 1.0, "day_high": 2.99}, {"date": "2026-02-12", "name": "", "strat": "굿모닝", "result": -0.69, "day_close": -17.62, "day_high": 3.45}, {"date": "2026-02-12", "name": "", "strat": "골든10분v2", "result": -1.98, "day_close": -2.62, "day_high": 0.06}, {"date": "2026-02-13", "name": "", "strat": "굿모닝", "result": 0.0, "day_close": 0.0, "day_high": 4.87}]}, "second_buy": {"total": 31, "sum_pnl": -79.45, "sl_count": 21, "no_sb_total": 52, "no_sb_pnl": 53.84}, "stop_loss_regret": [{"date": "2026-02-05", "name": "에코바이오", "strat": "골든10분v1", "result": -1.39, "day_close": -9.15, "day_high": 5.87, "second_buy": true, "exit_time": "09:14"}, {"date": "2026-02-05", "name": "에코바이오", "strat": "골든10분v2", "result": -4.02, "day_close": -9.15, "day_high": 5.87, "second_buy": true, "exit_time": "09:26"}, {"date": "2026-02-09", "name": "알톤", "strat": "굿모닝", "result": -4.0, "day_close": -3.97, "day_high": 6.87, "second_buy": true, "exit_time": "11:11"}, {"date": "2026-02-10", "name": "한온시스템", "strat": "굿모닝", "result": -4.02, "day_close": 2.7, "day_high": 7.08, "second_buy": true, "exit_time": "10:30"}, {"date": "2026-02-10", "name": "감성코퍼레이션", "strat": "세력감지", "result": -3.18, "day_close": 0.0, "day_high": 4.48, "second_buy": true, "exit_time": "14:30"}, {"date": "2026-02-11", "name": "서남", "strat": "골든10분v1", "result": -3.11, "day_close": 10.79, "day_high": 17.27, "second_buy": false, "exit_time": "09:07"}, {"date": "2026-02-11", "name": "서남", "strat": "골든10분v2", "result": -4.0, "day_close": 10.79, "day_high": 17.27, "second_buy": true, "exit_time": "09:07"}, {"date": "2026-02-11", "name": "오르비텍", "strat": "골든10분v1", "result": -1.72, "day_close": 6.3, "day_high": 9.92, "second_buy": true, "exit_time": "09:16"}, {"date": "2026-02-11", "name": "샤페론", "strat": "골든10분v1", "result": -3.14, "day_close": -4.37, "day_high": 3.44, "second_buy": false, "exit_time": "12:05"}, {"date": "2026-02-11", "name": "샤페론", "strat": "골든10분v2", "result": -4.03, "day_close": -4.37, "day_high": 3.44, "second_buy": true, "exit_time": "14:16"}, {"date": "2026-02-12", "name": "", "strat": "골든10분v1", "result": -3.11, "day_close": -6.25, "day_high": 3.12, "second_buy": false, "exit_time": "09:06"}, {"date": "2026-02-13", "name": "", "strat": "굿모닝", "result": -4.01, "day_close": -6.29, "day_high": 4.37, "second_buy": true, "exit_time": "10:19"}, {"date": "2026-02-13", "name": "", "strat": "골든10분v1", "result": -3.11, "day_close": 0.0, "day_high": 9.24, "second_buy": false, "exit_time": "10:53"}, {"date": "2026-02-13", "name": "", "strat": "굿모닝", "result": -4.01, "day_close": -1.55, "day_high": 4.4, "second_buy": true, "exit_time": "10:55"}], "trailing": {"current_count": 4, "current_pnl": 19.11, "high_runners": [{"date": "2026-02-05", "name": "링크솔루션", "strat": "굿모닝", "result": 3.97, "day_high": 7.8, "exit_type": "retracement_3"}, {"date": "2026-02-06", "name": "신라섬유", "strat": "골든10분v1", "result": 5.4, "day_high": 10.97, "exit_type": "trailing_stop"}, {"date": "2026-02-06", "name": "신라섬유", "strat": "골든10분v2", "result": 5.4, "day_high": 10.97, "exit_type": "trailing_stop"}, {"date": "2026-02-06", "name": "양지사", "strat": "골든10분v1", "result": 4.12, "day_high": 12.49, "exit_type": "retracement_3"}, {"date": "2026-02-06", "name": "양지사", "strat": "골든10분v2", "result": 4.12, "day_high": 12.49, "exit_type": "retracement_3"}, {"date": "2026-02-06", "name": "야스", "strat": "세력감지", "result": -2.01, "day_high": 8.54, "exit_type": "retracement_1"}, {"date": "2026-02-09", "name": "", "strat": "골든10분v1", "result": 2.59, "day_high": 16.41, "exit_type": "retracement_3"}, {"date": "2026-02-09", "name": "", "strat": "골든10분v2", "result": 2.59, "day_high": 16.41, "exit_type": "retracement_3"}, {"date": "2026-02-09", "name": "엔에프씨", "strat": "굿모닝", "result": 5.72, "day_high": 10.51, "exit_type": "trailing_stop"}, {"date": "2026-02-10", "name": "나인테크", "strat": "골든10분v1", "result": 1.1, "day_high": 9.6, "exit_type": "retracement_3"}, {"date": "2026-02-10", "name": "나인테크", "strat": "골든10분v2", "result": 3.29, "day_high": 9.6, "exit_type": "retracement_3"}, {"date": "2026-02-10", "name": "한온시스템", "strat": "굿모닝", "result": -4.02, "day_high": 7.08, "exit_type": "stop_loss"}, {"date": "2026-02-11", "name": "서남", "strat": "골든10분v1", "result": -3.11, "day_high": 17.27, "exit_type": "stop_loss"}, {"date": "2026-02-11", "name": "서남", "strat": "골든10분v2", "result": -4.0, "day_high": 17.27, "exit_type": "stop_loss"}, {"date": "2026-02-11", "name": "서남", "strat": "굿모닝", "result": -0.15, "day_high": 19.15, "exit_type": "retracement_1"}, {"date": "2026-02-11", "name": "오르비텍", "strat": "골든10분v1", "result": -1.72, "day_high": 9.92, "exit_type": "stop_loss"}, {"date": "2026-02-11", "name": "오르비텍", "strat": "골든10분v2", "result": 4.39, "day_high": 9.92, "exit_type": "retracement_3"}, {"date": "2026-02-11", "name": "LG전자", "strat": "굿모닝", "result": 7.66, "day_high": 8.33, "exit_type": "force_sell"}, {"date": "2026-02-13", "name": "", "strat": "굿모닝", "result": 4.88, "day_high": 12.13, "exit_type": "retracement_3"}, {"date": "2026-02-13", "name": "", "strat": "골든10분v1", "result": -3.11, "day_high": 9.24, "exit_type": "stop_loss"}, {"date": "2026-02-13", "name": "", "strat": "골든10분v2", "result": -0.82, "day_high": 9.24, "exit_type": "retracement_3"}]}, "time_buckets": {"14:00": {"n": 6, "wins": 2, "pnl": -0.48}, "14:30": {"n": 7, "wins": 4, "pnl": 6.12}, "09:00": {"n": 32, "wins": 11, "pnl": -19.62}, "10:30": {"n": 9, "wins": 1, "pnl": -17.15}, "10:00": {"n": 5, "wins": 2, "pnl": -0.47}, "09:30": {"n": 3, "wins": 0, "pnl": -7.28}, "11:00": {"n": 6, "wins": 3, "pnl": 5.35}, "11:30": {"n": 1, "wins": 1, "pnl": 5.72}, "12:00": {"n": 8, "wins": 4, "pnl": 9.48}, "13:00": {"n": 1, "wins": 1, "pnl": 1.63}, "13:30": {"n": 4, "wins": 0, "pnl": -8.91}, "15:00": {"n": 1, "wins": 0, "pnl": 0.0}}, "exit_types": {"force_sell": {"n": 22, "pnl": 32.63}, "retracement_3": {"n": 13, "pnl": 32.85}, "stop_loss": {"n": 29, "pnl": -98.95}, "trailing_stop": {"n": 4, "pnl": 19.11}, "retracement_1": {"n": 15, "pnl": -11.25}}, "force_sell": {"count": 22, "wins": 15, "sum_pnl": 32.63}}};
+const D = REPORT_DATA;
+const V = D.variants;
+const I = D.insights;
+
+const pctCls = v => v > 0 ? 'pct-pos' : v < 0 ? 'pct-neg' : 'pct-zero';
+const pctFmt = v => (v > 0 ? '+' : '') + v.toFixed(2) + '%';
+const baseline = V.find(v => v.name === 'CURRENT');
+const best = V[0];
+
+// ===== INSIGHT CARDS =====
+document.getElementById('insight-cards').innerHTML = `
+<div class="insight-card insight-good">
+  <div class="text-sm text-slate-400">최적 조합 수익률</div>
+  <div class="text-3xl font-bold ${pctCls(best.total_pnl)}">${pctFmt(best.total_pnl)}</div>
+  <div class="text-sm text-slate-400 mt-1">${best.name} | WR ${best.win_rate}%</div>
+</div>
+<div class="insight-card insight-bad">
+  <div class="text-sm text-slate-400">현행 대비 개선</div>
+  <div class="text-3xl font-bold pct-pos">${pctFmt(best.total_pnl - baseline.total_pnl)}</div>
+  <div class="text-sm text-slate-400 mt-1">현행 ${pctFmt(baseline.total_pnl)} → ${pctFmt(best.total_pnl)}</div>
+</div>
+<div class="insight-card insight-warn">
+  <div class="text-sm text-slate-400">승률 변화</div>
+  <div class="text-3xl font-bold pct-pos">${baseline.win_rate}% → ${best.win_rate}%</div>
+  <div class="text-sm text-slate-400 mt-1">+${(best.win_rate - baseline.win_rate).toFixed(1)}pp | 손절 ${baseline.stop_losses}→${best.stop_losses}</div>
+</div>`;
+
+// ===== ROOT CAUSE CARDS =====
+const rc = document.getElementById('root-cause');
+rc.innerHTML = `
+<div class="insight-card insight-bad">
+  <div class="text-sm font-semibold text-red-400 mb-2">TP1 되돌림 규칙</div>
+  <div class="text-2xl font-bold pct-neg">${pctFmt(I.retracement_1.sum_pnl)}</div>
+  <div class="text-xs text-slate-400 mt-1">${I.retracement_1.count}건 | TP1 달성→평단가 복귀 시 전량매도<br>대부분 이후 재상승하여 손실 확대</div>
+</div>
+<div class="insight-card insight-bad">
+  <div class="text-sm font-semibold text-red-400 mb-2">2차매수 후 손절</div>
+  <div class="text-2xl font-bold pct-neg">${pctFmt(I.second_buy.sum_pnl)}</div>
+  <div class="text-xs text-slate-400 mt-1">${I.second_buy.total}건 중 ${I.second_buy.sl_count}건(${Math.round(I.second_buy.sl_count/I.second_buy.total*100)}%) 손절<br>after_second SL -2.1% 너무 빡빡</div>
+</div>
+<div class="insight-card insight-good">
+  <div class="text-sm font-semibold text-green-400 mb-2">강제청산 (보유 끝)</div>
+  <div class="text-2xl font-bold pct-pos">${pctFmt(I.force_sell.sum_pnl)}</div>
+  <div class="text-xs text-slate-400 mt-1">${I.force_sell.count}건 | WR ${Math.round(I.force_sell.wins/I.force_sell.count*100)}%<br>규칙에 안 걸린 종목은 대부분 승리</div>
+</div>`;
+
+// ===== RANKING TABLE =====
+const tbody = document.querySelector('#ranking-table tbody');
+const maxAbs = Math.max(...V.map(v => Math.abs(v.total_pnl)));
+V.forEach((v, i) => {
+  const isBl = v.name === 'CURRENT';
+  const rowCls = isBl ? 'baseline' : i === 0 ? 'rank-gold' : i === 1 ? 'rank-silver' : i === 2 ? 'rank-bronze' : '';
+  const barW = Math.abs(v.total_pnl) / maxAbs * 100;
+  const barColor = v.total_pnl >= 0 ? '#22c55e' : '#ef4444';
+  const delta = v.total_pnl - baseline.total_pnl;
+  tbody.innerHTML += `<tr class="${rowCls}">
+    <td class="font-bold">${isBl ? '★' : i + 1}</td>
+    <td class="font-mono text-xs">${v.name}</td>
+    <td class="text-xs text-slate-400">${v.desc}</td>
+    <td class="text-right">${v.total}</td>
+    <td class="text-right">${v.win_rate}%</td>
+    <td class="text-right font-bold ${pctCls(v.total_pnl)}">${pctFmt(v.total_pnl)}</td>
+    <td class="text-right">${v.stop_losses}</td>
+    <td style="min-width:150px">
+      <div class="flex items-center gap-1">
+        ${v.total_pnl < 0 ? `<div class="bar" style="width:${barW}%;background:${barColor}30;color:${barColor};justify-content:flex-end">${v.total_pnl.toFixed(1)}</div>` : ''}
+        ${v.total_pnl >= 0 ? `<div class="bar" style="width:${barW}%;background:${barColor}30;color:${barColor}">${'+'+v.total_pnl.toFixed(1)}</div>` : ''}
+      </div>
+    </td>
+  </tr>`;
+});
+
+// ===== BAR CHART =====
+const barDiv = document.getElementById('bar-chart');
+const sorted = [...V].sort((a,b) => b.total_pnl - a.total_pnl);
+sorted.forEach(v => {
+  const isBl = v.name === 'CURRENT';
+  const barW = Math.abs(v.total_pnl) / maxAbs * 80;
+  const isPos = v.total_pnl >= 0;
+  const color = isPos ? '#22c55e' : '#ef4444';
+  const bgColor = isBl ? '#ef444440' : isPos ? '#22c55e20' : '#ef444420';
+  barDiv.innerHTML += `
+  <div class="flex items-center gap-2 mb-1 ${isBl ? 'ring-1 ring-red-500 rounded px-1' : ''}">
+    <div class="text-xs font-mono w-36 text-right text-slate-400 shrink-0">${v.name}</div>
+    <div class="flex-1 flex items-center" style="direction:${isPos?'ltr':'rtl'}">
+      <div class="bar" style="width:${Math.max(barW,1)}%;background:${bgColor};color:${color}">${pctFmt(v.total_pnl)}</div>
+    </div>
+  </div>`;
+});
+
+// ===== RETRACEMENT_1 TABLE =====
+const ret1Body = document.querySelector('#ret1-table tbody');
+let ret1TotalResult = 0, ret1TotalClose = 0;
+I.retracement_1.trades.forEach(t => {
+  const gap = t.day_high - t.result;
+  ret1TotalResult += t.result;
+  ret1TotalClose += t.day_close;
+  ret1Body.innerHTML += `<tr>
+    <td>${t.date}</td><td>${t.name}</td><td class="text-xs">${t.strat}</td>
+    <td class="text-right ${pctCls(t.result)}">${pctFmt(t.result)}</td>
+    <td class="text-right ${pctCls(t.day_close)}">${pctFmt(t.day_close)}</td>
+    <td class="text-right pct-pos">${pctFmt(t.day_high)}</td>
+    <td class="text-right pct-neg">${pctFmt(gap)}</td>
+  </tr>`;
+});
+ret1Body.innerHTML += `<tr class="font-bold" style="border-top:2px solid #475569">
+  <td colspan="3">합계 (${I.retracement_1.count}건)</td>
+  <td class="text-right ${pctCls(ret1TotalResult)}">${pctFmt(ret1TotalResult)}</td>
+  <td class="text-right ${pctCls(ret1TotalClose)}">${pctFmt(ret1TotalClose)}</td>
+  <td colspan="2" class="text-right text-slate-400">종가보유 시 ${pctFmt(ret1TotalClose - ret1TotalResult)} 개선</td>
+</tr>`;
+
+// ===== SECOND BUY ANALYSIS =====
+const sbDiv = document.getElementById('sb-analysis');
+const sb = I.second_buy;
+sbDiv.innerHTML = `
+<div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+  <div class="text-sm text-red-400 font-semibold">2차매수 발동</div>
+  <div class="text-2xl font-bold pct-neg mt-1">${pctFmt(sb.sum_pnl)}</div>
+  <div class="text-xs text-slate-400 mt-1">${sb.total}건 | ${sb.sl_count}건 손절 (${Math.round(sb.sl_count/sb.total*100)}%)</div>
+</div>
+<div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+  <div class="text-sm text-green-400 font-semibold">2차매수 미발동</div>
+  <div class="text-2xl font-bold pct-pos mt-1">${pctFmt(sb.no_sb_pnl)}</div>
+  <div class="text-xs text-slate-400 mt-1">${sb.no_sb_total}건 | 2차매수 없이 1차만으로 수익</div>
+</div>`;
+
+// SL Regret for 2nd buy
+const regrets = I.stop_loss_regret.filter(t => t.second_buy);
+if (regrets.length > 0) {
+  let html = '<p class="text-sm text-slate-400 mb-2">2차매수 후 손절 → 당일최고 +3% 이상 (손절 후회)</p>';
+  html += '<div class="overflow-x-auto"><table><thead><tr><th>날짜</th><th>종목</th><th>전략</th><th class="text-right">손절</th><th class="text-right">종가</th><th class="text-right">최고</th><th>시간</th></tr></thead><tbody>';
+  regrets.forEach(t => {
+    html += `<tr>
+      <td>${t.date}</td><td>${t.name}</td><td class="text-xs">${t.strat}</td>
+      <td class="text-right pct-neg">${pctFmt(t.result)}</td>
+      <td class="text-right ${pctCls(t.day_close)}">${pctFmt(t.day_close)}</td>
+      <td class="text-right pct-pos">${pctFmt(t.day_high)}</td>
+      <td class="text-xs">${t.exit_time}</td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  document.getElementById('sb-regret-section').innerHTML = html;
+}
+
+// ===== TRAILING TABLE =====
+const trailBody = document.querySelector('#trail-table tbody');
+I.trailing.high_runners.sort((a,b) => b.day_high - a.day_high);
+I.trailing.high_runners.forEach(t => {
+  const missed = t.day_high - t.result;
+  const exitColor = t.exit_type === 'trailing_stop' ? 'text-green-400' : t.exit_type === 'stop_loss' ? 'text-red-400' : 'text-slate-400';
+  trailBody.innerHTML += `<tr>
+    <td>${t.date}</td><td>${t.name}</td><td class="text-xs">${t.strat}</td>
+    <td class="text-right ${pctCls(t.result)}">${pctFmt(t.result)}</td>
+    <td class="text-right pct-pos">${pctFmt(t.day_high)}</td>
+    <td class="text-xs ${exitColor}">${t.exit_type}</td>
+    <td class="text-right ${pctCls(missed)}">${pctFmt(missed)}</td>
+  </tr>`;
+});
+
+// ===== TIME HEATMAP =====
+const timeDiv = document.getElementById('time-heatmap');
+const buckets = Object.entries(I.time_buckets).sort((a,b) => a[0].localeCompare(b[0]));
+buckets.forEach(([b, s]) => {
+  const wr = s.n > 0 ? Math.round(s.wins / s.n * 100) : 0;
+  const avg = s.n > 0 ? s.pnl / s.n : 0;
+  const bgIntensity = Math.min(Math.abs(avg) * 30, 100);
+  const bg = avg >= 0 ? `rgba(34,197,94,${bgIntensity/100*0.3})` : `rgba(239,68,68,${bgIntensity/100*0.3})`;
+  timeDiv.innerHTML += `
+  <div class="rounded-lg p-3 text-center" style="background:${bg};border:1px solid ${avg>=0?'#22c55e':'#ef4444'}30">
+    <div class="text-xs text-slate-400">${b}</div>
+    <div class="text-lg font-bold ${pctCls(avg)}">${pctFmt(avg)}</div>
+    <div class="text-xs text-slate-400">${s.n}건 | WR ${wr}%</div>
+  </div>`;
+});
+
+// ===== EXIT TYPE CHART =====
+const exitDiv = document.getElementById('exit-chart');
+const exits = Object.entries(I.exit_types).sort((a,b) => b[1].pnl - a[1].pnl);
+const exitMax = Math.max(...exits.map(([_,s]) => Math.abs(s.pnl)));
+exits.forEach(([et, s]) => {
+  const barW = Math.abs(s.pnl) / exitMax * 80;
+  const color = s.pnl >= 0 ? '#22c55e' : '#ef4444';
+  const avg = s.n > 0 ? s.pnl / s.n : 0;
+  exitDiv.innerHTML += `
+  <div class="flex items-center gap-2 mb-2">
+    <div class="text-xs w-32 text-right text-slate-400 shrink-0">${et}</div>
+    <div class="bar" style="width:${Math.max(barW,2)}%;background:${color}20;color:${color}">${s.n}건 | ${pctFmt(s.pnl)} (avg ${pctFmt(avg)})</div>
+  </div>`;
+});
+
+// ===== RECOMMENDATION =====
+const recDiv = document.getElementById('recommendation');
+const topCombo = V[0];
+recDiv.innerHTML = `
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+  <h3 class="text-white font-semibold mb-3">최적 조합: ${topCombo.name}</h3>
+  <table class="text-sm">
+    <tr><td class="text-slate-400 pr-4">수익률</td><td class="font-bold ${pctCls(topCombo.total_pnl)}">${pctFmt(topCombo.total_pnl)}</td></tr>
+    <tr><td class="text-slate-400 pr-4">승률</td><td>${topCombo.win_rate}% (현행 ${baseline.win_rate}%)</td></tr>
+    <tr><td class="text-slate-400 pr-4">거래수</td><td>${topCombo.total}건</td></tr>
+    <tr><td class="text-slate-400 pr-4">손절수</td><td>${topCombo.stop_losses}건 (현행 ${baseline.stop_losses}건)</td></tr>
+  </table>
+</div>
+<div>
+  <h3 class="text-white font-semibold mb-3">strategy.json 변경사항</h3>
+  <div class="space-y-2 text-sm">
+    <div class="bg-slate-800 rounded p-3">
+      <div class="text-yellow-400 font-mono text-xs">retracement_rules</div>
+      <div class="text-slate-400 mt-1"><code class="text-red-400 line-through">"1": 0.0</code> → <code class="text-green-400">삭제</code></div>
+      <div class="text-xs text-slate-500 mt-1">TP1 후 되돌림 매도 비활성화 → 재상승 포착</div>
+    </div>
+    <div class="bg-slate-800 rounded p-3">
+      <div class="text-yellow-400 font-mono text-xs">stop_loss.after_second</div>
+      <div class="text-slate-400 mt-1"><code class="text-red-400 line-through">-0.021</code> → <code class="text-green-400">-0.04</code></div>
+      <div class="text-xs text-slate-500 mt-1">2차매수 후 손절 여유 확대 → V자 회복 포착</div>
+    </div>
+    <div class="bg-slate-800 rounded p-3">
+      <div class="text-yellow-400 font-mono text-xs">trailing.trigger_profit / trailing_drop</div>
+      <div class="text-slate-400 mt-1"><code class="text-red-400 line-through">0.07 / -0.025</code> → <code class="text-green-400">0.10 / -0.03</code></div>
+      <div class="text-xs text-slate-500 mt-1">트레일링 여유 확대 → 대형 상승 종목 수익 극대화</div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="mt-4 p-3 bg-slate-800 rounded-lg text-sm text-slate-400">
+  <strong class="text-white">주의:</strong> 이 분석은 2026-02-04~13 (8영업일) 83건 기반. 더 긴 기간 데이터로 검증 필요. 마이크로 튜닝은 이전 매크로 개선안(A~D)과 독립적으로 적용 가능.
+</div>`;
+</script>
+</body>
+</html>
