@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>매매 전략 개선 분석 보고서 | 2026-02-13</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { colors: {
+    bg: '#f8f9fb', card: '#ffffff', card2: '#f1f3f7', border: '#e2e5ed',
+    accent: '#2563eb', profit: '#16a34a', loss: '#dc2626', warn: '#d97706', muted: '#6b7280',
+  }}}
+}
+</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+  body { font-family: 'Inter', sans-serif; }
+  code, .mono { font-family: 'JetBrains Mono', monospace; }
+  .report-card { transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .report-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+  .candle-row { font-size: 11px; line-height: 1.6; }
+  .candle-row:hover { background: #f1f5f9; }
+  .event-buy { background: #dbeafe; border-left: 3px solid #2563eb; }
+  .event-sell { background: #dcfce7; border-left: 3px solid #16a34a; }
+  .event-stop { background: #fee2e2; border-left: 3px solid #dc2626; }
+  .event-trail { background: #fef3c7; border-left: 3px solid #d97706; }
+  .section-toggle { cursor: pointer; user-select: none; }
+  .section-toggle .chevron { transition: transform 0.2s; }
+  .section-toggle.open .chevron { transform: rotate(90deg); }
+  .collapsible { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+  .collapsible.open { max-height: 5000px; }
+  table { border-collapse: collapse; }
+  th { position: sticky; top: 0; background: #f1f3f7; z-index: 1; }
+</style>
+</head>
+<body class="bg-bg text-gray-700 min-h-screen">
+
+<main class="max-w-6xl mx-auto px-4 py-8">
+
+<!-- Header -->
+<div class="mb-8">
+  <a href="/" class="text-accent text-sm hover:underline">&larr; 매매 전략 대시보드</a>
+  <h1 class="text-2xl font-bold text-gray-900 mt-2">매매 전략 개선 분석 보고서</h1>
+  <p class="text-muted text-sm mt-1">2026-02-06 ~ 02-13 실거래 14건 &middot; 1분봉 데이터 기반 분석</p>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+  <div class="bg-card border border-border rounded-xl p-4 text-center">
+    <div class="text-2xl font-bold text-gray-900 mono">14</div>
+    <div class="text-xs text-muted">총 거래</div>
+  </div>
+  <div class="bg-card border border-border rounded-xl p-4 text-center">
+    <div class="text-2xl font-bold text-accent mono">57%</div>
+    <div class="text-xs text-muted">승률 (8W / 6L)</div>
+  </div>
+  <div class="bg-card border border-border rounded-xl p-4 text-center">
+    <div class="text-2xl font-bold text-loss mono">-3.65%</div>
+    <div class="text-xs text-muted">누적 수익률</div>
+  </div>
+  <div class="bg-card border border-border rounded-xl p-4 text-center">
+    <div class="text-2xl font-bold text-warn mono">40%</div>
+    <div class="text-xs text-muted">평균 고가 캡처 효율</div>
+  </div>
+</div>
+
+<!-- Performance Table -->
+<div class="bg-card border border-border rounded-xl p-5 mb-8 overflow-x-auto">
+  <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">전체 거래 성과</h2>
+  <table class="w-full text-xs">
+    <thead>
+      <tr class="text-left text-muted border-b border-border">
+        <th class="py-2 px-2">날짜</th>
+        <th class="py-2 px-2">종목</th>
+        <th class="py-2 px-2">전략</th>
+        <th class="py-2 px-2 text-right">매수가</th>
+        <th class="py-2 px-2 text-right">청산가</th>
+        <th class="py-2 px-2 text-right">결과</th>
+        <th class="py-2 px-2">청산유형</th>
+        <th class="py-2 px-2 text-right">당일고가</th>
+        <th class="py-2 px-2 text-right">종가대비</th>
+        <th class="py-2 px-2 text-right">보유</th>
+      </tr>
+    </thead>
+    <tbody class="mono" id="trades-table">
+    </tbody>
+  </table>
+</div>
+
+<!-- Pattern Analysis -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+  <!-- Stop Loss Analysis -->
+  <div class="bg-card border border-border rounded-xl p-5 report-card">
+    <h2 class="text-sm font-semibold text-loss uppercase tracking-wider mb-4">
+      <span class="inline-block w-2 h-2 rounded-full bg-loss mr-2"></span>
+      조기 손절 후 반등 패턴
+    </h2>
+    <p class="text-xs text-muted mb-3">손절 종목 중 당일 고가가 매수가를 초과한 경우</p>
+    <div class="space-y-3" id="stop-loss-patterns">
+    </div>
+  </div>
+
+  <!-- Retracement Effectiveness -->
+  <div class="bg-card border border-border rounded-xl p-5 report-card">
+    <h2 class="text-sm font-semibold text-profit uppercase tracking-wider mb-4">
+      <span class="inline-block w-2 h-2 rounded-full bg-profit mr-2"></span>
+      되돌림 매도 효과
+    </h2>
+    <p class="text-xs text-muted mb-3">되돌림 매도 시점 vs 종가 비교 (6건 중 5건 성공)</p>
+    <div class="space-y-3" id="retracement-patterns">
+    </div>
+  </div>
+
+  <!-- Afternoon Entries -->
+  <div class="bg-card border border-border rounded-xl p-5 report-card">
+    <h2 class="text-sm font-semibold text-warn uppercase tracking-wider mb-4">
+      <span class="inline-block w-2 h-2 rounded-full bg-warn mr-2"></span>
+      오후 진입 성과 (13:00 이후)
+    </h2>
+    <p class="text-xs text-muted mb-3">세력감지 오후 진입 4건 평균 +0.09% &mdash; 비효율</p>
+    <div class="space-y-3" id="afternoon-patterns">
+    </div>
+  </div>
+
+  <!-- V1 vs V2 -->
+  <div class="bg-card border border-border rounded-xl p-5 report-card">
+    <h2 class="text-sm font-semibold text-accent uppercase tracking-wider mb-4">
+      <span class="inline-block w-2 h-2 rounded-full bg-accent mr-2"></span>
+      전략 비교: v1 vs v2
+    </h2>
+    <p class="text-xs text-muted mb-3">동일 종목(에스피소프트) 2026-02-12 동시 진입</p>
+    <div class="grid grid-cols-2 gap-4 mt-4">
+      <div class="bg-red-50 rounded-lg p-3 text-center">
+        <div class="text-xs text-muted mb-1">v1 (손절형)</div>
+        <div class="text-xl font-bold text-loss mono">-3.13%</div>
+        <div class="text-[10px] text-muted mt-1">1분 보유 &rarr; stop_loss</div>
+      </div>
+      <div class="bg-green-50 rounded-lg p-3 text-center">
+        <div class="text-xs text-muted mb-1">v2 (추매형)</div>
+        <div class="text-xl font-bold text-profit mono">-0.16%</div>
+        <div class="text-[10px] text-muted mt-1">3분 보유 &rarr; retracement_3</div>
+      </div>
+    </div>
+    <div class="text-center mt-3">
+      <span class="text-xs bg-blue-50 text-accent px-3 py-1 rounded-full">v2가 +2.97%p 우위</span>
+    </div>
+    <p class="text-[11px] text-muted mt-3">v1은 -3.1% 손절에 1분 변동성으로 즉시 발동. v2는 추매 후 TP3까지 달성하여 초기 급락을 버텨냄.</p>
+  </div>
+
+</div>
+
+<!-- Holding Time vs Return -->
+<div class="bg-card border border-border rounded-xl p-5 mb-8">
+  <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">보유시간 vs 수익률</h2>
+  <div class="relative h-64" id="scatter-chart">
+    <canvas id="holdingChart" class="w-full h-full"></canvas>
+  </div>
+</div>
+
+<!-- Capture Efficiency -->
+<div class="bg-card border border-border rounded-xl p-5 mb-8">
+  <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">고가 캡처 효율 (수익 종목)</h2>
+  <div class="space-y-3" id="capture-bars">
+  </div>
+</div>
+
+<!-- Detailed 1-Min Analysis (Collapsible) -->
+<div class="bg-card border border-border rounded-xl p-5 mb-8">
+  <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">종목별 1분봉 상세 분석</h2>
+  <p class="text-xs text-muted mb-4">각 종목 클릭 시 진입 2시간 전 ~ 청산 2시간 후 1분봉 데이터 표시</p>
+  <div class="space-y-2" id="detailed-sections">
+  </div>
+</div>
+
+<!-- Improvement Proposals -->
+<div class="bg-card border border-border rounded-xl p-5 mb-8">
+  <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">전략 개선 제안</h2>
+  <div class="space-y-4">
+
+    <div class="bg-red-50 rounded-lg p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-loss bg-red-100 px-2 py-0.5 rounded">HIGH</span>
+        <h3 class="text-sm font-semibold text-gray-900">v1 손절 기준 완화</h3>
+      </div>
+      <p class="text-xs text-gray-600">현재 <code class="bg-red-100 px-1 rounded">-3.1%</code> &rarr; 제안 <code class="bg-green-100 px-1 rounded">-4.5%</code> 이상</p>
+      <p class="text-[11px] text-muted mt-1">서남(-3.48% 손절 후 +18.12% 상승)처럼 1분 변동성에 쉽게 걸림. 기회비용 합계 21.59%p.</p>
+    </div>
+
+    <div class="bg-orange-50 rounded-lg p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-warn bg-orange-100 px-2 py-0.5 rounded">MED</span>
+        <h3 class="text-sm font-semibold text-gray-900">오후 세력감지 진입 제한</h3>
+      </div>
+      <p class="text-xs text-gray-600">13:30 이후 진입 차단 또는 14:00 이후 max_amount 50% 축소</p>
+      <p class="text-[11px] text-muted mt-1">오후 4건 평균 +0.09%, 고가 캡처 효율 38%. 장마감 강제청산 리스크.</p>
+    </div>
+
+    <div class="bg-yellow-50 rounded-lg p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-warn bg-yellow-100 px-2 py-0.5 rounded">MED</span>
+        <h3 class="text-sm font-semibold text-gray-900">트레일링 스탑 조정</h3>
+      </div>
+      <p class="text-xs text-gray-600">trigger_profit <code class="bg-yellow-100 px-1 rounded">10%</code> &rarr; <code class="bg-green-100 px-1 rounded">5%</code> 또는 trailing_drop <code class="bg-yellow-100 px-1 rounded">-2%</code> &rarr; <code class="bg-green-100 px-1 rounded">-3%</code></p>
+      <p class="text-[11px] text-muted mt-1">야스: 당일 최대 +8.64% 중 +1.22%만 캡처(14% 효율). 트레일링이 너무 일찍 발동.</p>
+    </div>
+
+    <div class="bg-blue-50 rounded-lg p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold text-accent bg-blue-100 px-2 py-0.5 rounded">LOW</span>
+        <h3 class="text-sm font-semibold text-gray-900">v2 중심 운영 전환</h3>
+      </div>
+      <p class="text-xs text-gray-600">v1:v2 비중 <code class="bg-blue-100 px-1 rounded">50:50</code> &rarr; <code class="bg-green-100 px-1 rounded">30:70</code> 또는 v1 폐지</p>
+      <p class="text-[11px] text-muted mt-1">에스피소프트: v1=-3.13% vs v2=-0.16%. 추매 전략이 초기 급락 버팀목 역할.</p>
+    </div>
+
+  </div>
+</div>
+
+<footer class="text-center text-muted text-xs mt-8 pt-4 border-t border-border">
+  분석 기준: 2026-02-06 ~ 02-13 실거래 14건 &middot; 키움 API ka10080 1분봉 데이터 &middot; 생성일: 2026-02-13
+</footer>
+
+</main>
+
+<script>
+// === DATA ===
+const trades = [
+  { date: '02-06', name: '누리플랜', code: '069140', strategy: '굿모닝', buy: 3220, exit: 2805, result: -12.89, type: 'stop_loss', dayHigh: 2.33, dayClose: -4.97, minutes: 7 },
+  { date: '02-06', name: '야스', code: '255440', strategy: '세력감지', buy: 11460, exit: 11600, result: 1.22, type: 'trailing_stop', dayHigh: 8.64, dayClose: 0.79, minutes: 19 },
+  { date: '02-09', name: '자람테크놀로지', code: '389020', strategy: '세력감지', buy: 44200, exit: 45250, result: 2.38, type: 'trailing_stop', dayHigh: 4.98, dayClose: 2.60, minutes: 111 },
+  { date: '02-09', name: '한신공영', code: '004960', strategy: '세력감지', buy: 12840, exit: 13080, result: 1.87, type: 'retracement_1', dayHigh: 3.58, dayClose: -1.48, minutes: 14 },
+  { date: '02-10', name: '나인테크', code: '267320', strategy: '골든10분', buy: 3650, exit: 3785, result: 3.70, type: 'retracement_2', dayHigh: 9.45, dayClose: 3.29, minutes: 9 },
+  { date: '02-10', name: '한국앤컴퍼니', code: '000240', strategy: '세력감지', buy: 30850, exit: 31200, result: 1.13, type: 'force_sell', dayHigh: 2.43, dayClose: 1.13, minutes: 135 },
+  { date: '02-10', name: '감성코퍼레이션', code: '036620', strategy: '세력감지', buy: 7400, exit: 7310, result: -1.22, type: 'retracement_1', dayHigh: 4.05, dayClose: -0.41, minutes: 44 },
+  { date: '02-11', name: '서남', code: '294630', strategy: '골든10분', buy: 3450, exit: 3330, result: -3.48, type: 'stop_loss', dayHigh: 18.12, dayClose: 11.59, minutes: 1 },
+  { date: '02-11', name: '코스텍시스', code: '355150', strategy: '세력감지', buy: 15610, exit: 15550, result: -0.38, type: 'force_sell', dayHigh: 1.99, dayClose: -0.38, minutes: 37 },
+  { date: '02-11', name: '라이콤', code: '388790', strategy: '세력감지', buy: 3015, exit: 3040, result: 0.83, type: 'force_sell', dayHigh: 2.82, dayClose: 0.83, minutes: 19 },
+  { date: '02-12', name: '진바이오텍', code: '086060', strategy: '굿모닝', buy: 5700, exit: 5880, result: 3.16, type: 'retracement_1', dayHigh: 5.09, dayClose: -16.32, minutes: 1 },
+  { date: '02-12', name: '에스피소프트', code: '443670', strategy: '골든10분v1', buy: 6070, exit: 5880, result: -3.13, type: 'stop_loss', dayHigh: 3.29, dayClose: -6.10, minutes: 1 },
+  { date: '02-12', name: '에스피소프트', code: '443670', strategy: '골든10분v2', buy: 6070, exit: 6060, result: -0.16, type: 'retracement_3', dayHigh: 3.29, dayClose: -6.10, minutes: 3 },
+  { date: '02-13', name: '유양디앤유', code: '011690', strategy: '굿모닝', buy: 6910, exit: 7140, result: 3.33, type: 'retracement_1', dayHigh: 6.22, dayClose: 2.60, minutes: 37 },
+];
+
+const stopLossPatterns = [
+  { name: '서남', date: '02-11', result: -3.48, dayHigh: 18.12, cost: 21.59 },
+  { name: '누리플랜', date: '02-06', result: -12.89, dayHigh: 2.33, cost: 15.22 },
+  { name: '야스', date: '02-06', result: 1.22, dayHigh: 8.64, cost: 7.42 },
+  { name: '에스피소프트', date: '02-12', result: -3.13, dayHigh: 3.29, cost: 6.43 },
+];
+
+const retracementPatterns = [
+  { name: '진바이오텍', date: '02-12', result: 3.16, close: -16.32, saved: 19.47, ok: true },
+  { name: '에스피소프트(v2)', date: '02-12', result: -0.16, close: -6.10, saved: 5.93, ok: true },
+  { name: '한신공영', date: '02-09', result: 1.87, close: -1.48, saved: 3.35, ok: true },
+  { name: '유양디앤유', date: '02-13', result: 3.33, close: 2.60, saved: 0.72, ok: true },
+  { name: '나인테크', date: '02-10', result: 3.70, close: 3.29, saved: 0.41, ok: true },
+  { name: '감성코퍼레이션', date: '02-10', result: -1.22, close: -0.41, saved: -0.81, ok: false },
+];
+
+const afternoonEntries = [
+  { name: '한국앤컴퍼니', date: '02-10', time: '13:15', result: 1.13, type: 'force_sell', minutes: 135 },
+  { name: '감성코퍼레이션', date: '02-10', time: '14:26', result: -1.22, type: 'retracement_1', minutes: 44 },
+  { name: '코스텍시스', date: '02-11', time: '14:53', result: -0.38, type: 'force_sell', minutes: 37 },
+  { name: '라이콤', date: '02-11', time: '15:11', result: 0.83, type: 'force_sell', minutes: 19 },
+];
+
+const captureData = [
+  { name: '진바이오텍', result: 3.16, dayHigh: 5.09, eff: 62 },
+  { name: '유양디앤유', result: 3.33, dayHigh: 6.22, eff: 53 },
+  { name: '한신공영', result: 1.87, dayHigh: 3.58, eff: 52 },
+  { name: '자람테크놀로지', result: 2.38, dayHigh: 4.98, eff: 48 },
+  { name: '한국앤컴퍼니', result: 1.13, dayHigh: 2.43, eff: 47 },
+  { name: '나인테크', result: 3.70, dayHigh: 9.45, eff: 39 },
+  { name: '라이콤', result: 0.83, dayHigh: 2.82, eff: 29 },
+  { name: '야스', result: 1.22, dayHigh: 8.64, eff: 14 },
+];
+
+// Detailed 1-min candle analysis data
+const detailedStocks = [
+  { code: '069140', name: '누리플랜', date: '02-06', strategy: '굿모닝', buyPrice: 3220, holdMin: 7,
+    summary: '09:01 매수 직후 초고속 익절(TP1~TP2) 성공했으나 09:03~08 급락으로 추매+손절 연쇄. 청산 후 10:23에 3,140원까지 회복(+11.9%). 초반 변동성이 극심한 종목.' },
+  { code: '255440', name: '야스', date: '02-06', strategy: '세력감지', buyPrice: 11460, holdMin: 19,
+    summary: '진입 전 2시간간 +12.13% 급등 추세. 매수 직후 -4.01%까지 하락 후 추매, 반등하여 TP1~3 달성. 트레일링 스탑 발동 시점(11,600) 이후에도 12,000원(+4.71%)까지 상승. 14% 캡처 효율로 가장 낮음.' },
+  { code: '389020', name: '자람테크놀로지', date: '02-09', strategy: '세력감지', buyPrice: 44200, holdMin: 111,
+    summary: '111분 최장 보유. 진입 후 완만한 상승세 지속, 12:53 트레일링 스탑 발동(+2.38%). 장중 고가 46,400원(+4.98%) 대비 48% 캡처. 안정적 수익 실현.' },
+  { code: '004960', name: '한신공영', date: '02-09', strategy: '세력감지', buyPrice: 12840, holdMin: 14,
+    summary: 'TP1(13,160) 달성 후 되돌림(13,080)으로 청산(+1.87%). 종가 12,650원(-1.48%)이므로 되돌림이 3.35%p 손실 회피. 적절한 타이밍.' },
+  { code: '267320', name: '나인테크', date: '02-10', strategy: '골든10분', buyPrice: 3650, holdMin: 9,
+    summary: '매수 1분 후 추매(3,680), TP1~2 달성 후 되돌림 청산(+3.70%). 당일 고가 3,995원(+9.45%) 대비 39% 캡처. 오전 골든타임 잘 활용한 케이스.' },
+  { code: '000240', name: '한국앤컴퍼니', date: '02-10', strategy: '세력감지', buyPrice: 30850, holdMin: 135,
+    summary: '13:15 오후 진입, 고가 31,600원(+2.43%)에 미치지 못한 채 장마감 강제청산(+1.13%). 135분 보유해서 겨우 +1.13% — 자본 효율 낮음.' },
+  { code: '036620', name: '감성코퍼레이션', date: '02-10', strategy: '세력감지', buyPrice: 7400, holdMin: 44,
+    summary: '14:26 오후 진입. 매수 4분 후 7,120원까지 급락(-3.78%), 추매 후 장마감 직전 TP1~2 달성했으나 되돌림 청산(-1.22%). 유일한 되돌림 실패 케이스.' },
+  { code: '294630', name: '서남', date: '02-11', strategy: '골든10분', buyPrice: 3450, holdMin: 1,
+    summary: '가장 큰 기회비용. 09:06 매수 → 09:07 손절(-3.48%). 이후 11:15까지 4,075원(+18.12%) 폭등. v1 손절(-3.1%)이 1분 변동성에 발동된 최악의 사례. 2시간 후 +17.57% 상승 중.' },
+  { code: '355150', name: '코스텍시스', date: '02-11', strategy: '세력감지', buyPrice: 15610, holdMin: 37,
+    summary: '14:53 진입, 고가 15,920원(+1.99%)에 미달. 15:08에 15,540원까지 하락 후 장마감 강제청산(-0.38%). TP1(+1.4%) 근접했으나 미달.' },
+  { code: '388790', name: '라이콤', date: '02-11', strategy: '세력감지', buyPrice: 3015, holdMin: 19,
+    summary: '15:11 진입 — 장마감 19분 전. 최고 3,070원(+1.82%)에서 TP1(+1.3%) 근접. 결국 장마감 강제청산(+0.83%). 진입 시간 자체가 너무 늦음.' },
+  { code: '086060', name: '진바이오텍', date: '02-12', strategy: '굿모닝', buyPrice: 5700, holdMin: 1,
+    summary: '최고의 되돌림 청산. 1분만에 TP1 달성 후 되돌림(+3.16%). 이후 종가 4,770원(-16.32%)까지 폭락. 19.47%p 손실 회피 — 되돌림 전략의 가치 증명.' },
+  { code: '443670', name: '에스피소프트(v1)', date: '02-12', strategy: '골든10분v1', buyPrice: 6070, holdMin: 1,
+    summary: 'v2와 동일 시점 진입. v1은 1분만에 -3.13% 손절. 이후 09:11에 6,270원(+3.29%)까지 반등. v2가 추매로 버틴 것과 대조적.' },
+  { code: '443670', name: '에스피소프트(v2)', date: '02-12', strategy: '골든10분v2', buyPrice: 6070, holdMin: 3,
+    summary: 'v1과 동일 시점 진입이나 -2.9% 하락 시 추매 실행. 추매 후 TP1~3 달성, retracement_3으로 청산(-0.16%). v1 대비 +2.97%p 우위. 추매 전략 유효성 입증.' },
+  { code: '011690', name: '유양디앤유', date: '02-13', strategy: '굿모닝', buyPrice: 6910, holdMin: 37,
+    summary: '시가 6,090원에서 개장 급등, 09:11 매수. 37분 보유 중 -3.04%까지 하락했으나 버텨서 TP1(7,150, +3.47%) 달성 후 되돌림(+3.33%). 청산 후 10:36에 7,340원(+6.22%)까지 추가 상승. 53% 캡처 효율.' },
+];
+
+
+// === RENDER FUNCTIONS ===
+
+function fmtPct(v) {
+  const sign = v >= 0 ? '+' : '';
+  return sign + v.toFixed(2) + '%';
+}
+
+function fmtPrice(v) {
+  return v.toLocaleString();
+}
+
+function resultColor(v) {
+  return v >= 0 ? 'text-profit' : 'text-loss';
+}
+
+function typeLabel(t) {
+  const map = {
+    stop_loss: ['손절', 'bg-red-100 text-loss'],
+    trailing_stop: ['트레일링', 'bg-yellow-100 text-warn'],
+    force_sell: ['강제청산', 'bg-gray-100 text-muted'],
+    retracement_1: ['되돌림1', 'bg-green-100 text-profit'],
+    retracement_2: ['되돌림2', 'bg-green-100 text-profit'],
+    retracement_3: ['되돌림3', 'bg-green-100 text-profit'],
+    take_profit_1: ['익절1', 'bg-blue-100 text-accent'],
+  };
+  const [label, cls] = map[t] || [t, 'bg-gray-100 text-muted'];
+  return `<span class="text-[10px] px-1.5 py-0.5 rounded ${cls}">${label}</span>`;
+}
+
+function stratColor(s) {
+  const map = {
+    '굿모닝': 'bg-green-100 text-green-600',
+    '세력감지': 'bg-orange-100 text-orange-600',
+    '골든10분': 'bg-blue-100 text-blue-600',
+    '골든10분v1': 'bg-blue-100 text-blue-600',
+    '골든10분v2': 'bg-purple-100 text-purple-600',
+  };
+  return map[s] || 'bg-gray-100 text-muted';
+}
+
+// Trades table
+const tbody = document.getElementById('trades-table');
+trades.forEach(t => {
+  const row = document.createElement('tr');
+  row.className = 'border-b border-gray-100 hover:bg-gray-50';
+  row.innerHTML = `
+    <td class="py-2 px-2 text-muted">${t.date}</td>
+    <td class="py-2 px-2 font-medium text-gray-900">${t.name}</td>
+    <td class="py-2 px-2"><span class="text-[10px] px-1.5 py-0.5 rounded ${stratColor(t.strategy)}">${t.strategy}</span></td>
+    <td class="py-2 px-2 text-right">${fmtPrice(t.buy)}</td>
+    <td class="py-2 px-2 text-right">${fmtPrice(t.exit)}</td>
+    <td class="py-2 px-2 text-right font-semibold ${resultColor(t.result)}">${fmtPct(t.result)}</td>
+    <td class="py-2 px-2">${typeLabel(t.type)}</td>
+    <td class="py-2 px-2 text-right text-muted">${fmtPct(t.dayHigh)}</td>
+    <td class="py-2 px-2 text-right ${resultColor(t.dayClose)}">${fmtPct(t.dayClose)}</td>
+    <td class="py-2 px-2 text-right text-muted">${t.minutes}m</td>
+  `;
+  tbody.appendChild(row);
+});
+
+// Stop loss patterns
+const slDiv = document.getElementById('stop-loss-patterns');
+stopLossPatterns.forEach(p => {
+  slDiv.innerHTML += `
+    <div class="bg-red-50 rounded-lg p-3">
+      <div class="flex justify-between items-center">
+        <span class="text-xs font-medium text-gray-900">${p.name} <span class="text-muted">${p.date}</span></span>
+        <span class="mono text-xs font-bold text-loss">${fmtPct(p.result)}</span>
+      </div>
+      <div class="flex items-center gap-2 mt-1.5">
+        <div class="flex-1 h-1.5 bg-red-200 rounded-full relative">
+          <div class="absolute h-1.5 bg-profit rounded-full" style="width:${Math.min(100, p.dayHigh / (p.dayHigh + Math.abs(p.result)) * 100)}%"></div>
+        </div>
+        <span class="text-[10px] text-profit mono">${fmtPct(p.dayHigh)}</span>
+      </div>
+      <div class="text-[10px] text-muted mt-1">기회비용: <span class="font-semibold text-loss">${p.cost.toFixed(2)}%p</span></div>
+    </div>
+  `;
+});
+
+// Retracement patterns
+const rtDiv = document.getElementById('retracement-patterns');
+retracementPatterns.forEach(p => {
+  const cls = p.ok ? 'bg-green-50' : 'bg-red-50';
+  const badge = p.ok ? '<span class="text-[10px] bg-green-200 text-profit px-1 rounded">OK</span>' : '<span class="text-[10px] bg-red-200 text-loss px-1 rounded">X</span>';
+  rtDiv.innerHTML += `
+    <div class="${cls} rounded-lg p-3">
+      <div class="flex justify-between items-center">
+        <span class="text-xs font-medium text-gray-900">${p.name} <span class="text-muted">${p.date}</span> ${badge}</span>
+      </div>
+      <div class="flex justify-between mt-1.5 text-[10px] mono">
+        <span>되돌림: <span class="${resultColor(p.result)} font-semibold">${fmtPct(p.result)}</span></span>
+        <span>종가: <span class="${resultColor(p.close)} font-semibold">${fmtPct(p.close)}</span></span>
+        <span class="${p.ok ? 'text-profit' : 'text-loss'} font-semibold">${p.ok ? '회피' : '손실'}: ${Math.abs(p.saved).toFixed(2)}%p</span>
+      </div>
+    </div>
+  `;
+});
+
+// Afternoon entries
+const afDiv = document.getElementById('afternoon-patterns');
+afternoonEntries.forEach(p => {
+  afDiv.innerHTML += `
+    <div class="bg-orange-50 rounded-lg p-3">
+      <div class="flex justify-between items-center">
+        <span class="text-xs font-medium text-gray-900">${p.name} <span class="text-muted">${p.date}</span></span>
+        <span class="mono text-xs font-bold ${resultColor(p.result)}">${fmtPct(p.result)}</span>
+      </div>
+      <div class="text-[10px] text-muted mt-1">${p.time} 진입 &rarr; ${p.minutes}분 보유 &rarr; ${typeLabel(p.type)}</div>
+    </div>
+  `;
+});
+
+// Capture efficiency bars
+const capDiv = document.getElementById('capture-bars');
+captureData.forEach(c => {
+  const barW = c.eff;
+  const color = c.eff >= 50 ? 'bg-profit' : c.eff >= 30 ? 'bg-warn' : 'bg-loss';
+  capDiv.innerHTML += `
+    <div class="flex items-center gap-3">
+      <span class="text-xs w-28 text-right text-gray-900 font-medium truncate">${c.name}</span>
+      <div class="flex-1 h-5 bg-gray-100 rounded-full relative overflow-hidden">
+        <div class="${color} h-full rounded-full flex items-center justify-end pr-2" style="width:${barW}%">
+          <span class="text-[10px] text-white font-bold">${c.eff}%</span>
+        </div>
+      </div>
+      <span class="text-[10px] mono text-muted w-24">${fmtPct(c.result)} / ${fmtPct(c.dayHigh)}</span>
+    </div>
+  `;
+});
+
+// Detailed sections (collapsible)
+const detDiv = document.getElementById('detailed-sections');
+detailedStocks.forEach((s, i) => {
+  const resultPct = trades.find(t => t.code === s.code && t.strategy === s.strategy)?.result || 0;
+  detDiv.innerHTML += `
+    <div class="border border-border rounded-lg overflow-hidden">
+      <div class="section-toggle flex items-center gap-3 p-3 bg-card2 hover:bg-gray-100" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+        <svg class="chevron w-4 h-4 text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        <span class="text-xs font-medium text-gray-900">${s.code} ${s.name}</span>
+        <span class="text-[10px] px-1.5 py-0.5 rounded ${stratColor(s.strategy)}">${s.strategy}</span>
+        <span class="text-[10px] text-muted">${s.date}</span>
+        <span class="text-xs mono font-semibold ml-auto ${resultColor(resultPct)}">${fmtPct(resultPct)}</span>
+        <span class="text-[10px] text-muted">${s.holdMin}m</span>
+      </div>
+      <div class="collapsible">
+        <div class="p-4 text-xs text-gray-600 leading-relaxed bg-white">
+          <p class="mb-2">${s.summary}</p>
+          <div class="flex gap-4 text-[10px] text-muted mono">
+            <span>매수: ${fmtPrice(s.buyPrice)}원</span>
+            <span>보유: ${s.holdMin}분</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+});
+
+// Scatter chart (holding time vs return) — simple canvas
+const canvas = document.getElementById('holdingChart');
+if (canvas) {
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+
+  const w = canvas.width;
+  const h = canvas.height;
+  const pad = { top: 20, right: 20, bottom: 30, left: 50 };
+  const pw = w - pad.left - pad.right;
+  const ph = h - pad.top - pad.bottom;
+
+  const maxMin = 140;
+  const minPct = -15;
+  const maxPct = 5;
+
+  ctx.strokeStyle = '#e2e5ed';
+  ctx.lineWidth = 1;
+
+  // Grid
+  for (let y = minPct; y <= maxPct; y += 5) {
+    const py = pad.top + ph - (y - minPct) / (maxPct - minPct) * ph;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, py);
+    ctx.lineTo(w - pad.right, py);
+    ctx.stroke();
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '10px JetBrains Mono';
+    ctx.textAlign = 'right';
+    ctx.fillText(y + '%', pad.left - 5, py + 3);
+  }
+
+  // Zero line
+  const zeroY = pad.top + ph - (0 - minPct) / (maxPct - minPct) * ph;
+  ctx.strokeStyle = '#9ca3af';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, zeroY);
+  ctx.lineTo(w - pad.right, zeroY);
+  ctx.stroke();
+
+  // X axis labels
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '10px JetBrains Mono';
+  ctx.textAlign = 'center';
+  for (let x = 0; x <= maxMin; x += 30) {
+    const px = pad.left + x / maxMin * pw;
+    ctx.fillText(x + 'm', px, h - 5);
+  }
+
+  // Plot points
+  trades.forEach(t => {
+    const px = pad.left + Math.min(t.minutes, maxMin) / maxMin * pw;
+    const py = pad.top + ph - (Math.max(minPct, Math.min(maxPct, t.result)) - minPct) / (maxPct - minPct) * ph;
+
+    const color = t.result >= 0 ? '#16a34a' : '#dc2626';
+    ctx.beginPath();
+    ctx.arc(px, py, 5, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Label
+    ctx.fillStyle = '#374151';
+    ctx.font = '9px Inter';
+    ctx.textAlign = 'left';
+    ctx.fillText(t.name.substring(0, 5), px + 8, py + 3);
+  });
+}
+</script>
+
+</body>
+</html>
