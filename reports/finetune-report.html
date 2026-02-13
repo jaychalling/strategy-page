@@ -28,7 +28,7 @@ tailwind.config = {
   th { text-align: left; font-size: 11px; text-transform: uppercase; color: #6b7280; padding: 8px; border-bottom: 2px solid #e2e5ed; }
   td { padding: 8px; border-bottom: 1px solid #f3f4f6; font-size: 13px; }
   tr:hover td { background: #f9fafb; }
-  .sparkline-canvas { width: 100%; height: 60px; }
+  .sparkline-wrap { position: relative; height: 60px; }
 </style>
 </head>
 <body class="bg-bg min-h-screen">
@@ -210,7 +210,7 @@ function renderSensitivity() {
         <span class="text-xs font-medium">${PARAM_LABELS[param] || param}</span>
         <span class="tag ${deltaClass}">d=${s.delta > 0 ? '+' : ''}${s.delta.toFixed(2)}</span>
       </div>
-      <canvas id="chart-${param}" class="sparkline-canvas"></canvas>
+      <div style="position:relative;height:60px"><canvas id="chart-${param}"></canvas></div>
       <div class="flex justify-between text-xs text-muted mt-1">
         <span>base: ${PARAM_FMT(param, s.base_val)}</span>
         <span>best: ${PARAM_FMT(param, s.best_val)} (${s.best_pnl.toFixed(1)}%)</span>
