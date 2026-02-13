@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>전면 백테스트 보고서 | 2026-02-04~13</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{accent:'#3b82f6',win:'#22c55e',lose:'#ef4444',warn:'#f59e0b'}}}}</script>
+<style>
+body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2e8f0}
+.card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155}
+.card-sm{background:#1e293b;border-radius:8px;padding:12px;border:1px solid #334155}
+table{width:100%;border-collapse:collapse}
+th{background:#334155;padding:8px 10px;text-align:left;font-size:13px;font-weight:600;color:#94a3b8}
+td{padding:7px 10px;border-bottom:1px solid #334155;font-size:13px}
+tr:hover td{background:#334155}
+.badge{display:inline-block;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600}
+.badge-win{background:#22c55e20;color:#22c55e}
+.badge-lose{background:#ef444420;color:#ef4444}
+.badge-neutral{background:#3b82f620;color:#3b82f6}
+.tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:11px}
+.collapsible{cursor:pointer;user-select:none}
+.collapsible-content{display:none}
+.collapsible.active+.collapsible-content{display:block}
+.heatmap-cell{text-align:center;font-weight:600;font-size:12px;padding:6px 4px!important}
+.pct-pos{color:#22c55e}.pct-neg{color:#ef4444}.pct-zero{color:#94a3b8}
+</style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+<div class="max-w-7xl mx-auto">
+
+<!-- Header -->
+<div class="mb-8">
+<div class="flex items-center gap-3 mb-2">
+<a href="/" class="text-sm text-accent hover:underline">&larr; 대시보드</a>
+<span class="text-slate-600">|</span>
+<a href="/reports/260213" class="text-sm text-accent hover:underline">02-13 분석</a>
+</div>
+<h1 class="text-2xl md:text-3xl font-bold text-white">전면 백테스트 보고서</h1>
+<p class="text-slate-400 mt-1">2026-02-04 ~ 02-13 | 현재 strategy.json 기준 | 69 신호 → 83 시뮬레이션</p>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6" id="summary-cards"></div>
+
+<!-- Strategy Performance -->
+<div class="grid md:grid-cols-2 gap-4 mb-6">
+<div class="card">
+<h2 class="text-lg font-bold text-white mb-3">전략별 성과</h2>
+<table><thead><tr><th>전략</th><th>건수</th><th>승률</th><th>평균</th><th>누적</th></tr></thead>
+<tbody id="strat-table"></tbody></table>
+</div>
+<div class="card">
+<h2 class="text-lg font-bold text-white mb-3">청산유형별 분석</h2>
+<table><thead><tr><th>유형</th><th>건수</th><th>평균 수익률</th><th>비율</th></tr></thead>
+<tbody id="exit-table"></tbody></table>
+<div class="mt-3 p-3 bg-slate-800 rounded-lg">
+<p class="text-xs text-slate-400"><strong class="text-amber-400">핵심 발견:</strong> 손절(stop_loss)이 29건으로 전체 손실의 주 원인. 그러나 이 중 8건은 당일 고가가 +5% 이상으로, 너무 이른 손절이 수익 기회를 놓침.</p>
+</div>
+</div>
+</div>
+
+<!-- Time Heatmap -->
+<div class="card mb-6">
+<h2 class="text-lg font-bold text-white mb-3">시간대별 성과 히트맵</h2>
+<p class="text-xs text-slate-400 mb-3">조건식별 시간대 수익률. 굿모닝은 현재 09:00-09:15로 제한, 확장 검토 중.</p>
+<div class="overflow-x-auto">
+<table>
+<thead><tr><th>조건식</th><th class="text-center">09:00-09:15</th><th class="text-center">09:15-09:30</th><th class="text-center">09:30-10:00</th><th class="text-center">10:00-11:00</th><th class="text-center">11:00-13:00</th><th class="text-center">13:00+</th></tr></thead>
+<tbody id="time-heatmap"></tbody>
+</table>
+</div>
+</div>
+
+<!-- Stop Loss Regret -->
+<div class="card mb-6">
+<h2 class="text-lg font-bold text-white mb-3">손절 후회 분석 <span class="badge badge-lose">조기 손절 8건</span></h2>
+<p class="text-xs text-slate-400 mb-3">손절 실행 후 당일 고가가 매수가 대비 +5% 이상 올라간 종목. 손절이 아니었으면 수익이었을 가능성.</p>
+<table>
+<thead><tr><th>일자</th><th>시간</th><th>종목</th><th>전략</th><th>손절 결과</th><th>당일 고가</th><th>놓친 수익</th></tr></thead>
+<tbody id="regret-table"></tbody>
+</table>
+</div>
+
+<!-- Improvement Proposals -->
+<div class="card mb-6">
+<h2 class="text-lg font-bold text-white mb-4">개선안</h2>
+<div class="grid md:grid-cols-2 gap-4">
+
+<div class="card-sm border-amber-900">
+<div class="flex items-center gap-2 mb-2">
+<span class="badge" style="background:#f59e0b30;color:#f59e0b">P1 - 높음</span>
+<h3 class="font-bold text-white text-sm">손절 기준 완화</h3>
+</div>
+<p class="text-xs text-slate-400 mb-2">현재 v1: -3.1%, v2/굿모닝: 2차매수 후 -2.1%. 29건 손절 중 8건(28%)이 당일 고가 +5% 이상 → 조기손절.</p>
+<div class="bg-slate-800 rounded p-2 text-xs">
+<p class="text-slate-300"><strong>현재:</strong> first_only: -3.1% / after_second: -2.1%</p>
+<p class="text-emerald-400"><strong>제안:</strong> first_only: -4.0% / after_second: -3.0%</p>
+<p class="text-slate-500 mt-1">예상: 손절 8건 → 약 4건 회피, 평균 +3~5% 추가 수익 가능</p>
+</div>
+</div>
+
+<div class="card-sm border-amber-900">
+<div class="flex items-center gap-2 mb-2">
+<span class="badge" style="background:#f59e0b30;color:#f59e0b">P1 - 높음</span>
+<h3 class="font-bold text-white text-sm">굿모닝 시간대 확장</h3>
+</div>
+<p class="text-xs text-slate-400 mb-2">현재 09:00-09:15 (5건, 40% 승률, +0.34%). 10:00-11:00도 38% 승률로 유사. 11:00+ 는 +1.02%로 더 좋음.</p>
+<div class="bg-slate-800 rounded p-2 text-xs">
+<p class="text-slate-300"><strong>현재:</strong> 09:00-09:15 (5건)</p>
+<p class="text-emerald-400"><strong>제안:</strong> 09:00-11:00 또는 09:00-13:00</p>
+<p class="text-slate-500 mt-1">09:15-09:30은 0% 승률로 위험 → 09:00-09:15 + 10:00-13:00 분리 운영 검토</p>
+</div>
+</div>
+
+<div class="card-sm border-blue-900">
+<div class="flex items-center gap-2 mb-2">
+<span class="badge badge-neutral">P2 - 중간</span>
+<h3 class="font-bold text-white text-sm">골든10분 v1 폐기 또는 v2로 통합</h3>
+</div>
+<p class="text-xs text-slate-400 mb-2">v2가 v1보다 일관되게 우수 (42% vs 38%, -0.15% vs -0.38%). v1의 zone 방식 2차매수가 v2의 direct보다 타이밍 늦음.</p>
+<div class="bg-slate-800 rounded p-2 text-xs">
+<p class="text-slate-300"><strong>현재:</strong> 골든10분 → v1 + v2 동시 (금액 분할)</p>
+<p class="text-emerald-400"><strong>제안:</strong> v2 단독 운영 (전체 금액 투입)</p>
+<p class="text-slate-500 mt-1">v1의 zone 2차매수(bounce 2.2%)가 너무 보수적. v2의 direct(-2.9%)가 더 효과적</p>
+</div>
+</div>
+
+<div class="card-sm border-blue-900">
+<div class="flex items-center gap-2 mb-2">
+<span class="badge badge-neutral">P2 - 중간</span>
+<h3 class="font-bold text-white text-sm">골든10분 시간대 최적화</h3>
+</div>
+<p class="text-xs text-slate-400 mb-2">09:15-10:00이 최악 (20% 승률, -2.33%). 현재 종료 09:10이지만 실제 11:00+ 에서 50% 승률.</p>
+<div class="bg-slate-800 rounded p-2 text-xs">
+<p class="text-slate-300"><strong>현재:</strong> 09:00-09:10</p>
+<p class="text-emerald-400"><strong>제안:</strong> 09:00-09:10 유지 (현재 최적). 09:15-10:00은 진입 금지 유지</p>
+<p class="text-slate-500 mt-1">09:00-09:15 데이터가 50% 승률로 가장 안정적</p>
+</div>
+</div>
+
+<div class="card-sm border-slate-700">
+<div class="flex items-center gap-2 mb-2">
+<span class="badge" style="background:#64748b30;color:#64748b">P3 - 낮음</span>
+<h3 class="font-bold text-white text-sm">세력감지 오후 진입 제한 검증</h3>
+</div>
+<p class="text-xs text-slate-400 mb-2">이미 14:30으로 단축 적용. 11건 중 11:00+ 8건(38% 승률, +0.34%) vs 오전 3건(0% 승률). 오후가 오히려 나음.</p>
+<div class="bg-slate-800 rounded p-2 text-xs">
+<p class="text-slate-300"><strong>현재:</strong> 09:00-14:30</p>
+<p class="text-emerald-400"><strong>제안:</strong> 11:00-14:30 (오전 진입 제외)</p>
+<p class="text-slate-500 mt-1">데이터 적어 판단 유보. 추가 데이터 수집 후 재평가</p>
+</div>
+</div>
+
+<div class="card-sm border-slate-700">
+<div class="flex items-center gap-2 mb-2">
+<span class="badge" style="background:#64748b30;color:#64748b">P3 - 낮음</span>
+<h3 class="font-bold text-white text-sm">Retracement 규칙 최적화</h3>
+</div>
+<p class="text-xs text-slate-400 mb-2">retracement 28건 평균 +0.77%로 양호. TP1 후 매입가 복귀 시 전량 청산이 현재 수익의 주요 원천.</p>
+<div class="bg-slate-800 rounded p-2 text-xs">
+<p class="text-slate-300"><strong>현재:</strong> TP1 달성 후 매입가 복귀 → 전량 청산</p>
+<p class="text-emerald-400"><strong>유지:</strong> 현행 규칙이 효과적 — 변경 불필요</p>
+<p class="text-slate-500 mt-1">force_sell(22건, +1.48%)도 양호 → 청산 전략 자체는 적절</p>
+</div>
+</div>
+
+</div>
+
+<div class="mt-4 p-4 bg-slate-800 rounded-lg">
+<h3 class="font-bold text-white text-sm mb-2">개선안 요약: 예상 효과</h3>
+<p class="text-xs text-slate-400">현재 83건 평균 -0.31%, 누적 -25.61%. 손절 완화만 적용해도 8건의 조기손절 중 절반을 회피하면 약 +15~20% 개선 가능. v1→v2 통합 시 추가 +5% 개선. 전체적으로 누적 손실을 -5% 이내로 줄이거나 소폭 양전 가능.</p>
+</div>
+</div>
+
+<!-- All Trades Table -->
+<div class="card mb-6">
+<h2 class="text-lg font-bold text-white mb-3 collapsible active" onclick="this.classList.toggle('active')">
+전체 거래 목록 (83건) <span class="text-sm text-slate-400 font-normal">클릭하여 접기/펼치기</span>
+</h2>
+<div class="collapsible-content overflow-x-auto">
+<table>
+<thead><tr><th>일자</th><th>시간</th><th>코드</th><th>종목명</th><th>조건식</th><th>전략</th><th>매수가</th><th>청산가</th><th>수익률</th><th>청산유형</th><th>2차</th><th>고가%</th></tr></thead>
+<tbody id="all-trades"></tbody>
+</table>
+</div>
+</div>
+
+<!-- Skipped -->
+<div class="card mb-8">
+<h2 class="text-lg font-bold text-white mb-3 collapsible" onclick="this.classList.toggle('active')">
+스킵된 신호 (<span id="skip-count"></span>건) <span class="text-sm text-slate-400 font-normal">클릭하여 접기/펼치기</span>
+</h2>
+<div class="collapsible-content">
+<table>
+<thead><tr><th>일자</th><th>시간</th><th>코드</th><th>종목명</th><th>조건식</th><th>가격</th><th>사유</th></tr></thead>
+<tbody id="skip-table"></tbody>
+</table>
+</div>
+</div>
+
+<footer class="text-center text-slate-600 text-xs pb-8">Generated on 2026-02-13 | strategy.json 기준 시뮬레이션 (실제 체결가와 차이 있을 수 있음)</footer>
+</div>
+
+<script>
+const DATA = {"summary": {"total": 83, "wins": 29, "losses": 54, "win_rate": 34.9, "avg_pct": -0.31, "total_pnl": -25.61}, "strat_summary": [{"name": "골든10분v1", "count": 24, "wins": 9, "losses": 15, "win_rate": 37.5, "avg": -0.38, "total": -9.15}, {"name": "골든10분v2", "count": 24, "wins": 10, "losses": 14, "win_rate": 41.7, "avg": -0.15, "total": -3.7}, {"name": "굿모닝", "count": 24, "wins": 7, "losses": 17, "win_rate": 29.2, "avg": -0.38, "total": -9.0}, {"name": "세력감지", "count": 11, "wins": 3, "losses": 8, "win_rate": 27.3, "avg": -0.34, "total": -3.76}], "exit_data": [{"type": "stop_loss", "count": 29, "avg": -3.41}, {"type": "retracement", "count": 28, "avg": 0.77}, {"type": "trailing_stop", "count": 4, "avg": 4.78}, {"type": "force_sell", "count": 22, "avg": 1.48}], "time_data": {"골든10분": {"09:00-09:15": {"count": 14, "wins": 7, "losses": 7, "win_rate": 50, "avg": 0.68}, "09:15-09:30": {"count": 10, "wins": 2, "losses": 8, "win_rate": 20, "avg": -2.33}, "10:00-11:00": {"count": 4, "wins": 0, "losses": 4, "win_rate": 0, "avg": -2.25}, "11:00-13:00": {"count": 10, "wins": 6, "losses": 4, "win_rate": 60, "avg": 1.24}, "13:00+": {"count": 10, "wins": 4, "losses": 6, "win_rate": 40, "avg": -0.24}}, "굿모닝": {"09:00-09:15": {"count": 5, "wins": 2, "losses": 3, "win_rate": 40, "avg": 0.34}, "09:15-09:30": {"count": 2, "wins": 0, "losses": 2, "win_rate": 0, "avg": -3.38}, "09:30-10:00": {"count": 3, "wins": 0, "losses": 3, "win_rate": 0, "avg": -2.43}, "10:00-11:00": {"count": 8, "wins": 3, "losses": 5, "win_rate": 38, "avg": -0.35}, "11:00-13:00": {"count": 3, "wins": 1, "losses": 2, "win_rate": 33, "avg": 1.87}, "13:00+": {"count": 3, "wins": 1, "losses": 2, "win_rate": 33, "avg": 0.18}}, "세력감지": {"09:15-09:30": {"count": 1, "wins": 0, "losses": 1, "win_rate": 0, "avg": -0.68}, "10:00-11:00": {"count": 2, "wins": 0, "losses": 2, "win_rate": 0, "avg": -2.9}, "11:00-13:00": {"count": 2, "wins": 1, "losses": 1, "win_rate": 50, "avg": 1.25}, "13:00+": {"count": 6, "wins": 2, "losses": 4, "win_rate": 33, "avg": 0.04}}}, "regret": [{"date": "2026-02-11", "time": "09:06", "code": "294630", "name": "서남", "strat": "골든10분v1", "result": -3.11, "high": 17.27}, {"date": "2026-02-11", "time": "09:06", "code": "294630", "name": "서남", "strat": "골든10분v2", "result": -4.0, "high": 17.27}, {"date": "2026-02-11", "time": "09:12", "code": "046120", "name": "오르비텍", "strat": "골든10분v1", "result": -1.72, "high": 9.92}, {"date": "2026-02-13", "time": "10:42", "code": "003530", "name": "", "strat": "골든10분v1", "result": -3.11, "high": 9.24}, {"date": "2026-02-10", "time": "10:11", "code": "018880", "name": "한온시스템", "strat": "굿모닝", "result": -4.02, "high": 7.08}, {"date": "2026-02-09", "time": "10:53", "code": "123750", "name": "알톤", "strat": "굿모닝", "result": -4.0, "high": 6.87}, {"date": "2026-02-05", "time": "09:13", "code": "038870", "name": "에코바이오", "strat": "골든10분v1", "result": -1.39, "high": 5.87}, {"date": "2026-02-05", "time": "09:13", "code": "038870", "name": "에코바이오", "strat": "골든10분v2", "result": -4.02, "high": 5.87}], "all_trades": [{"date": "2026-02-04", "time": "14:10", "code": "238120", "name": "얼라인드", "cond": "세력감지", "strat": "세력감지", "result": 3.49, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 6.37, "day_close": 3.49, "buy_price": 4160, "exit_price": 4305}, {"date": "2026-02-04", "time": "14:15", "code": "388050", "name": "지투파워", "cond": "굿모닝", "strat": "굿모닝", "result": -0.63, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 6.49, "day_close": -0.63, "buy_price": 9560, "exit_price": 9500}, {"date": "2026-02-04", "time": "14:26", "code": "009070", "name": "KCTC", "cond": "굿모닝", "strat": "굿모닝", "result": 1.52, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 6.61, "day_close": 1.52, "buy_price": 7870, "exit_price": 7990}, {"date": "2026-02-04", "time": "14:26", "code": "047040", "name": "대우건설", "cond": "굿모닝", "strat": "굿모닝", "result": -0.36, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 1.96, "day_close": -0.36, "buy_price": 5610, "exit_price": 5590}, {"date": "2026-02-04", "time": "14:37", "code": "037370", "name": "EG", "cond": "골든10분", "strat": "골든10분v1", "result": 0.47, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 3.58, "day_close": 0.47, "buy_price": 6420, "exit_price": 6450}, {"date": "2026-02-04", "time": "14:37", "code": "037370", "name": "EG", "cond": "골든10분", "strat": "골든10분v2", "result": 0.47, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 3.58, "day_close": 0.47, "buy_price": 6420, "exit_price": 6450}, {"date": "2026-02-04", "time": "14:52", "code": "388050", "name": "지투파워", "cond": "골든10분", "strat": "골든10분v1", "result": -0.63, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 6.49, "day_close": -0.63, "buy_price": 9560, "exit_price": 9500}, {"date": "2026-02-04", "time": "14:52", "code": "388050", "name": "지투파워", "cond": "골든10분", "strat": "골든10분v2", "result": -0.63, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 6.49, "day_close": -0.63, "buy_price": 9560, "exit_price": 9500}, {"date": "2026-02-05", "time": "09:07", "code": "474650", "name": "링크솔루션", "cond": "굿모닝", "strat": "굿모닝", "result": 3.97, "exit_type": "retracement_3", "exit_time": "09:15", "second_buy": false, "day_high": 7.8, "day_close": -2.25, "buy_price": 75600, "exit_price": 78600}, {"date": "2026-02-05", "time": "09:13", "code": "038870", "name": "에코바이오", "cond": "골든10분", "strat": "골든10분v1", "result": -1.39, "exit_type": "stop_loss", "exit_time": "09:14", "second_buy": true, "day_high": 5.87, "day_close": -9.15, "buy_price": 3660, "exit_price": 3609}, {"date": "2026-02-05", "time": "09:13", "code": "038870", "name": "에코바이오", "cond": "골든10분", "strat": "골든10분v2", "result": -4.02, "exit_type": "stop_loss", "exit_time": "09:26", "second_buy": true, "day_high": 5.87, "day_close": -9.15, "buy_price": 3660, "exit_price": 3513}, {"date": "2026-02-05", "time": "09:18", "code": "128660", "name": "피제이메탈", "cond": "골든10분", "strat": "골든10분v1", "result": -3.13, "exit_type": "stop_loss", "exit_time": "09:38", "second_buy": false, "day_high": 0.59, "day_close": -8.55, "buy_price": 3390, "exit_price": 3284}, {"date": "2026-02-05", "time": "09:18", "code": "128660", "name": "피제이메탈", "cond": "골든10분", "strat": "골든10분v2", "result": -4.01, "exit_type": "stop_loss", "exit_time": "10:03", "second_buy": true, "day_high": 0.59, "day_close": -8.55, "buy_price": 3390, "exit_price": 3254}, {"date": "2026-02-05", "time": "09:23", "code": "382480", "name": "지아이텍", "cond": "골든10분", "strat": "골든10분v1", "result": -3.1, "exit_type": "stop_loss", "exit_time": "09:33", "second_buy": false, "day_high": 0.95, "day_close": -7.75, "buy_price": 2645, "exit_price": 2563}, {"date": "2026-02-05", "time": "09:23", "code": "382480", "name": "지아이텍", "cond": "골든10분", "strat": "골든10분v2", "result": -4.01, "exit_type": "stop_loss", "exit_time": "09:33", "second_buy": true, "day_high": 0.95, "day_close": -7.75, "buy_price": 2645, "exit_price": 2539}, {"date": "2026-02-05", "time": "09:23", "code": "382480", "name": "지아이텍", "cond": "굿모닝", "strat": "굿모닝", "result": -4.0, "exit_type": "stop_loss", "exit_time": "09:33", "second_buy": true, "day_high": 0.75, "day_close": -7.92, "buy_price": 2650, "exit_price": 2544}, {"date": "2026-02-05", "time": "09:24", "code": "002350", "name": "넥센타이어", "cond": "세력감지", "strat": "세력감지", "result": -0.68, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 3.94, "day_close": -0.68, "buy_price": 8880, "exit_price": 8820}, {"date": "2026-02-05", "time": "10:39", "code": "033640", "name": "네패스", "cond": "세력감지", "strat": "세력감지", "result": -3.8, "exit_type": "stop_loss", "exit_time": "15:00", "second_buy": true, "day_high": 1.02, "day_close": -3.71, "buy_price": 19680, "exit_price": 18933}, {"date": "2026-02-06", "time": "09:01", "code": "069140", "name": "누리플랜", "cond": "굿모닝", "strat": "굿모닝", "result": -4.03, "exit_type": "stop_loss", "exit_time": "09:04", "second_buy": true, "day_high": 2.17, "day_close": -5.12, "buy_price": 3225, "exit_price": 3095}, {"date": "2026-02-06", "time": "09:12", "code": "001000", "name": "신라섬유", "cond": "골든10분", "strat": "골든10분v1", "result": 5.4, "exit_type": "trailing_stop", "exit_time": "09:15", "second_buy": false, "day_high": 10.97, "day_close": -14.21, "buy_price": 2780, "exit_price": 2930}, {"date": "2026-02-06", "time": "09:12", "code": "001000", "name": "신라섬유", "cond": "골든10분", "strat": "골든10분v2", "result": 5.4, "exit_type": "trailing_stop", "exit_time": "09:15", "second_buy": false, "day_high": 10.97, "day_close": -14.21, "buy_price": 2780, "exit_price": 2930}, {"date": "2026-02-06", "time": "09:12", "code": "030960", "name": "양지사", "cond": "골든10분", "strat": "골든10분v1", "result": 4.12, "exit_type": "retracement_3", "exit_time": "09:19", "second_buy": false, "day_high": 12.49, "day_close": -2.06, "buy_price": 8730, "exit_price": 9090}, {"date": "2026-02-06", "time": "09:12", "code": "030960", "name": "양지사", "cond": "골든10분", "strat": "골든10분v2", "result": 4.12, "exit_type": "retracement_3", "exit_time": "09:19", "second_buy": false, "day_high": 12.49, "day_close": -2.06, "buy_price": 8730, "exit_price": 9090}, {"date": "2026-02-06", "time": "10:13", "code": "255440", "name": "야스", "cond": "세력감지", "strat": "세력감지", "result": -2.01, "exit_type": "retracement_1", "exit_time": "10:14", "second_buy": true, "day_high": 8.54, "day_close": 0.7, "buy_price": 11470, "exit_price": 11240}, {"date": "2026-02-09", "time": "09:23", "code": "451220", "name": "", "cond": "골든10분", "strat": "골든10분v1", "result": 2.59, "exit_type": "retracement_3", "exit_time": "10:18", "second_buy": false, "day_high": 16.41, "day_close": 16.41, "buy_price": 11210, "exit_price": 11500}, {"date": "2026-02-09", "time": "09:23", "code": "451220", "name": "", "cond": "골든10분", "strat": "골든10분v2", "result": 2.59, "exit_type": "retracement_3", "exit_time": "10:18", "second_buy": false, "day_high": 16.41, "day_close": 16.41, "buy_price": 11210, "exit_price": 11500}, {"date": "2026-02-09", "time": "09:59", "code": "073240", "name": "", "cond": "굿모닝", "strat": "굿모닝", "result": -0.43, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 3.75, "day_close": -0.43, "buy_price": 6940, "exit_price": 6910}, {"date": "2026-02-09", "time": "10:53", "code": "123750", "name": "알톤", "cond": "굿모닝", "strat": "굿모닝", "result": -4.0, "exit_type": "stop_loss", "exit_time": "11:11", "second_buy": true, "day_high": 6.87, "day_close": -3.97, "buy_price": 3275, "exit_price": 3144}, {"date": "2026-02-09", "time": "11:00", "code": "214420", "name": "토니모리", "cond": "골든10분", "strat": "골든10분v1", "result": 1.59, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 3.49, "day_close": 1.59, "buy_price": 9450, "exit_price": 9600}, {"date": "2026-02-09", "time": "11:00", "code": "214420", "name": "토니모리", "cond": "골든10분", "strat": "골든10분v2", "result": 1.59, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 3.49, "day_close": 1.59, "buy_price": 9450, "exit_price": 9600}, {"date": "2026-02-09", "time": "11:02", "code": "389020", "name": "자람테크놀로지", "cond": "세력감지", "strat": "세력감지", "result": 2.49, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 4.86, "day_close": 2.49, "buy_price": 44250, "exit_price": 45350}, {"date": "2026-02-09", "time": "11:20", "code": "004960", "name": "한신공영", "cond": "세력감지", "strat": "세력감지", "result": 0.0, "exit_type": "retracement_1", "exit_time": "11:52", "second_buy": false, "day_high": 3.5, "day_close": -1.56, "buy_price": 12850, "exit_price": 12850}, {"date": "2026-02-09", "time": "11:22", "code": "045970", "name": "코아시아", "cond": "골든10분", "strat": "골든10분v1", "result": -0.16, "exit_type": "retracement_1", "exit_time": "13:38", "second_buy": false, "day_high": 3.15, "day_close": 3.15, "buy_price": 6340, "exit_price": 6330}, {"date": "2026-02-09", "time": "11:22", "code": "045970", "name": "코아시아", "cond": "골든10분", "strat": "골든10분v2", "result": -0.16, "exit_type": "retracement_1", "exit_time": "13:38", "second_buy": false, "day_high": 3.15, "day_close": 3.15, "buy_price": 6340, "exit_price": 6330}, {"date": "2026-02-09", "time": "11:51", "code": "265740", "name": "엔에프씨", "cond": "굿모닝", "strat": "굿모닝", "result": 5.72, "exit_type": "trailing_stop", "exit_time": "13:19", "second_buy": false, "day_high": 10.51, "day_close": 10.51, "buy_price": 6470, "exit_price": 6840}, {"date": "2026-02-09", "time": "12:07", "code": "126700", "name": "하이비젼시스템", "cond": "골든10분", "strat": "골든10분v1", "result": 4.18, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 5.1, "day_close": 4.18, "buy_price": 18430, "exit_price": 19200}, {"date": "2026-02-09", "time": "12:07", "code": "126700", "name": "하이비젼시스템", "cond": "골든10분", "strat": "골든10분v2", "result": 4.18, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 5.1, "day_close": 4.18, "buy_price": 18430, "exit_price": 19200}, {"date": "2026-02-09", "time": "12:09", "code": "083310", "name": "엘오티베큠", "cond": "골든10분", "strat": "골든10분v1", "result": 0.61, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 1.64, "day_close": 0.61, "buy_price": 14650, "exit_price": 14740}, {"date": "2026-02-09", "time": "12:09", "code": "083310", "name": "엘오티베큠", "cond": "골든10분", "strat": "골든10분v2", "result": 0.61, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 1.64, "day_close": 0.61, "buy_price": 14650, "exit_price": 14740}, {"date": "2026-02-09", "time": "12:15", "code": "209640", "name": "와이제이링크", "cond": "굿모닝", "strat": "굿모닝", "result": -0.1, "exit_type": "retracement_1", "exit_time": "13:02", "second_buy": false, "day_high": 6.46, "day_close": -0.51, "buy_price": 4875, "exit_price": 4870}, {"date": "2026-02-09", "time": "12:16", "code": "389020", "name": "자람테크놀로지", "cond": "골든10분", "strat": "골든10분v1", "result": 0.0, "exit_type": "retracement_1", "exit_time": "12:58", "second_buy": false, "day_high": 3.34, "day_close": 1.0, "buy_price": 44900, "exit_price": 44900}, {"date": "2026-02-09", "time": "12:16", "code": "389020", "name": "자람테크놀로지", "cond": "골든10분", "strat": "골든10분v2", "result": 0.0, "exit_type": "retracement_1", "exit_time": "12:58", "second_buy": false, "day_high": 3.34, "day_close": 1.0, "buy_price": 44900, "exit_price": 44900}, {"date": "2026-02-10", "time": "09:02", "code": "267320", "name": "나인테크", "cond": "골든10분", "strat": "골든10분v1", "result": 1.1, "exit_type": "retracement_3", "exit_time": "09:12", "second_buy": true, "day_high": 9.6, "day_close": 3.43, "buy_price": 3645, "exit_price": 3685}, {"date": "2026-02-10", "time": "09:02", "code": "267320", "name": "나인테크", "cond": "골든10분", "strat": "골든10분v2", "result": 3.29, "exit_type": "retracement_3", "exit_time": "09:34", "second_buy": false, "day_high": 9.6, "day_close": 3.43, "buy_price": 3645, "exit_price": 3765}, {"date": "2026-02-10", "time": "09:23", "code": "380550", "name": "뉴로핏", "cond": "굿모닝", "strat": "굿모닝", "result": -2.76, "exit_type": "retracement_1", "exit_time": "09:35", "second_buy": true, "day_high": 3.07, "day_close": -5.68, "buy_price": 32550, "exit_price": 31650}, {"date": "2026-02-10", "time": "10:11", "code": "018880", "name": "한온시스템", "cond": "굿모닝", "strat": "굿모닝", "result": -4.02, "exit_type": "stop_loss", "exit_time": "10:30", "second_buy": true, "day_high": 7.08, "day_close": 2.7, "buy_price": 4450, "exit_price": 4271}, {"date": "2026-02-10", "time": "10:53", "code": "417200", "name": "LS머트리얼즈", "cond": "굿모닝", "strat": "굿모닝", "result": -3.99, "exit_type": "stop_loss", "exit_time": "12:45", "second_buy": true, "day_high": 0.92, "day_close": -2.93, "buy_price": 17400, "exit_price": 16705}, {"date": "2026-02-10", "time": "13:15", "code": "000240", "name": "한국앤컴퍼니", "cond": "세력감지", "strat": "세력감지", "result": 1.63, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 2.93, "day_close": 1.63, "buy_price": 30700, "exit_price": 31200}, {"date": "2026-02-10", "time": "14:26", "code": "036620", "name": "감성코퍼레이션", "cond": "세력감지", "strat": "세력감지", "result": -3.18, "exit_type": "stop_loss", "exit_time": "14:30", "second_buy": true, "day_high": 4.48, "day_close": 0.0, "buy_price": 7370, "exit_price": 7136}, {"date": "2026-02-11", "time": "09:06", "code": "294630", "name": "서남", "cond": "골든10분", "strat": "골든10분v1", "result": -3.11, "exit_type": "stop_loss", "exit_time": "09:07", "second_buy": false, "day_high": 17.27, "day_close": 10.79, "buy_price": 3475, "exit_price": 3367}, {"date": "2026-02-11", "time": "09:06", "code": "294630", "name": "서남", "cond": "골든10분", "strat": "골든10분v2", "result": -4.0, "exit_type": "stop_loss", "exit_time": "09:07", "second_buy": true, "day_high": 17.27, "day_close": 10.79, "buy_price": 3475, "exit_price": 3336}, {"date": "2026-02-11", "time": "09:12", "code": "294630", "name": "서남", "cond": "굿모닝", "strat": "굿모닝", "result": -0.15, "exit_type": "retracement_1", "exit_time": "09:14", "second_buy": false, "day_high": 19.15, "day_close": 12.57, "buy_price": 3420, "exit_price": 3415}, {"date": "2026-02-11", "time": "09:12", "code": "046120", "name": "오르비텍", "cond": "골든10분", "strat": "골든10분v1", "result": -1.72, "exit_type": "stop_loss", "exit_time": "09:16", "second_buy": true, "day_high": 9.92, "day_close": 6.3, "buy_price": 5240, "exit_price": 5150}, {"date": "2026-02-11", "time": "09:12", "code": "046120", "name": "오르비텍", "cond": "골든10분", "strat": "골든10분v2", "result": 4.39, "exit_type": "retracement_3", "exit_time": "09:35", "second_buy": false, "day_high": 9.92, "day_close": 6.3, "buy_price": 5240, "exit_price": 5470}, {"date": "2026-02-11", "time": "09:26", "code": "378800", "name": "샤페론", "cond": "골든10분", "strat": "골든10분v1", "result": -3.14, "exit_type": "stop_loss", "exit_time": "12:05", "second_buy": false, "day_high": 3.44, "day_close": -4.37, "buy_price": 2035, "exit_price": 1971}, {"date": "2026-02-11", "time": "09:26", "code": "378800", "name": "샤페론", "cond": "골든10분", "strat": "골든10분v2", "result": -4.03, "exit_type": "stop_loss", "exit_time": "14:16", "second_buy": true, "day_high": 3.44, "day_close": -4.37, "buy_price": 2035, "exit_price": 1953}, {"date": "2026-02-11", "time": "09:31", "code": "046120", "name": "오르비텍", "cond": "굿모닝", "strat": "굿모닝", "result": -2.86, "exit_type": "retracement_1", "exit_time": "09:45", "second_buy": true, "day_high": 3.04, "day_close": -0.36, "buy_price": 5590, "exit_price": 5430}, {"date": "2026-02-11", "time": "10:40", "code": "066570", "name": "LG전자", "cond": "굿모닝", "strat": "굿모닝", "result": 7.66, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 8.33, "day_close": 7.66, "buy_price": 118800, "exit_price": 127900}, {"date": "2026-02-11", "time": "13:53", "code": "419120", "name": "산돌", "cond": "골든10분", "strat": "골든10분v1", "result": -1.39, "exit_type": "stop_loss", "exit_time": "13:54", "second_buy": true, "day_high": 2.24, "day_close": -5.12, "buy_price": 4690, "exit_price": 4625}, {"date": "2026-02-11", "time": "13:53", "code": "419120", "name": "산돌", "cond": "골든10분", "strat": "골든10분v2", "result": -4.01, "exit_type": "stop_loss", "exit_time": "13:58", "second_buy": true, "day_high": 2.24, "day_close": -5.12, "buy_price": 4690, "exit_price": 4502}, {"date": "2026-02-11", "time": "14:52", "code": "355150", "name": "코스텍시스", "cond": "세력감지", "strat": "세력감지", "result": -0.38, "exit_type": "retracement_1", "exit_time": "15:08", "second_buy": false, "day_high": 2.05, "day_close": -0.32, "buy_price": 15600, "exit_price": 15540}, {"date": "2026-02-11", "time": "15:11", "code": "388790", "name": "라이콤", "cond": "세력감지", "strat": "세력감지", "result": 0.0, "exit_type": "retracement_1", "exit_time": "15:14", "second_buy": false, "day_high": 2.99, "day_close": 1.0, "buy_price": 3010, "exit_price": 3010}, {"date": "2026-02-12", "time": "09:02", "code": "086060", "name": "", "cond": "굿모닝", "strat": "굿모닝", "result": -0.69, "exit_type": "retracement_1", "exit_time": "09:06", "second_buy": false, "day_high": 3.45, "day_close": -17.62, "buy_price": 5790, "exit_price": 5750}, {"date": "2026-02-12", "time": "09:04", "code": "443670", "name": "", "cond": "골든10분", "strat": "골든10분v1", "result": -3.11, "exit_type": "stop_loss", "exit_time": "09:06", "second_buy": false, "day_high": 3.12, "day_close": -6.25, "buy_price": 6080, "exit_price": 5891}, {"date": "2026-02-12", "time": "09:04", "code": "443670", "name": "", "cond": "골든10분", "strat": "골든10분v2", "result": -0.99, "exit_type": "retracement_3", "exit_time": "09:12", "second_buy": true, "day_high": 3.12, "day_close": -6.25, "buy_price": 6080, "exit_price": 6020}, {"date": "2026-02-12", "time": "09:38", "code": "042700", "name": "", "cond": "굿모닝", "strat": "굿모닝", "result": -3.99, "exit_type": "stop_loss", "exit_time": "11:31", "second_buy": true, "day_high": 2.28, "day_close": -4.56, "buy_price": 219500, "exit_price": 210735}, {"date": "2026-02-12", "time": "10:40", "code": "091580", "name": "", "cond": "골든10분", "strat": "골든10분v1", "result": -3.1, "exit_type": "stop_loss", "exit_time": "11:10", "second_buy": false, "day_high": 0.06, "day_close": -2.62, "buy_price": 17150, "exit_price": 16618}, {"date": "2026-02-12", "time": "10:40", "code": "091580", "name": "", "cond": "골든10분", "strat": "골든10분v2", "result": -1.98, "exit_type": "retracement_1", "exit_time": "11:26", "second_buy": true, "day_high": 0.06, "day_close": -2.62, "buy_price": 17150, "exit_price": 16810}, {"date": "2026-02-12", "time": "13:31", "code": "361390", "name": "", "cond": "골든10분", "strat": "골든10분v1", "result": -2.43, "exit_type": "stop_loss", "exit_time": "13:52", "second_buy": true, "day_high": 2.78, "day_close": -8.64, "buy_price": 32400, "exit_price": 31614}, {"date": "2026-02-12", "time": "13:31", "code": "361390", "name": "", "cond": "골든10분", "strat": "골든10분v2", "result": -1.08, "exit_type": "retracement_3", "exit_time": "13:44", "second_buy": true, "day_high": 2.78, "day_close": -8.64, "buy_price": 32400, "exit_price": 32050}, {"date": "2026-02-12", "time": "14:33", "code": "160980", "name": "", "cond": "골든10분", "strat": "골든10분v1", "result": 3.41, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": true, "day_high": 6.1, "day_close": 3.41, "buy_price": 20500, "exit_price": 21200}, {"date": "2026-02-12", "time": "14:33", "code": "160980", "name": "", "cond": "골든10분", "strat": "골든10분v2", "result": 3.41, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 6.1, "day_close": 3.41, "buy_price": 20500, "exit_price": 21200}, {"date": "2026-02-13", "time": "09:11", "code": "011690", "name": "", "cond": "굿모닝", "strat": "굿모닝", "result": 2.59, "exit_type": "trailing_stop", "exit_time": "10:57", "second_buy": true, "day_high": 5.76, "day_close": 4.61, "buy_price": 6940, "exit_price": 7120}, {"date": "2026-02-13", "time": "09:24", "code": "030960", "name": "", "cond": "골든10분", "strat": "골든10분v1", "result": -3.1, "exit_type": "stop_loss", "exit_time": "11:44", "second_buy": false, "day_high": 1.93, "day_close": -2.6, "buy_price": 8830, "exit_price": 8556}, {"date": "2026-02-13", "time": "09:24", "code": "030960", "name": "", "cond": "골든10분", "strat": "골든10분v2", "result": -4.01, "exit_type": "stop_loss", "exit_time": "13:17", "second_buy": true, "day_high": 1.93, "day_close": -2.6, "buy_price": 8830, "exit_price": 8476}, {"date": "2026-02-13", "time": "10:12", "code": "047770", "name": "", "cond": "굿모닝", "strat": "굿모닝", "result": -4.01, "exit_type": "stop_loss", "exit_time": "10:19", "second_buy": true, "day_high": 4.37, "day_close": -6.29, "buy_price": 4690, "exit_price": 4502}, {"date": "2026-02-13", "time": "10:13", "code": "001200", "name": "", "cond": "굿모닝", "strat": "굿모닝", "result": 4.69, "exit_type": "retracement_3", "exit_time": "13:27", "second_buy": false, "day_high": 6.61, "day_close": 1.92, "buy_price": 4690, "exit_price": 4910}, {"date": "2026-02-13", "time": "10:28", "code": "003530", "name": "", "cond": "굿모닝", "strat": "굿모닝", "result": 4.88, "exit_type": "retracement_3", "exit_time": "13:40", "second_buy": false, "day_high": 12.13, "day_close": 2.65, "buy_price": 7170, "exit_price": 7520}, {"date": "2026-02-13", "time": "10:42", "code": "003530", "name": "", "cond": "골든10분", "strat": "골든10분v1", "result": -3.11, "exit_type": "stop_loss", "exit_time": "10:53", "second_buy": false, "day_high": 9.24, "day_close": 0.0, "buy_price": 7360, "exit_price": 7131}, {"date": "2026-02-13", "time": "10:42", "code": "003530", "name": "", "cond": "골든10분", "strat": "골든10분v2", "result": -0.82, "exit_type": "retracement_3", "exit_time": "11:58", "second_buy": true, "day_high": 9.24, "day_close": 0.0, "buy_price": 7360, "exit_price": 7300}, {"date": "2026-02-13", "time": "10:46", "code": "078020", "name": "", "cond": "굿모닝", "strat": "굿모닝", "result": -4.01, "exit_type": "stop_loss", "exit_time": "10:55", "second_buy": true, "day_high": 4.4, "day_close": -1.55, "buy_price": 7730, "exit_price": 7420}, {"date": "2026-02-13", "time": "12:24", "code": "006800", "name": "", "cond": "굿모닝", "strat": "굿모닝", "result": 0.0, "exit_type": "retracement_1", "exit_time": "14:34", "second_buy": false, "day_high": 4.87, "day_close": 0.0, "buy_price": 61600, "exit_price": 61600}, {"date": "2026-02-13", "time": "14:13", "code": "015860", "name": "", "cond": "세력감지", "strat": "세력감지", "result": -1.32, "exit_type": "force_sell", "exit_time": "15:30", "second_buy": false, "day_high": 1.56, "day_close": -1.32, "buy_price": 8340, "exit_price": 8230}], "skipped": [{"code": "389680", "name": "유디엠텍", "date": "2026-02-05", "time": "10:14", "cond": "굿모닝", "price": 1700, "reason": "price 1700 < 2000"}, {"code": "004060", "name": "SG세계물산", "date": "2026-02-05", "time": "10:32", "cond": "굿모닝", "price": 510, "reason": "price 510 < 2000"}, {"code": "001510", "name": "SK증권", "date": "2026-02-09", "time": "11:06", "cond": "굿모닝", "price": 959, "reason": "price 959 < 2000"}, {"code": "067390", "name": "아스트", "date": "2026-02-09", "time": "11:58", "cond": "골든10분", "price": 696, "reason": "price 696 < 2000"}, {"code": "067390", "name": "아스트", "date": "2026-02-09", "time": "14:31", "cond": "굿모닝", "price": 686, "reason": "price 686 < 2000"}, {"code": "016600", "name": "", "date": "2026-02-12", "time": "11:18", "cond": "굿모닝", "price": 368, "reason": "price 368 < 2000"}, {"code": "038530", "name": "", "date": "2026-02-12", "time": "13:56", "cond": "굿모닝", "price": 490, "reason": "price 490 < 2000"}, {"code": "001290", "name": "", "date": "2026-02-13", "time": "09:06", "cond": "굿모닝", "price": 795, "reason": "price 795 < 2000"}, {"code": "001290", "name": "", "date": "2026-02-13", "time": "09:12", "cond": "골든10분", "price": 827, "reason": "price 827 < 2000"}, {"code": "001510", "name": "", "date": "2026-02-13", "time": "09:25", "cond": "굿모닝", "price": 1132, "reason": "price 1132 < 2000"}]};
+
+// Summary cards
+const s = DATA.summary;
+document.getElementById('summary-cards').innerHTML = [
+{label:'총 거래',value:s.total+'건',color:'text-white'},
+{label:'승률',value:s.win_rate+'%',color:s.win_rate>50?'text-emerald-400':'text-red-400'},
+{label:'평균 수익률',value:(s.avg_pct>0?'+':'')+s.avg_pct+'%',color:s.avg_pct>0?'text-emerald-400':'text-red-400'},
+{label:'누적 손익',value:(s.total_pnl>0?'+':'')+s.total_pnl+'%',color:s.total_pnl>0?'text-emerald-400':'text-red-400'},
+{label:'승/패',value:s.wins+'W / '+s.losses+'L',color:'text-white'},
+].map(c=>`<div class="card-sm"><p class="text-xs text-slate-400">${c.label}</p><p class="text-xl font-bold ${c.color}">${c.value}</p></div>`).join('');
+
+// Strategy table
+document.getElementById('strat-table').innerHTML = DATA.strat_summary.map(s=>{
+const barW = Math.min(100, Math.abs(s.avg)*15);
+const barC = s.avg>0?'bg-emerald-500':'bg-red-500';
+return `<tr><td class="font-medium text-white">${s.name}</td><td>${s.count}</td>
+<td><span class="badge ${s.win_rate>40?'badge-win':'badge-lose'}">${s.win_rate}%</span> ${s.wins}W/${s.losses}L</td>
+<td class="${s.avg>0?'pct-pos':'pct-neg'}">${s.avg>0?'+':''}${s.avg}%</td>
+<td class="${s.total>0?'pct-pos':'pct-neg'}">${s.total>0?'+':''}${s.total}%</td></tr>`;
+}).join('');
+
+// Exit table
+const totalExits = DATA.exit_data.reduce((a,b)=>a+b.count,0);
+document.getElementById('exit-table').innerHTML = DATA.exit_data.map(e=>{
+const pct = Math.round(e.count/totalExits*100);
+return `<tr><td class="font-medium text-white">${e.type.replace('_',' ')}</td><td>${e.count}</td>
+<td class="${e.avg>0?'pct-pos':'pct-neg'}">${e.avg>0?'+':''}${e.avg}%</td>
+<td><div class="w-full bg-slate-700 rounded h-2"><div class="h-2 rounded ${e.avg>0?'bg-emerald-500':'bg-red-500'}" style="width:${pct}%"></div></div><span class="text-xs text-slate-500">${pct}%</span></td></tr>`;
+}).join('');
+
+// Time heatmap
+const timeBuckets = ['09:00-09:15','09:15-09:30','09:30-10:00','10:00-11:00','11:00-13:00','13:00+'];
+document.getElementById('time-heatmap').innerHTML = ['골든10분','굿모닝','세력감지'].map(cond=>{
+const td = DATA.time_data[cond]||{};
+return `<tr><td class="font-medium text-white">${cond}</td>${timeBuckets.map(b=>{
+const d = td[b];
+if(!d) return '<td class="heatmap-cell text-slate-600">-</td>';
+const bg = d.avg>1?'rgba(34,197,94,0.3)':d.avg>0?'rgba(34,197,94,0.15)':d.avg>-1?'rgba(239,68,68,0.15)':'rgba(239,68,68,0.3)';
+return `<td class="heatmap-cell" style="background:${bg}"><span class="${d.avg>0?'pct-pos':'pct-neg'}">${d.avg>0?'+':''}${d.avg}%</span><br><span class="text-slate-500" style="font-size:10px">${d.count}건 ${d.win_rate}%</span></td>`;
+}).join('')}</tr>`;
+}).join('');
+
+// Regret table
+document.getElementById('regret-table').innerHTML = DATA.regret.map(r=>{
+const missed = (r.high - Math.abs(r.result)).toFixed(1);
+return `<tr><td>${r.date}</td><td>${r.time}</td><td>${r.code} ${r.name}</td><td><span class="tag bg-slate-700 text-slate-300">${r.strat}</span></td>
+<td class="pct-neg">${r.result.toFixed(2)}%</td><td class="pct-pos">+${r.high.toFixed(2)}%</td>
+<td class="text-amber-400 font-bold">+${missed}%</td></tr>`;
+}).join('');
+
+// All trades
+document.getElementById('all-trades').innerHTML = DATA.all_trades.sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time)).map(r=>{
+const cls = r.result>0?'pct-pos':'pct-neg';
+const et = r.exit_type.replace(/_/g,' ');
+return `<tr><td>${r.date}</td><td>${r.time}</td><td>${r.code}</td><td>${r.name||'-'}</td>
+<td><span class="tag bg-slate-700 text-slate-300">${r.cond}</span></td>
+<td><span class="tag bg-slate-600 text-slate-200">${r.strat}</span></td>
+<td>${r.buy_price.toLocaleString()}</td><td>${r.exit_price.toLocaleString()}</td>
+<td class="${cls} font-medium">${r.result>0?'+':''}${r.result}%</td>
+<td>${et}</td><td>${r.second_buy?'O':'-'}</td>
+<td class="${r.day_high>0?'pct-pos':'pct-neg'}">${r.day_high>0?'+':''}${r.day_high}%</td></tr>`;
+}).join('');
+
+// Skipped
+document.getElementById('skip-count').textContent = DATA.skipped.length;
+document.getElementById('skip-table').innerHTML = DATA.skipped.map(s=>`<tr><td>${s.date}</td><td>${s.time}</td><td>${s.code}</td><td>${s.name||'-'}</td><td>${s.cond}</td><td>${s.price||'-'}</td><td class="text-slate-500">${s.reason}</td></tr>`).join('');
+</script>
+</body>
+</html>
