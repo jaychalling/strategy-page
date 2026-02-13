@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>전체 조합 시뮬레이션 보고서 | 2026-02-04~13</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        bg: '#f8f9fb',
+        card: '#ffffff',
+        profit: '#16a34a',
+        loss: '#dc2626',
+        accent: '#2563eb',
+      },
+      fontFamily: {
+        sans: ['Inter', 'Pretendard', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+      }
+    }
+  }
+}
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+body { background: #f8f9fb; }
+.card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); }
+table { width: 100%; border-collapse: collapse; }
+th { padding: 10px 12px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e5e7eb; white-space: nowrap; }
+td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; font-size: 13px; white-space: nowrap; }
+tr:hover td { background: #f9fafb; }
+.gold-row td { background: linear-gradient(90deg, rgba(245,158,11,0.08), transparent); }
+.gold-row:hover td { background: linear-gradient(90deg, rgba(245,158,11,0.15), transparent); }
+.best-cell { background: rgba(22,163,74,0.08); font-weight: 600; }
+.worst-cell { background: rgba(220,38,38,0.06); }
+.insight-card { border-left: 4px solid #2563eb; background: #f0f7ff; }
+</style>
+</head>
+<body class="min-h-screen p-4 md:p-6 lg:p-8 font-sans text-gray-800">
+<div class="max-w-7xl mx-auto">
+
+<!-- Navigation Header -->
+<div class="mb-8">
+  <div class="flex items-center gap-3 mb-3 flex-wrap">
+    <a href="/" class="text-sm text-accent hover:underline font-medium">&larr; 대시보드</a>
+    <span class="text-gray-300">|</span>
+    <a href="/reports/full-backtest" class="text-sm text-accent hover:underline">전면 백테스트</a>
+    <span class="text-gray-300">|</span>
+    <a href="/reports/meta-report" class="text-sm text-accent hover:underline">메타보고서</a>
+    <span class="text-gray-300">|</span>
+    <a href="/reports/full-optimization" class="text-sm text-accent hover:underline">Greedy 최적화</a>
+  </div>
+  <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">전체 조합 시뮬레이션 보고서</h1>
+  <p class="text-gray-500 mt-2 text-base">294,912개 조합 x 6개 파라미터 차원 | 100만원 기준 | 2026-02-04~13</p>
+</div>
+
+<!-- Section 1: Executive Summary -->
+<div class="card p-5 md:p-6 mb-4">
+  <h2 class="text-lg font-bold text-gray-900 mb-2">분석 개요</h2>
+  <div class="text-sm text-gray-600 leading-relaxed space-y-2">
+    <p><strong>무엇인가:</strong> 6개 파라미터 차원(되돌림, 손절, 익절전략, 트레일링, 시간대, 2차매수)의 모든 후보값을 교차 조합하여 총 <strong>294,912개</strong>의 전수 시뮬레이션(full combinatorial simulation)을 수행한 결과입니다. 되돌림 6가지 x 손절 8가지 x 익절 12가지 x 트레일링 8가지 x 시간대 8가지 x 2차매수 8가지 = 294,912개 조합입니다. 시뮬레이션 소요 시간: 약 14분 29초.</p>
+    <p><strong>왜 필요한가:</strong> 기존 <a href="/reports/full-optimization" class="text-accent hover:underline">Greedy 순차 최적화</a>는 한 번에 한 파라미터만 최적화하고 고정하는 방식(좌표 하강법)입니다. 이 방식은 파라미터 간 <strong>상호작용(interaction)</strong>을 놓칠 수 있습니다. 예를 들어, 손절을 없앴을 때 최적 익절 전략이 달라질 수 있고, 시간대를 확장하면 2차 매수의 최적값이 변할 수 있습니다. 전체 조합 시뮬레이션은 이러한 상호작용 효과를 완전히 포착합니다.</p>
+    <p><strong>Greedy와의 핵심 차이:</strong> Greedy는 TP1@3%/100%(전량매도)를 최적으로 찾았지만, 전체 조합은 <strong>3단계 분할매도(3%/33 → 6%/50 → 10%/100)</strong>가 더 낫다는 결론을 냈습니다. 이는 Greedy가 TP1에서 전량매도를 고정한 후 이후 단계를 최적화했기 때문에, 분할매도의 잠재력을 탐색하지 못한 것입니다.</p>
+    <p class="text-xs text-gray-400">아래 3개 카드는 현행(Baseline), Greedy 최적, 전체조합 최적의 핵심 지표를 비교합니다.</p>
+  </div>
+</div>
+<div id="exec-summary" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"></div>
+
+<!-- Section 2: Greedy vs Combo -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">Greedy vs 전체조합 비교</h2>
+  <p class="text-sm text-gray-500 mb-3">순차 최적화와 전수 조합 시뮬레이션의 결과 차이 분석</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>Greedy 결과:</strong> 순차 최적화는 TP1에서 +3%/100%(전량매도)를 선택했습니다. 이 설정은 개별 파라미터 스윕에서 최적이었지만, 나머지 물량으로 추가 상승을 포착하는 시나리오를 차단합니다.</p>
+    <p><strong>Combo 결과:</strong> 전체 조합 시뮬레이션은 3단계 분할매도(3%/33 → 6%/50 → 10%/100)가 최적임을 발견했습니다. 이 전략은 3% 도달 시 33%만 매도하고 나머지 67%를 보유하여 6%, 10% 상승까지 추가 수익을 포착합니다.</p>
+    <p><strong>차이의 원인:</strong> 시간대를 G15(골든10분 09:15까지)로 확장하면 추세 강한 종목이 더 많이 포착됩니다. 이런 종목들은 3% 이상 더 올라가는 경우가 많아서, 3%에서 전량매도하면 이 추가 수익을 놓칩니다. 분할매도는 남은 67% 물량으로 이 상승분을 포착할 수 있습니다.</p>
+  </div>
+  <div id="greedy-vs-combo" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+</div>
+
+<!-- Section 3: TOP 20 Table -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">TOP 20 조합</h2>
+  <p class="text-sm text-gray-500 mb-3">294,912개 조합 중 합산 PNL% 기준 상위 20개</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>읽는 법:</strong> 각 행은 6개 파라미터의 특정 조합입니다. 동일한 PNL을 보이는 조합이 여러 개 있는 것은 해당 파라미터가 결과에 영향을 미치지 않기 때문입니다(예: 되돌림 규칙이 발동하지 않는 익절 전략에서는 되돌림 변경이 무의미).</p>
+    <p><strong>열 설명:</strong></p>
+    <ul class="list-disc list-inside text-xs space-y-1 ml-2">
+      <li><strong>되돌림:</strong> 익절 후 가격 하락 시 잔여 물량 청산 규칙</li>
+      <li><strong>손절:</strong> FO(1차만)/AS(2차후) 형태. "없음"은 비활성화</li>
+      <li><strong>익절전략:</strong> 전량매도/2단계/3단계 등 수익 실현 방식</li>
+      <li><strong>트레일링:</strong> +trigger%/-drop% (최고가 추적 매도)</li>
+      <li><strong>시간대:</strong> G=골든10분, GM=굿모닝, F=세력감지 종료시간</li>
+      <li><strong>2차매수:</strong> -trigger%/qty배수. "비활성화"=물타기 안함</li>
+      <li><strong>거래수:</strong> 해당 조합의 총 거래 건수</li>
+      <li><strong>PNL%:</strong> 개별 거래 수익률 합산</li>
+      <li><strong>승률%:</strong> 수익 거래 비율</li>
+      <li><strong>평균PNL%:</strong> 거래당 평균 수익률</li>
+      <li><strong>손절:</strong> 손절매 발동 횟수</li>
+    </ul>
+  </div>
+  <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
+    <table>
+      <thead>
+        <tr>
+          <th class="text-center">#</th>
+          <th>되돌림</th>
+          <th>손절</th>
+          <th>익절전략</th>
+          <th>트레일링</th>
+          <th>시간대</th>
+          <th>2차매수</th>
+          <th class="text-right">거래수</th>
+          <th class="text-right">PNL%</th>
+          <th class="text-right">승률%</th>
+          <th class="text-right">평균PNL%</th>
+          <th class="text-right">손절</th>
+        </tr>
+      </thead>
+      <tbody id="top20-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Section 4: TOP 10 Compound -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">TOP 10 복리 수익률</h2>
+  <p class="text-sm text-gray-500 mb-3">100만원 시작 → 각 거래 수익률 순차 적용 → 최종 잔고 기준</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>복리 수익률 모델:</strong> 100만원으로 시작하여 각 거래의 수익률을 순차적으로 잔고에 적용합니다. 예: 첫 거래 +3% → 잔고 1,030,000원 → 두 번째 거래 -1% → 잔고 1,019,700원. 이 방식은 단순 합산(PNL%)과 달리 거래 순서와 복리 효과를 반영합니다.</p>
+    <p><strong>단순 합산 PNL과의 차이:</strong> 승률이 높고 손절이 적은 조합일수록 복리 효과가 크게 나타납니다. 큰 손실 한 번이 여러 번의 소수익을 상쇄할 수 있기 때문입니다.</p>
+    <p><strong>주의:</strong> 동시 보유 포지션, 슬리피지, 수수료는 미반영입니다. 실전 결과와 차이가 있을 수 있습니다.</p>
+  </div>
+  <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
+    <table>
+      <thead>
+        <tr>
+          <th class="text-center">#</th>
+          <th>되돌림</th>
+          <th>손절</th>
+          <th>익절전략</th>
+          <th>트레일링</th>
+          <th>시간대</th>
+          <th>2차매수</th>
+          <th class="text-right">거래수</th>
+          <th class="text-right">PNL%</th>
+          <th class="text-right">승률%</th>
+          <th class="text-right">최종잔고</th>
+          <th class="text-right">복리수익률%</th>
+        </tr>
+      </thead>
+      <tbody id="compound-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Section 5: Contribution Analysis -->
+<div id="contribution-section"></div>
+
+<!-- Section 6: Interaction Analysis -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">파라미터 상호작용 분석</h2>
+  <p class="text-sm text-gray-500 mb-3">2개 파라미터 쌍별 평균 PNL 상위 5개 조합 | 시너지 효과 탐지</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>상호작용이란:</strong> 두 파라미터를 각각 최적화하면 A, B가 최적이지만, 함께 적용하면 A+C가 더 나은 경우가 있습니다. 이를 "상호작용 효과"라고 합니다. 아래 테이블은 각 파라미터 쌍의 상위 5개 조합을 보여줍니다.</p>
+    <p><strong>읽는 법:</strong> "d1"과 "d2"는 두 파라미터의 값이고, "평균PNL"은 나머지 4개 파라미터를 모두 평균낸 값입니다. 평균PNL이 높을수록 해당 조합이 다른 파라미터 설정에 관계없이 일관되게 좋은 성과를 보인다는 뜻입니다.</p>
+  </div>
+  <div id="interaction-section"></div>
+</div>
+
+<!-- Section 7: Key Insights -->
+<div id="insight-cards" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"></div>
+
+<!-- Section 8: BOTTOM 10 -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">BOTTOM 10 (최악의 조합)</h2>
+  <p class="text-sm text-gray-500 mb-3">294,912개 조합 중 가장 나쁜 성과를 보인 10개 | 피해야 할 설정</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>용도:</strong> 최악의 조합을 분석하면 "어떤 설정 조합이 치명적인지"를 파악할 수 있습니다. 공통 패턴을 찾아 실전에서 반드시 피해야 할 설정을 식별합니다.</p>
+    <p><strong>공통 패턴:</strong> 대부분 좁은 시간대(G07/GM10) + 현행 손절(-3.1%/-2.1%) + 높은 익절 기준(전량@4%) + 2차매수 비활성화의 조합입니다. 좁은 시간대로 거래 기회가 적은데 타이트한 손절로 많이 잘려나가고, 살아남은 거래도 4%까지 못 올라 익절 실패하는 구조입니다.</p>
+  </div>
+  <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
+    <table>
+      <thead>
+        <tr>
+          <th class="text-center">#</th>
+          <th>되돌림</th>
+          <th>손절</th>
+          <th>익절전략</th>
+          <th>트레일링</th>
+          <th>시간대</th>
+          <th>2차매수</th>
+          <th class="text-right">거래수</th>
+          <th class="text-right">PNL%</th>
+          <th class="text-right">승률%</th>
+          <th class="text-right">평균PNL%</th>
+          <th class="text-right">손절</th>
+        </tr>
+      </thead>
+      <tbody id="bottom10-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Section 9: Final Recommendation -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">최종 추천 설정</h2>
+  <p class="text-sm text-gray-500 mb-3">전체 조합 시뮬레이션 #1 결과 기반 | Greedy 추천과 비교</p>
+  <div id="final-recommendation"></div>
+  <div class="text-sm text-gray-600 leading-relaxed mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200 space-y-2">
+    <p class="font-semibold text-amber-800">주의사항 (Greedy 최적화 보고서와 동일)</p>
+    <ul class="list-disc list-inside text-xs space-y-1 ml-2 text-amber-700">
+      <li>8거래일(Feb 4~13) 데이터 기반이므로 <strong>과적합(overfitting)</strong> 위험이 있습니다</li>
+      <li>294,912개 조합 중 1위를 선택하는 것은 그 자체로 과적합 가능성이 높습니다</li>
+      <li>손절 비활성화는 이 기간에 최적이었지만, 급락장에서 큰 손실을 초래할 수 있습니다</li>
+      <li>시간대 확장(G15)은 더 많은 거래를 만들지만, 늦은 시간대 신호 품질은 검증 부족</li>
+      <li><strong>권장:</strong> 한 번에 모든 파라미터를 바꾸지 말고, 확신이 높은 것부터 점진적으로 적용하세요. 1~2주간 관찰 후 다음 파라미터를 변경하는 것이 안전합니다.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="text-center text-xs text-gray-400 py-6">
+  Generated from combo_full_results.json | 294,912 simulations in 869.2s | 2026-02-13
+</div>
+
+</div>
+
+<script>
+const DATA = {"meta":{"total_simulations":294912,"elapsed_seconds":869.2,"starting_capital":1000000,"dimensions":{"retracement":6,"stop_loss":8,"tp_strategy":12,"trailing":8,"time_windows":8,"second_buy":8}},"baseline":{"n":20,"wr":60.0,"pnl":6.95,"avg":0.35,"sl":6},"top50":[{"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":76.6,"avg":2.55,"sl":0},{"ret":"3:avg","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":76.6,"avg":2.55,"sl":0},{"ret":"3만제거","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":76.6,"avg":2.55,"sl":0},{"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":75.99,"avg":2.53,"sl":0},{"ret":"3:avg","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":75.99,"avg":2.53,"sl":0},{"ret":"3만제거","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":75.99,"avg":2.53,"sl":0},{"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-5%/2x","n":28,"wr":92.9,"pnl":75.92,"avg":2.71,"sl":0},{"ret":"3:avg","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-5%/2x","n":28,"wr":92.9,"pnl":75.92,"avg":2.71,"sl":0},{"ret":"3만제거","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-5%/2x","n":28,"wr":92.9,"pnl":75.92,"avg":2.71,"sl":0},{"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":75.78,"avg":2.53,"sl":0},{"ret":"3:avg","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":75.78,"avg":2.53,"sl":0},{"ret":"3만제거","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":75.78,"avg":2.53,"sl":0},{"ret":"현행{1:0,3:t2}","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":75.53,"avg":2.52,"sl":1},{"ret":"3:avg","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":75.53,"avg":2.52,"sl":1},{"ret":"3만제거","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":75.53,"avg":2.52,"sl":1},{"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-4%/3x","n":28,"wr":92.9,"pnl":75.31,"avg":2.69,"sl":0},{"ret":"3:avg","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-4%/3x","n":28,"wr":92.9,"pnl":75.31,"avg":2.69,"sl":0},{"ret":"3만제거","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-4%/3x","n":28,"wr":92.9,"pnl":75.31,"avg":2.69,"sl":0},{"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":75.16,"avg":2.51,"sl":0},{"ret":"3:avg","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":75.16,"avg":2.51,"sl":0},{"ret":"3만제거","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":75.16,"avg":2.51,"sl":0},{"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM20/F14:30","sb":"-5%/2x","n":28,"wr":92.9,"pnl":75.1,"avg":2.68,"sl":0},{"ret":"3:avg","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM20/F14:30","sb":"-5%/2x","n":28,"wr":92.9,"pnl":75.1,"avg":2.68,"sl":0},{"ret":"3만제거","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM20/F14:30","sb":"-5%/2x","n":28,"wr":92.9,"pnl":75.1,"avg":2.68,"sl":0},{"ret":"현행{1:0,3:t2}","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":75.03,"avg":2.5,"sl":1},{"ret":"3:avg","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":75.03,"avg":2.5,"sl":1},{"ret":"3만제거","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":75.03,"avg":2.5,"sl":1},{"ret":"현행{1:0,3:t2}","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-5%/2x","n":28,"wr":92.9,"pnl":74.85,"avg":2.67,"sl":1},{"ret":"3:avg","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-5%/2x","n":28,"wr":92.9,"pnl":74.85,"avg":2.67,"sl":1},{"ret":"3만제거","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-5%/2x","n":28,"wr":92.9,"pnl":74.85,"avg":2.67,"sl":1},{"ret":"현행{1:0,3:t2}","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":74.71,"avg":2.49,"sl":1},{"ret":"3:avg","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":74.71,"avg":2.49,"sl":1},{"ret":"3만제거","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":74.71,"avg":2.49,"sl":1},{"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM20/F14:30","sb":"-4%/3x","n":28,"wr":92.9,"pnl":74.48,"avg":2.66,"sl":0},{"ret":"3:avg","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM20/F14:30","sb":"-4%/3x","n":28,"wr":92.9,"pnl":74.48,"avg":2.66,"sl":0},{"ret":"3만제거","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM20/F14:30","sb":"-4%/3x","n":28,"wr":92.9,"pnl":74.48,"avg":2.66,"sl":0},{"ret":"현행{1:0,3:t2}","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-4%/3x","n":28,"wr":92.9,"pnl":74.35,"avg":2.66,"sl":1},{"ret":"3:avg","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-4%/3x","n":28,"wr":92.9,"pnl":74.35,"avg":2.66,"sl":1},{"ret":"3만제거","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-4%/3x","n":28,"wr":92.9,"pnl":74.35,"avg":2.66,"sl":1},{"ret":"현행{1:0,3:t2}","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":74.2,"avg":2.47,"sl":1},{"ret":"3:avg","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":74.2,"avg":2.47,"sl":1},{"ret":"3만제거","sl_name":"없음/-5%","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":74.2,"avg":2.47,"sl":1},{"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+10%/-2%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":74.11,"avg":2.47,"sl":0},{"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+10%/-3%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":74.11,"avg":2.47,"sl":0},{"ret":"3:avg","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+10%/-2%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":74.11,"avg":2.47,"sl":0},{"ret":"3:avg","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+10%/-3%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":74.11,"avg":2.47,"sl":0},{"ret":"3만제거","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+10%/-2%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":74.11,"avg":2.47,"sl":0},{"ret":"3만제거","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+10%/-3%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":74.11,"avg":2.47,"sl":0},{"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+10%/-2%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":74.03,"avg":2.47,"sl":0},{"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+10%/-3%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":74.03,"avg":2.47,"sl":0}],"bottom10":[{"ret":"1만제거","sl_name":"현행(~-3.1%/-2.1%)","tp":"전량@4%","trail":"+10%/-2%","tw":"G07/GM10/F14:00","sb":"비활성화","n":15,"wr":40.0,"pnl":-22.06,"avg":-1.47,"sl":4},{"ret":"1만제거","sl_name":"현행(~-3.1%/-2.1%)","tp":"전량@4%","trail":"+10%/-3%","tw":"G07/GM10/F14:00","sb":"비활성화","n":15,"wr":40.0,"pnl":-22.06,"avg":-1.47,"sl":4},{"ret":"1+2+3","sl_name":"현행(~-3.1%/-2.1%)","tp":"전량@4%","trail":"+5%/-1%","tw":"G07/GM10/F14:00","sb":"비활성화","n":15,"wr":40.0,"pnl":-22.06,"avg":-1.47,"sl":4},{"ret":"1+2+3","sl_name":"현행(~-3.1%/-2.1%)","tp":"전량@4%","trail":"+5%/-1.5%","tw":"G07/GM10/F14:00","sb":"비활성화","n":15,"wr":40.0,"pnl":-22.06,"avg":-1.47,"sl":4},{"ret":"1+2+3","sl_name":"현행(~-3.1%/-2.1%)","tp":"전량@4%","trail":"+7%/-1%","tw":"G07/GM10/F14:00","sb":"비활성화","n":15,"wr":40.0,"pnl":-22.06,"avg":-1.47,"sl":4},{"ret":"1+2+3","sl_name":"현행(~-3.1%/-2.1%)","tp":"전량@4%","trail":"+7%/-1.5%","tw":"G07/GM10/F14:00","sb":"비활성화","n":15,"wr":40.0,"pnl":-22.06,"avg":-1.47,"sl":4},{"ret":"1+2+3","sl_name":"현행(~-3.1%/-2.1%)","tp":"전량@4%","trail":"+7%/-2%","tw":"G07/GM10/F14:00","sb":"비활성화","n":15,"wr":40.0,"pnl":-22.06,"avg":-1.47,"sl":4},{"ret":"1+2+3","sl_name":"현행(~-3.1%/-2.1%)","tp":"전량@4%","trail":"+7%/-2.5%","tw":"G07/GM10/F14:00","sb":"비활성화","n":15,"wr":40.0,"pnl":-22.06,"avg":-1.47,"sl":4},{"ret":"1+2+3","sl_name":"현행(~-3.1%/-2.1%)","tp":"전량@4%","trail":"+10%/-2%","tw":"G07/GM10/F14:00","sb":"비활성화","n":15,"wr":40.0,"pnl":-22.06,"avg":-1.47,"sl":4},{"ret":"1+2+3","sl_name":"현행(~-3.1%/-2.1%)","tp":"전량@4%","trail":"+10%/-3%","tw":"G07/GM10/F14:00","sb":"비활성화","n":15,"wr":40.0,"pnl":-22.06,"avg":-1.47,"sl":4}],"top10_compound":[{"rank":1,"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":76.6,"avg":2.55,"sl_count":0,"bal":2112810,"cr":111.28},{"rank":2,"ret":"3:avg","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":76.6,"avg":2.55,"sl_count":0,"bal":2112810,"cr":111.28},{"rank":3,"ret":"3만제거","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":76.6,"avg":2.55,"sl_count":0,"bal":2112810,"cr":111.28},{"rank":4,"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":75.99,"avg":2.53,"sl_count":0,"bal":2100874,"cr":110.09},{"rank":5,"ret":"3:avg","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":75.99,"avg":2.53,"sl_count":0,"bal":2100874,"cr":110.09},{"rank":6,"ret":"3만제거","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM15/F15:20","sb":"-4%/3x","n":30,"wr":90.0,"pnl":75.99,"avg":2.53,"sl_count":0,"bal":2100874,"cr":110.09},{"rank":7,"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-5%/2x","n":28,"wr":92.9,"pnl":75.92,"avg":2.71,"sl_count":0,"bal":2098605,"cr":109.86},{"rank":8,"ret":"3:avg","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-5%/2x","n":28,"wr":92.9,"pnl":75.92,"avg":2.71,"sl_count":0,"bal":2098605,"cr":109.86},{"rank":9,"ret":"3만제거","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1%","tw":"G15/GM20/F14:30","sb":"-5%/2x","n":28,"wr":92.9,"pnl":75.92,"avg":2.71,"sl_count":0,"bal":2098605,"cr":109.86},{"rank":10,"ret":"현행{1:0,3:t2}","sl_name":"없음/없음","tp":"3단계:3%/33→6%/50→10%/100","trail":"+7%/-1.5%","tw":"G15/GM15/F15:20","sb":"-5%/2x","n":30,"wr":90.0,"pnl":75.78,"avg":2.53,"sl_count":0,"bal":2096340,"cr":109.63}],"contribution":{"ret":[{"name":"1+2+3","avg_pnl":28.55,"avg_wr":73.6,"avg_sl":3.6,"best_pnl":72.5,"count":49152},{"name":"3만제거","avg_pnl":28.45,"avg_wr":72.9,"avg_sl":3.9,"best_pnl":76.6,"count":49152},{"name":"3:avg","avg_pnl":28.44,"avg_wr":73.0,"avg_sl":3.8,"best_pnl":76.6,"count":49152},{"name":"현행{1:0,3:t2}","avg_pnl":28.34,"avg_wr":73.0,"avg_sl":3.8,"best_pnl":76.6,"count":49152},{"name":"전부제거","avg_pnl":27.36,"avg_wr":68.4,"avg_sl":4.8,"best_pnl":69.99,"count":49152},{"name":"1만제거","avg_pnl":27.24,"avg_wr":68.5,"avg_sl":4.7,"best_pnl":69.99,"count":49152}],"sl_name":[{"name":"없음/-5%","avg_pnl":36.68,"avg_wr":79.2,"avg_sl":1.8,"best_pnl":75.53,"count":36864},{"name":"없음/없음","avg_pnl":35.36,"avg_wr":80.8,"avg_sl":0.0,"best_pnl":76.6,"count":36864},{"name":"없음/-4%","avg_pnl":32.16,"avg_wr":75.3,"avg_sl":3.0,"best_pnl":71.36,"count":36864},{"name":"-5%/-4%","avg_pnl":29.64,"avg_wr":73.6,"avg_sl":3.8,"best_pnl":70.36,"count":36864},{"name":"없음/-3%","avg_pnl":26.99,"avg_wr":70.1,"avg_sl":4.4,"best_pnl":62.26,"count":36864},{"name":"-4%/-3%","avg_pnl":24.95,"avg_wr":68.3,"avg_sl":5.5,"best_pnl":59.58,"count":36864},{"name":"-5%/-3%","avg_pnl":24.38,"avg_wr":68.9,"avg_sl":5.2,"best_pnl":58.57,"count":36864},{"name":"현행(~-3.1%/-2.1%)","avg_pnl":14.34,"avg_wr":56.1,"avg_sl":9.1,"best_pnl":48.97,"count":36864}],"tp":[{"name":"전량@3%","avg_pnl":38.36,"avg_wr":79.1,"avg_sl":3.2,"best_pnl":68.19,"count":24576},{"name":"2단계:3%/50→7%/100","avg_pnl":36.47,"avg_wr":73.2,"avg_sl":4.2,"best_pnl":69.3,"count":24576},{"name":"3단계:3%/33→6%/50→10%/100","avg_pnl":35.95,"avg_wr":73.3,"avg_sl":4.5,"best_pnl":76.6,"count":24576},{"name":"전량@5%","avg_pnl":32.56,"avg_wr":59.7,"avg_sl":5.1,"best_pnl":69.99,"count":24576},{"name":"전량@2.5%","avg_pnl":30.51,"avg_wr":79.2,"avg_sl":3.2,"best_pnl":57.09,"count":24576},{"name":"현행4단계","avg_pnl":26.62,"avg_wr":67.3,"avg_sl":4.5,"best_pnl":59.15,"count":24576},{"name":"2단계:2%/50→5%/100","avg_pnl":25.61,"avg_wr":76.4,"avg_sl":3.7,"best_pnl":56.21,"count":24576},{"name":"전량@4%","avg_pnl":25.49,"avg_wr":60.0,"avg_sl":5.1,"best_pnl":57.92,"count":24576},{"name":"3단계:2%/25→4%/50→8%/100","avg_pnl":24.96,"avg_wr":63.8,"avg_sl":4.7,"best_pnl":58.27,"count":24576},{"name":"전량@3.5%","avg_pnl":23.57,"avg_wr":64.4,"avg_sl":5.0,"best_pnl":53.13,"count":24576},{"name":"전량@2%","avg_pnl":22.99,"avg_wr":81.0,"avg_sl":3.0,"best_pnl":50.12,"count":24576},{"name":"전량@1.5%","avg_pnl":13.64,"avg_wr":81.3,"avg_sl":2.9,"best_pnl":36.12,"count":24576}],"trail":[{"name":"+7%/-1%","avg_pnl":28.48,"avg_wr":71.4,"avg_sl":4.2,"best_pnl":76.6,"count":36864},{"name":"+7%/-1.5%","avg_pnl":28.4,"avg_wr":71.4,"avg_sl":4.2,"best_pnl":75.78,"count":36864},{"name":"+5%/-1%","avg_pnl":28.07,"avg_wr":72.0,"avg_sl":3.9,"best_pnl":70.79,"count":36864},{"name":"+10%/-2%","avg_pnl":28.0,"avg_wr":71.4,"avg_sl":4.2,"best_pnl":74.11,"count":36864},{"name":"+10%/-3%","avg_pnl":27.99,"avg_wr":71.4,"avg_sl":4.2,"best_pnl":74.11,"count":36864},{"name":"+7%/-2%","avg_pnl":27.94,"avg_wr":71.4,"avg_sl":4.2,"best_pnl":72.91,"count":36864},{"name":"+7%/-2.5%","avg_pnl":27.87,"avg_wr":71.4,"avg_sl":4.2,"best_pnl":72.27,"count":36864},{"name":"+5%/-1.5%","avg_pnl":27.75,"avg_wr":72.0,"avg_sl":3.9,"best_pnl":69.99,"count":36864}],"tw":[{"name":"G15/GM15/F15:20","avg_pnl":41.7,"avg_wr":74.8,"avg_sl":4.0,"best_pnl":76.6,"count":36864},{"name":"G15/GM20/F14:30","avg_pnl":40.49,"avg_wr":75.1,"avg_sl":4.0,"best_pnl":75.92,"count":36864},{"name":"G15/GM15/F14:00","avg_pnl":38.38,"avg_wr":77.0,"avg_sl":3.9,"best_pnl":72.82,"count":36864},{"name":"G15/GM30/F15:20","avg_pnl":36.64,"avg_wr":71.7,"avg_sl":5.2,"best_pnl":72.65,"count":36864},{"name":"G20/GM30/F14:30","avg_pnl":24.77,"avg_wr":67.2,"avg_sl":6.5,"best_pnl":58.03,"count":36864},{"name":"현행(G10/GM15/F14:30)","avg_pnl":17.52,"avg_wr":68.9,"avg_sl":3.2,"best_pnl":44.61,"count":36864},{"name":"G12/GM20/F14:00","avg_pnl":15.4,"avg_wr":70.7,"avg_sl":3.1,"best_pnl":41.71,"count":36864},{"name":"G07/GM10/F14:00","avg_pnl":9.6,"avg_wr":66.8,"avg_sl":3.1,"best_pnl":35.73,"count":36864}],"sb":[{"name":"-5%/2x","avg_pnl":31.8,"avg_wr":73.3,"avg_sl":3.7,"best_pnl":76.6,"count":36864},{"name":"-4%/3x","avg_pnl":31.46,"avg_wr":72.7,"avg_sl":3.9,"best_pnl":75.99,"count":36864},{"name":"-4%/2x","avg_pnl":29.92,"avg_wr":71.9,"avg_sl":4.1,"best_pnl":69.13,"count":36864},{"name":"현행","avg_pnl":28.7,"avg_wr":71.8,"avg_sl":4.4,"best_pnl":70.64,"count":36864},{"name":"-3%/2x","avg_pnl":28.15,"avg_wr":71.5,"avg_sl":4.5,"best_pnl":68.79,"count":36864},{"name":"-3.5%/1.1x","avg_pnl":26.61,"avg_wr":70.3,"avg_sl":4.8,"best_pnl":69.28,"count":36864},{"name":"-2.5%/1.5x","avg_pnl":25.93,"avg_wr":70.6,"avg_sl":4.7,"best_pnl":68.62,"count":36864},{"name":"비활성화","avg_pnl":21.92,"avg_wr":70.2,"avg_sl":2.8,"best_pnl":62.26,"count":36864}]},"interaction":{"sl_name_sb":[{"d1":"없음/-5%","d2":"-4%/3x","avg_pnl":42.35},{"d1":"없음/-5%","d2":"-5%/2x","avg_pnl":41.53},{"d1":"없음/-5%","d2":"-4%/2x","avg_pnl":41.21},{"d1":"없음/없음","d2":"-4%/3x","avg_pnl":37.88},{"d1":"없음/-4%","d2":"-4%/3x","avg_pnl":37.5}],"tp_trail":[{"d1":"3단계:3%/33→6%/50→10%/100","d2":"+7%/-1%","avg_pnl":38.45},{"d1":"전량@3%","d2":"+5%/-1%","avg_pnl":38.36},{"d1":"전량@3%","d2":"+5%/-1.5%","avg_pnl":38.36},{"d1":"전량@3%","d2":"+7%/-1%","avg_pnl":38.36},{"d1":"전량@3%","d2":"+7%/-1.5%","avg_pnl":38.36}],"tp_sl_name":[{"d1":"전량@3%","d2":"없음/없음","avg_pnl":51.93},{"d1":"전량@3%","d2":"없음/-5%","avg_pnl":48.4},{"d1":"2단계:3%/50→7%/100","d2":"없음/-5%","avg_pnl":44.87},{"d1":"3단계:3%/33→6%/50→10%/100","d2":"없음/-5%","avg_pnl":44.34},{"d1":"2단계:3%/50→7%/100","d2":"없음/없음","avg_pnl":43.7}],"ret_tp":[{"d1":"현행{1:0,3:t2}","d2":"2단계:3%/50→7%/100","avg_pnl":38.51},{"d1":"3:avg","d2":"2단계:3%/50→7%/100","avg_pnl":38.51},{"d1":"3만제거","d2":"2단계:3%/50→7%/100","avg_pnl":38.51},{"d1":"1+2+3","d2":"2단계:3%/50→7%/100","avg_pnl":38.51},{"d1":"현행{1:0,3:t2}","d2":"전량@3%","avg_pnl":38.36}],"tw_tp":[{"d1":"G15/GM15/F15:20","d2":"3단계:3%/33→6%/50→10%/100","avg_pnl":52.87},{"d1":"G15/GM20/F14:30","d2":"3단계:3%/33→6%/50→10%/100","avg_pnl":52.19},{"d1":"G15/GM15/F15:20","d2":"2단계:3%/50→7%/100","avg_pnl":51.48},{"d1":"G15/GM15/F15:20","d2":"전량@5%","avg_pnl":51.42},{"d1":"G15/GM20/F14:30","d2":"2단계:3%/50→7%/100","avg_pnl":50.8}],"sl_name_trail":[{"d1":"없음/-5%","d2":"+7%/-1%","avg_pnl":37.09},{"d1":"없음/-5%","d2":"+7%/-1.5%","avg_pnl":37.0},{"d1":"없음/-5%","d2":"+5%/-1%","avg_pnl":36.75},{"d1":"없음/-5%","d2":"+10%/-2%","avg_pnl":36.63},{"d1":"없음/-5%","d2":"+10%/-3%","avg_pnl":36.62}]},"candidates":{"ret":["현행{1:0,3:t2}","3:avg","3만제거","전부제거","1만제거","1+2+3"],"sl":["현행(~-3.1%/-2.1%)","없음/없음","없음/-3%","없음/-4%","없음/-5%","-4%/-3%","-5%/-3%","-5%/-4%"],"tp":["현행4단계","전량@1.5%","전량@2%","전량@2.5%","전량@3%","전량@3.5%","전량@4%","전량@5%","2단계:2%/50→5%/100","2단계:3%/50→7%/100","3단계:2%/25→4%/50→8%/100","3단계:3%/33→6%/50→10%/100"],"trail":["+5%/-1%","+5%/-1.5%","+7%/-1%","+7%/-1.5%","+7%/-2%","+7%/-2.5%","+10%/-2%","+10%/-3%"],"tw":["현행(G10/GM15/F14:30)","G15/GM15/F14:00","G15/GM20/F14:30","G15/GM15/F15:20","G12/GM20/F14:00","G20/GM30/F14:30","G07/GM10/F14:00","G15/GM30/F15:20"],"sb":["현행","비활성화","-2.5%/1.5x","-3%/2x","-3.5%/1.1x","-4%/2x","-4%/3x","-5%/2x"]}};
+
+// Greedy comparison data (from full_optimization.json greedy_steps final result)
+const GREEDY = {
+  final: { n: 32, wr: 87.5, pnl: 66.7, avg: 2.08, sl: 0 },
+  tp: "전량@3%/100%",
+  desc: "RET:3:avg / SL:없음/없음 / TP1:+3%/100% / TRAIL:+7%/-1% / TW:G15/GM30/F15:20 / SB:-4%/3x"
+};
+
+// ==== Utility functions ====
+function fmt(v, d=2) { return v == null ? '-' : Number(v).toFixed(d); }
+function pnlColor(v) { return v > 0 ? 'text-profit font-semibold' : v < 0 ? 'text-loss font-semibold' : 'text-gray-500'; }
+function pnlBg(v) { return v > 0 ? 'bg-green-50' : v < 0 ? 'bg-red-50' : ''; }
+function numFmt(n) { return n.toLocaleString('ko-KR'); }
+
+// ==== Section 1: Executive Summary ====
+function renderExecSummary() {
+  const b = DATA.baseline;
+  const g = GREEDY.final;
+  const best = DATA.top10_compound[0];
+
+  const cards = [
+    {
+      label: '현행 (Baseline)',
+      pnl: b.pnl, wr: b.wr, n: b.n, sl: b.sl, avg: b.avg,
+      color: 'border-gray-300', badge: 'bg-gray-100 text-gray-600',
+      sub: '현재 운영 중인 전략 설정'
+    },
+    {
+      label: 'Greedy 최적',
+      pnl: g.pnl, wr: g.wr, n: g.n, sl: g.sl, avg: g.avg,
+      color: 'border-blue-400', badge: 'bg-blue-50 text-blue-700',
+      sub: '순차 최적화 (좌표 하강법)'
+    },
+    {
+      label: '전체조합 #1',
+      pnl: best.pnl, wr: best.wr, n: best.n, sl: best.sl_count, avg: best.avg,
+      color: 'border-amber-400', badge: 'bg-amber-50 text-amber-700',
+      sub: '294,912개 전수 탐색'
+    }
+  ];
+
+  const container = document.getElementById('exec-summary');
+  container.innerHTML = cards.map(c => `
+    <div class="card p-5 border-t-4 ${c.color}">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-sm font-bold text-gray-900">${c.label}</span>
+        <span class="text-xs px-2 py-0.5 rounded-full ${c.badge}">${c.sub}</span>
+      </div>
+      <div class="text-3xl font-extrabold ${pnlColor(c.pnl)} font-mono mb-1">${c.pnl > 0 ? '+' : ''}${fmt(c.pnl)}%</div>
+      <div class="grid grid-cols-4 gap-2 mt-3 text-xs text-gray-500">
+        <div>거래수<br><span class="font-semibold text-gray-800">${c.n}</span></div>
+        <div>승률<br><span class="font-semibold text-gray-800">${fmt(c.wr, 1)}%</span></div>
+        <div>평균PNL<br><span class="font-semibold ${pnlColor(c.avg)}">${fmt(c.avg)}%</span></div>
+        <div>손절<br><span class="font-semibold text-gray-800">${c.sl}</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ==== Section 2: Greedy vs Combo ====
+function renderGreedyVsCombo() {
+  const g = GREEDY.final;
+  const best = DATA.top50[0];
+
+  const container = document.getElementById('greedy-vs-combo');
+  container.innerHTML = `
+    <div class="card p-5 border-l-4 border-blue-400">
+      <h3 class="font-bold text-gray-900 mb-2">Greedy 순차 최적화</h3>
+      <div class="space-y-2 text-sm text-gray-600">
+        <div class="flex justify-between"><span>익절 전략</span><span class="font-mono font-semibold text-gray-900">전량@3%/100%</span></div>
+        <div class="flex justify-between"><span>PNL%</span><span class="font-mono font-semibold ${pnlColor(g.pnl)}">${fmt(g.pnl)}%</span></div>
+        <div class="flex justify-between"><span>승률</span><span class="font-mono">${fmt(g.wr, 1)}%</span></div>
+        <div class="flex justify-between"><span>거래수</span><span class="font-mono">${g.n}</span></div>
+        <div class="flex justify-between"><span>손절</span><span class="font-mono">${g.sl}</span></div>
+        <div class="mt-3 p-3 bg-blue-50 rounded text-xs">
+          <strong>전략:</strong> 3% 도달 시 전량 매도. 빠르고 확실한 수익 확정. 하지만 3% 이상 상승하는 종목의 추가 수익을 포기합니다.
+        </div>
+      </div>
+    </div>
+    <div class="card p-5 border-l-4 border-amber-400">
+      <h3 class="font-bold text-gray-900 mb-2">전체조합 #1</h3>
+      <div class="space-y-2 text-sm text-gray-600">
+        <div class="flex justify-between"><span>익절 전략</span><span class="font-mono font-semibold text-gray-900">3단계 분할매도</span></div>
+        <div class="flex justify-between"><span>PNL%</span><span class="font-mono font-semibold ${pnlColor(best.pnl)}">${fmt(best.pnl)}%</span></div>
+        <div class="flex justify-between"><span>승률</span><span class="font-mono">${fmt(best.wr, 1)}%</span></div>
+        <div class="flex justify-between"><span>거래수</span><span class="font-mono">${best.n}</span></div>
+        <div class="flex justify-between"><span>손절</span><span class="font-mono">${best.sl}</span></div>
+        <div class="mt-3 p-3 bg-amber-50 rounded text-xs">
+          <strong>전략:</strong> 3%/33% → 6%/50% → 10%/100% 3단계 분할매도. 3%에서 1/3만 팔고 나머지로 6%, 10% 상승까지 추가 수익 포착. PNL +${fmt(best.pnl - g.pnl)}%p 우위.
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ==== Section 3: TOP 20 Table ====
+function renderTop20() {
+  const body = document.getElementById('top20-body');
+  const maxPnl = Math.max(...DATA.top50.slice(0, 20).map(r => r.pnl));
+
+  body.innerHTML = DATA.top50.slice(0, 20).map((r, i) => {
+    const isGold = i === 0;
+    const isMax = r.pnl === maxPnl;
+    const cls = isGold ? 'gold-row' : '';
+    return `<tr class="${cls}">
+      <td class="text-center font-mono font-semibold ${isGold ? 'text-amber-600' : 'text-gray-400'}">${i + 1}</td>
+      <td class="font-mono text-xs">${r.ret}</td>
+      <td class="font-mono text-xs">${r.sl_name}</td>
+      <td class="font-mono text-xs">${r.tp}</td>
+      <td class="font-mono text-xs">${r.trail}</td>
+      <td class="font-mono text-xs">${r.tw}</td>
+      <td class="font-mono text-xs">${r.sb}</td>
+      <td class="text-right font-mono">${r.n}</td>
+      <td class="text-right font-mono ${pnlColor(r.pnl)} ${isMax ? 'best-cell' : ''}">${fmt(r.pnl)}</td>
+      <td class="text-right font-mono">${fmt(r.wr, 1)}</td>
+      <td class="text-right font-mono ${pnlColor(r.avg)}">${fmt(r.avg)}</td>
+      <td class="text-right font-mono">${r.sl}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ==== Section 4: TOP 10 Compound ====
+function renderCompound() {
+  const body = document.getElementById('compound-body');
+  body.innerHTML = DATA.top10_compound.map((r, i) => {
+    const isGold = i === 0;
+    const cls = isGold ? 'gold-row' : '';
+    return `<tr class="${cls}">
+      <td class="text-center font-mono font-semibold ${isGold ? 'text-amber-600' : 'text-gray-400'}">${r.rank}</td>
+      <td class="font-mono text-xs">${r.ret}</td>
+      <td class="font-mono text-xs">${r.sl_name}</td>
+      <td class="font-mono text-xs">${r.tp}</td>
+      <td class="font-mono text-xs">${r.trail}</td>
+      <td class="font-mono text-xs">${r.tw}</td>
+      <td class="font-mono text-xs">${r.sb}</td>
+      <td class="text-right font-mono">${r.n}</td>
+      <td class="text-right font-mono ${pnlColor(r.pnl)}">${fmt(r.pnl)}</td>
+      <td class="text-right font-mono">${fmt(r.wr, 1)}</td>
+      <td class="text-right font-mono font-semibold">${numFmt(r.bal)}원</td>
+      <td class="text-right font-mono ${pnlColor(r.cr)}">${fmt(r.cr)}%</td>
+    </tr>`;
+  }).join('');
+}
+
+// ==== Section 5: Contribution Analysis ====
+function renderContribution() {
+  const container = document.getElementById('contribution-section');
+
+  const dims = [
+    {
+      key: 'ret', title: '되돌림 규칙 (Retracement)',
+      desc: `<p><strong>되돌림 규칙이란:</strong> 익절 단계(TP1~TP4)를 달성한 후 가격이 다시 하락했을 때, 남은 물량을 청산하는 규칙입니다.</p>
+        <ul class="list-disc list-inside text-xs space-y-1 ml-2 mt-1">
+          <li><strong>현행{1:0,3:t2}</strong> -- TP1 후 평균가까지 하락하면 청산 + TP3 후 TP2 가격까지 하락하면 청산</li>
+          <li><strong>3:avg</strong> -- TP1 되돌림 유지 + TP3 후 평균가까지 하락 시 청산 (tier2 대신 avg)</li>
+          <li><strong>3만제거</strong> -- TP1 되돌림만 유지, TP3 되돌림 비활성화</li>
+          <li><strong>전부제거</strong> -- 모든 되돌림 비활성화 (트레일링/강제청산에만 의존)</li>
+          <li><strong>1만제거</strong> -- TP1 되돌림 비활성화, TP3 되돌림만 유지</li>
+          <li><strong>1+2+3</strong> -- TP1,2,3 모두 되돌림 활성화 (가장 적극적 청산)</li>
+        </ul>
+        <p class="mt-1"><strong>발견:</strong> 되돌림 규칙 간 평균PNL 차이는 약 1.3%p로, 6개 차원 중 <strong>영향력이 가장 작습니다</strong>. 이는 최적 익절 전략(3단계 분할)에서는 되돌림이 거의 발동하지 않기 때문입니다.</p>`
+    },
+    {
+      key: 'sl_name', title: '손절 (Stop-Loss)',
+      desc: `<p><strong>FO/AS 형식:</strong> FO = 1차매수만 상태의 손절(First Only), AS = 2차매수 완료 후 손절(After Second). "없음"은 해당 단계에서 손절 비활성화.</p>
+        <ul class="list-disc list-inside text-xs space-y-1 ml-2 mt-1">
+          <li><strong>없음/없음</strong> -- 손절 완전 비활성화. V자 반등 기회 극대화, 급락 방어 불가</li>
+          <li><strong>없음/-5%</strong> -- 1차만 상태에서는 손절 안 함, 2차매수 후 -5% 하락 시 손절</li>
+          <li><strong>현행(~-3.1%/-2.1%)</strong> -- 현재 운영 중인 타이트한 손절. 잦은 손절로 승률 저하</li>
+        </ul>
+        <p class="mt-1"><strong>발견:</strong> 손절은 6개 차원 중 <strong>영향력 2위</strong>입니다. 현행 타이트한 손절(-3.1%/-2.1%)이 평균 PNL을 크게 하락시키고 있습니다(14.34% vs 최적 36.68%).</p>`
+    },
+    {
+      key: 'tp', title: '익절 전략 (Take-Profit Strategy)',
+      desc: `<p><strong>익절 전략 유형:</strong></p>
+        <ul class="list-disc list-inside text-xs space-y-1 ml-2 mt-1">
+          <li><strong>전량@X%</strong> -- X% 도달 시 전량 매도. 단순하고 확실한 수익 확정</li>
+          <li><strong>2단계:A%/B→C%/100</strong> -- A%에서 B% 매도, C%에서 나머지 전량 매도</li>
+          <li><strong>3단계:A%/B→C%/D→E%/100</strong> -- 3단계 분할매도. 점진적 수익 확정</li>
+          <li><strong>현행4단계</strong> -- 현재 운영 중인 4단계 분할매도 (2.5%/25→4.9%/40→6.3%/50→8.5%/50)</li>
+        </ul>
+        <p class="mt-1"><strong>발견:</strong> 평균 PNL 기준 전량@3%가 1위(38.36%)이지만, 최고 PNL 기준 3단계 분할(76.6%)이 압도적. 이는 <strong>분할매도가 최적 조건(넓은 시간대 + 2차매수)과 결합할 때 시너지</strong>가 크다는 뜻입니다.</p>`
+    },
+    {
+      key: 'trail', title: '트레일링 스탑 (Trailing Stop)',
+      desc: `<p><strong>트레일링 스탑:</strong> +trigger%/-drop% 형식. 매수가 대비 trigger% 이상 오르면 활성화, 이후 최고가 대비 drop% 하락 시 전량 매도.</p>
+        <ul class="list-disc list-inside text-xs space-y-1 ml-2 mt-1">
+          <li><strong>+7%/-1%</strong> -- 7% 상승 시 활성화, 최고가 대비 1% 하락 시 매도 (가장 타이트)</li>
+          <li><strong>+5%/-1%</strong> -- 5% 상승 시 활성화 (더 빨리 활성화)</li>
+          <li><strong>+10%/-3%</strong> -- 10% 상승 시 활성화, 3% 하락 허용 (가장 느슨)</li>
+        </ul>
+        <p class="mt-1"><strong>발견:</strong> 트레일링은 6개 차원 중 <strong>영향력이 가장 작습니다</strong>(범위 0.73%p). 어떤 설정이든 큰 차이가 없으며, +7%/-1%가 근소하게 최적입니다.</p>`
+    },
+    {
+      key: 'tw', title: '시간대 (Time Windows)',
+      desc: `<p><strong>시간대 필터:</strong> G=골든10분 종료시간, GM=굿모닝 종료시간, F=세력감지 종료시간. 각 조건식의 매수 접수 시간 범위를 결정합니다.</p>
+        <ul class="list-disc list-inside text-xs space-y-1 ml-2 mt-1">
+          <li><strong>G15</strong> -- 골든10분을 09:15까지 확장 (현행 09:10에서 +5분)</li>
+          <li><strong>GM15/GM20/GM30</strong> -- 굿모닝 종료를 09:15/09:20/09:30으로 설정</li>
+          <li><strong>F14:00/F14:30/F15:20</strong> -- 세력감지 종료를 14:00/14:30/15:20으로 설정</li>
+          <li><strong>G07</strong> -- 골든10분을 09:07로 축소 (현행보다 좁음)</li>
+        </ul>
+        <p class="mt-1"><strong>발견:</strong> 시간대는 6개 차원 중 <strong>영향력 1위</strong>입니다(범위 32.1%p). G15 확장이 결정적이며, 골든10분 5분 연장만으로 평균 PNL이 2배 이상 증가합니다.</p>`
+    },
+    {
+      key: 'sb', title: '2차 매수 (Second Buy)',
+      desc: `<p><strong>2차 매수:</strong> -trigger%/qty배수 형식. 1차 매수가 대비 trigger% 하락 시 qty배수만큼 추가 매수.</p>
+        <ul class="list-disc list-inside text-xs space-y-1 ml-2 mt-1">
+          <li><strong>-5%/2x</strong> -- 5% 하락 시 1차의 2배 수량 추가 매수</li>
+          <li><strong>-4%/3x</strong> -- 4% 하락 시 1차의 3배 수량 추가 매수</li>
+          <li><strong>현행</strong> -- -2.9%/2x (현재 운영 중)</li>
+          <li><strong>비활성화</strong> -- 2차 매수 안 함</li>
+        </ul>
+        <p class="mt-1"><strong>발견:</strong> 2차매수는 6개 차원 중 <strong>영향력 3위</strong>입니다(범위 9.88%p). -5%/2x가 최적이며, 비활성화하면 PNL이 약 10%p 하락합니다.</p>`
+    }
+  ];
+
+  container.innerHTML = dims.map(dim => {
+    const data = DATA.contribution[dim.key];
+    if (!data) return '';
+    const maxAvg = Math.max(...data.map(d => d.avg_pnl));
+
+    return `
+      <div class="card p-5 md:p-6 mb-8">
+        <h2 class="text-lg font-bold text-gray-900 mb-1">${dim.title}</h2>
+        <p class="text-sm text-gray-500 mb-3">후보값별 평균 성과 비교 | 294,912개 시뮬레이션에서 추출</p>
+        <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+          ${dim.desc}
+        </div>
+        <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
+          <table>
+            <thead>
+              <tr>
+                <th class="text-center">#</th>
+                <th>후보값</th>
+                <th class="text-right">평균PNL%</th>
+                <th class="text-right">평균승률%</th>
+                <th class="text-right">평균손절</th>
+                <th class="text-right">최고PNL%</th>
+                <th class="text-right">시뮬레이션수</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.map((d, i) => {
+                const isBest = d.avg_pnl === maxAvg;
+                return `<tr class="${isBest ? 'gold-row' : ''}">
+                  <td class="text-center font-mono ${isBest ? 'text-amber-600 font-semibold' : 'text-gray-400'}">${i + 1}</td>
+                  <td class="font-mono text-xs font-semibold">${d.name}</td>
+                  <td class="text-right font-mono ${pnlColor(d.avg_pnl)} ${isBest ? 'best-cell' : ''}">${fmt(d.avg_pnl)}</td>
+                  <td class="text-right font-mono">${fmt(d.avg_wr, 1)}</td>
+                  <td class="text-right font-mono">${fmt(d.avg_sl, 1)}</td>
+                  <td class="text-right font-mono ${pnlColor(d.best_pnl)}">${fmt(d.best_pnl)}</td>
+                  <td class="text-right font-mono text-gray-400">${numFmt(d.count)}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ==== Section 6: Interaction Analysis ====
+function renderInteraction() {
+  const container = document.getElementById('interaction-section');
+  const pairs = [
+    { key: 'tw_tp', title: '시간대 x 익절전략', d1Label: '시간대', d2Label: '익절전략',
+      desc: '가장 강력한 시너지. 넓은 시간대(G15)에서 3단계 분할매도가 압도적 1위. 시간대 확장으로 추세 강한 종목이 추가되면 분할매도가 그 상승폭을 극대화합니다.' },
+    { key: 'tp_sl_name', title: '익절전략 x 손절', d1Label: '익절전략', d2Label: '손절',
+      desc: '전량@3% + 손절없음이 1위. 하지만 3단계분할 + 없음/-5%도 44.34%로 준수. 손절을 완전 비활성화하면 위험하므로 2차매수 후 -5% 손절은 합리적 타협입니다.' },
+    { key: 'sl_name_sb', title: '손절 x 2차매수', d1Label: '손절', d2Label: '2차매수',
+      desc: '없음/-5% 손절 + -4%/3x 2차매수가 최강 조합. 1차매수에서 손절 없이 버티다가 -4% 하락 시 3배 물타기로 평균가를 크게 낮추면 반등 시 이익이 극대화됩니다.' },
+    { key: 'ret_tp', title: '되돌림 x 익절전략', d1Label: '되돌림', d2Label: '익절전략',
+      desc: '되돌림 규칙별 차이가 거의 없습니다(38.51 vs 38.36). 3단계 분할매도에서는 TP1(3%)에서 33%만 매도하므로 되돌림이 발동할 구간이 줄어듭니다.' },
+    { key: 'tp_trail', title: '익절전략 x 트레일링', d1Label: '익절전략', d2Label: '트레일링',
+      desc: '3단계분할 + +7%/-1%가 근소한 차로 1위. 전량@3%는 어떤 트레일링과 조합해도 동일(전량매도로 트레일링 발동 기회 없음).' },
+    { key: 'sl_name_trail', title: '손절 x 트레일링', d1Label: '손절', d2Label: '트레일링',
+      desc: '없음/-5% 손절이 모든 트레일링 조합에서 1위. 트레일링 자체보다 손절 설정이 결과를 좌우합니다.' }
+  ];
+
+  container.innerHTML = pairs.map(pair => {
+    const data = DATA.interaction[pair.key];
+    if (!data) return '';
+
+    return `
+      <div class="mb-6">
+        <h3 class="font-bold text-gray-800 mb-1 text-base">${pair.title}</h3>
+        <p class="text-xs text-gray-500 mb-2">${pair.desc}</p>
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th class="text-center">#</th>
+                <th>${pair.d1Label}</th>
+                <th>${pair.d2Label}</th>
+                <th class="text-right">평균PNL%</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.map((d, i) => `
+                <tr class="${i === 0 ? 'gold-row' : ''}">
+                  <td class="text-center font-mono ${i === 0 ? 'text-amber-600 font-semibold' : 'text-gray-400'}">${i + 1}</td>
+                  <td class="font-mono text-xs">${d.d1}</td>
+                  <td class="font-mono text-xs">${d.d2}</td>
+                  <td class="text-right font-mono ${pnlColor(d.avg_pnl)}">${fmt(d.avg_pnl)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ==== Section 7: Key Insight Cards ====
+function renderInsights() {
+  const container = document.getElementById('insight-cards');
+  const insights = [
+    {
+      title: '핵심 발견: 시간대가 왕이다',
+      body: '6개 파라미터 중 시간대(Time Windows)의 영향력이 압도적 1위입니다. 골든10분을 09:10에서 09:15로 5분만 늘려도 평균 PNL이 17.52% → 41.70%로 2.4배 증가합니다. 이는 09:10~09:15 사이에 발생하는 고품질 신호를 현행 설정이 모두 놓치고 있다는 뜻입니다.'
+    },
+    {
+      title: '핵심 발견: 분할매도의 숨은 가치',
+      body: 'Greedy 최적화는 전량@3%를 선택했지만, 전체 조합에서는 3단계 분할(3%/33→6%/50→10%/100)이 +9.9%p 더 높습니다. 이는 시간대 확장(G15)과 결합할 때만 드러나는 시너지 — Greedy는 기존 시간대에서 TP를 먼저 최적화했기 때문에 이 패턴을 발견하지 못했습니다.'
+    },
+    {
+      title: '안정성: TOP 50 공통 패턴',
+      body: 'TOP 50 조합 모두 동일한 핵심 설정을 공유합니다: 3단계 분할매도 + 손절 없음(또는 없음/-5%) + 트레일링 +7% 트리거 + G15 시간대 + -5%/2x 또는 -4%/3x 2차매수. 차이는 되돌림/트레일링 하락폭 같은 미세 파라미터에서만 발생합니다.'
+    },
+    {
+      title: '위험: 과적합 경고',
+      body: '294,912개 조합에서 1위를 선택하는 것 자체가 심각한 과적합 위험입니다. 8거래일 데이터에서 특정 종목의 가격 패턴에 맞춰진 결과일 수 있습니다. 특히 손절 비활성화는 이 기간에 큰 급락이 없었기 때문에 최적으로 나온 것이며, 급락장에서는 치명적입니다.'
+    }
+  ];
+
+  container.innerHTML = insights.map(ins => `
+    <div class="insight-card rounded-lg p-4">
+      <h3 class="font-bold text-gray-900 text-sm mb-2">${ins.title}</h3>
+      <p class="text-xs text-gray-600 leading-relaxed">${ins.body}</p>
+    </div>
+  `).join('');
+}
+
+// ==== Section 8: Bottom 10 ====
+function renderBottom10() {
+  const body = document.getElementById('bottom10-body');
+  body.innerHTML = DATA.bottom10.map((r, i) => `
+    <tr class="${i < 3 ? 'worst-cell' : ''}">
+      <td class="text-center font-mono text-gray-400">${i + 1}</td>
+      <td class="font-mono text-xs">${r.ret}</td>
+      <td class="font-mono text-xs">${r.sl_name}</td>
+      <td class="font-mono text-xs">${r.tp}</td>
+      <td class="font-mono text-xs">${r.trail}</td>
+      <td class="font-mono text-xs">${r.tw}</td>
+      <td class="font-mono text-xs">${r.sb}</td>
+      <td class="text-right font-mono">${r.n}</td>
+      <td class="text-right font-mono ${pnlColor(r.pnl)}">${fmt(r.pnl)}</td>
+      <td class="text-right font-mono">${fmt(r.wr, 1)}</td>
+      <td class="text-right font-mono ${pnlColor(r.avg)}">${fmt(r.avg)}</td>
+      <td class="text-right font-mono">${r.sl}</td>
+    </tr>
+  `).join('');
+}
+
+// ==== Section 9: Final Recommendation ====
+function renderFinalRecommendation() {
+  const best = DATA.top10_compound[0];
+  const g = GREEDY.final;
+
+  const container = document.getElementById('final-recommendation');
+  container.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <h3 class="font-bold text-gray-900 mb-3">전체조합 #1 추천 설정</h3>
+        <div class="space-y-2">
+          ${[
+            { label: '되돌림', value: best.ret, desc: 'TP1 후 평단가 하락 시 청산 + TP3 후 TP2 가격 하락 시 청산' },
+            { label: '손절', value: best.sl_name, desc: '1차매수/2차매수 후 모두 손절 비활성화' },
+            { label: '익절전략', value: best.tp, desc: '3%/33% → 6%/50% → 10%/100% 3단계 분할매도' },
+            { label: '트레일링', value: best.trail, desc: '7% 상승 시 활성화, 최고가 대비 1% 하락 시 매도' },
+            { label: '시간대', value: best.tw, desc: '골든10분:09:15 / 굿모닝:09:15 / 세력감지:15:20' },
+            { label: '2차매수', value: best.sb, desc: '5% 하락 시 1차의 2배 수량 추가매수' }
+          ].map(p => `
+            <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+              <span class="text-xs font-semibold text-gray-500 w-16 shrink-0 pt-0.5">${p.label}</span>
+              <div>
+                <span class="font-mono text-sm font-semibold text-gray-900">${p.value}</span>
+                <p class="text-xs text-gray-400 mt-0.5">${p.desc}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+          <div class="text-xs text-green-800">
+            <strong>예상 성과:</strong> PNL ${fmt(best.pnl)}% | 승률 ${fmt(best.wr, 1)}% | 복리수익률 ${fmt(best.cr)}% | 최종잔고 ${numFmt(best.bal)}원
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3 class="font-bold text-gray-900 mb-3">Greedy 추천과 비교</h3>
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th>지표</th>
+                <th class="text-right">Greedy</th>
+                <th class="text-right">전체조합</th>
+                <th class="text-right">차이</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${[
+                { label: '익절 전략', gv: '전량@3%', cv: '3단계 분할', diff: '-' },
+                { label: 'PNL%', gv: fmt(g.pnl), cv: fmt(best.pnl), diff: fmt(best.pnl - g.pnl), isDiff: true },
+                { label: '승률', gv: fmt(g.wr, 1) + '%', cv: fmt(best.wr, 1) + '%', diff: fmt(best.wr - g.wr, 1) + '%p', isDiff: true },
+                { label: '거래수', gv: g.n, cv: best.n, diff: best.n - g.n },
+                { label: '평균PNL%', gv: fmt(g.avg), cv: fmt(best.avg), diff: fmt(best.avg - g.avg), isDiff: true },
+                { label: '손절', gv: g.sl, cv: best.sl_count, diff: best.sl_count - g.sl }
+              ].map(r => `
+                <tr>
+                  <td class="font-semibold text-xs">${r.label}</td>
+                  <td class="text-right font-mono text-xs">${r.gv}</td>
+                  <td class="text-right font-mono text-xs font-semibold">${r.cv}</td>
+                  <td class="text-right font-mono text-xs ${r.isDiff ? pnlColor(parseFloat(r.diff)) : ''}">${r.isDiff ? (parseFloat(r.diff) > 0 ? '+' : '') : ''}${r.diff}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div class="text-xs text-blue-800">
+            <strong>Greedy 설정:</strong> ${GREEDY.desc}
+          </div>
+        </div>
+        <div class="mt-3 p-3 bg-gray-50 rounded-lg">
+          <p class="text-xs text-gray-600"><strong>공통점:</strong> 두 방법 모두 손절 비활성화, G15 시간대 확장, +7% 트레일링 트리거를 선택했습니다. <strong>차이점:</strong> 익절 방식(전량 vs 분할)과 2차매수 설정(-4%/3x vs -5%/2x)만 다릅니다.</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ==== Init ====
+document.addEventListener('DOMContentLoaded', () => {
+  renderExecSummary();
+  renderGreedyVsCombo();
+  renderTop20();
+  renderCompound();
+  renderContribution();
+  renderInteraction();
+  renderInsights();
+  renderBottom10();
+  renderFinalRecommendation();
+});
+</script>
+
+</body>
+</html>
