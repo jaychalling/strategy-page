@@ -107,7 +107,7 @@ tailwind.config = {
 <div class="bg-card border border-indigo-200 rounded-xl p-5 mb-8">
   <div class="flex items-center gap-2 mb-4">
     <h2 class="text-sm font-semibold text-indigo-700 uppercase tracking-wider">통합 매도 전략</h2>
-    <span class="text-[10px] text-muted bg-card2 px-2 py-0.5 rounded">4개 전략 공통 적용</span>
+    <span class="text-[10px] text-muted bg-card2 px-2 py-0.5 rounded">3개 전략 공통 적용</span>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -223,40 +223,6 @@ tailwind.config = {
 <!-- Strategy Cards (per-strategy unique: SB, time window) -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
-  <!-- 골든10분v1 -->
-  <div class="strat-card bg-card border border-blue-200 rounded-xl overflow-hidden">
-    <div class="bg-blue-50 border-b border-blue-200 px-5 py-3 flex items-center justify-between">
-      <div>
-        <h2 class="text-lg font-bold text-blue-600">골든10분v1</h2>
-        <div class="text-xs text-muted">조건: 골든10분 &rarr; 09:00~09:15 <span class="delta delta-new">10분 &rarr; 15분</span></div>
-      </div>
-      <div class="flex flex-col items-end gap-1">
-        <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-medium">반등 추매</span>
-        <span class="px-2 py-0.5 bg-blue-50 text-blue-500 rounded text-[10px]">고가대비 -8.4%</span>
-      </div>
-    </div>
-    <div class="p-5 space-y-4">
-      <div>
-        <div class="text-[10px] text-muted uppercase tracking-wider mb-2">2차 매수 (반등)</div>
-        <div class="grid grid-cols-3 gap-2 text-sm">
-          <div class="bg-card2 rounded-lg p-2 text-center">
-            <div class="mono text-gray-900">-1.6%</div>
-            <div class="text-[10px] text-muted">진입 기준</div>
-          </div>
-          <div class="bg-card2 rounded-lg p-2 text-center">
-            <div class="mono text-profit">+2.2%</div>
-            <div class="text-[10px] text-muted">반등 기준</div>
-          </div>
-          <div class="bg-card2 rounded-lg p-2 text-center">
-            <div class="mono text-gray-900">1.56x</div>
-            <div class="text-[10px] text-muted">수량 배수</div>
-            <div class="delta delta-new">1.15x &rarr; 1.56x</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- 골든10분v2 -->
   <div class="strat-card bg-card border border-purple-200 rounded-xl overflow-hidden">
     <div class="bg-purple-50 border-b border-purple-200 px-5 py-3 flex items-center justify-between">
@@ -362,8 +328,6 @@ tailwind.config = {
     <div class="flex items-center gap-3 bg-card2 rounded-lg p-3">
       <span class="text-gray-900 font-semibold w-20">골든10분</span>
       <svg class="w-4 h-4 text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-      <span class="mono text-xs px-2.5 py-1 bg-blue-100 text-blue-600 rounded-md">골든10분v1</span>
-      <span class="text-muted text-xs">+</span>
       <span class="mono text-xs px-2.5 py-1 bg-purple-100 text-purple-600 rounded-md">골든10분v2</span>
       <span class="text-muted text-xs ml-auto">09:00~09:15</span>
     </div>
