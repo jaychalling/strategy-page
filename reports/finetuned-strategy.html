@@ -232,7 +232,8 @@ tailwind.config = {
         <tr class="text-[10px] text-muted uppercase tracking-wider border-b border-border">
           <th class="text-left py-2 px-3">조건식</th>
           <th class="text-center py-2 px-3">포지션 키</th>
-          <th class="text-center py-2 px-3">시간대</th>
+          <th class="text-center py-2 px-3">시간대 (base)</th>
+          <th class="text-center py-2 px-3">시간대 (new)</th>
           <th class="text-center py-2 px-3">고가대비 제한</th>
         </tr>
       </thead>
@@ -243,7 +244,8 @@ tailwind.config = {
             <span class="mono text-[10px] px-2 py-0.5 bg-gray-100 rounded">_base</span>
             <span class="mono text-[10px] px-2 py-0.5 bg-indigo-100 text-indigo-600 rounded">_new</span>
           </td>
-          <td class="py-3 px-3 text-center mono">09:00~09:15</td>
+          <td class="py-3 px-3 text-center mono bg-gray-50">~09:10</td>
+          <td class="py-3 px-3 text-center mono bg-indigo-50 font-semibold text-indigo-700">~09:15</td>
           <td class="py-3 px-3 text-center mono">-8.4%</td>
         </tr>
         <tr class="border-b border-border/50">
@@ -252,7 +254,8 @@ tailwind.config = {
             <span class="mono text-[10px] px-2 py-0.5 bg-gray-100 rounded">_base</span>
             <span class="mono text-[10px] px-2 py-0.5 bg-indigo-100 text-indigo-600 rounded">_new</span>
           </td>
-          <td class="py-3 px-3 text-center mono">09:00~09:15</td>
+          <td class="py-3 px-3 text-center mono bg-gray-50">~09:15</td>
+          <td class="py-3 px-3 text-center mono bg-indigo-50">~09:15</td>
           <td class="py-3 px-3 text-center mono">-8.4%</td>
         </tr>
         <tr>
@@ -261,7 +264,8 @@ tailwind.config = {
             <span class="mono text-[10px] px-2 py-0.5 bg-gray-100 rounded">_base</span>
             <span class="mono text-[10px] px-2 py-0.5 bg-indigo-100 text-indigo-600 rounded">_new</span>
           </td>
-          <td class="py-3 px-3 text-center mono">09:00~15:20</td>
+          <td class="py-3 px-3 text-center mono bg-gray-50">~14:30</td>
+          <td class="py-3 px-3 text-center mono bg-indigo-50 font-semibold text-indigo-700">~15:20</td>
           <td class="py-3 px-3 text-center mono text-muted">없음</td>
         </tr>
       </tbody>
@@ -285,6 +289,16 @@ tailwind.config = {
         </tr>
       </thead>
       <tbody class="text-xs">
+        <tr class="border-b border-border/50 bg-slate-50">
+          <td class="py-2 px-3 text-muted">골든10분 시간대</td>
+          <td class="py-2 px-3 text-center mono bg-gray-50">~09:10</td>
+          <td class="py-2 px-3 text-center mono bg-indigo-50 font-semibold text-indigo-700">~09:15</td>
+        </tr>
+        <tr class="border-b border-border/50 bg-slate-50">
+          <td class="py-2 px-3 text-muted">세력감지 시간대</td>
+          <td class="py-2 px-3 text-center mono bg-gray-50">~14:30</td>
+          <td class="py-2 px-3 text-center mono bg-indigo-50 font-semibold text-indigo-700">~15:20</td>
+        </tr>
         <tr class="border-b border-border/50">
           <td class="py-2 px-3 text-muted">2차매수 하락기준</td>
           <td class="py-2 px-3 text-center mono bg-gray-50">-2.9%</td>
