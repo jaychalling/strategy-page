@@ -66,12 +66,26 @@ tr:hover td { background: #f9fafb; }
 </div>
 
 <!-- Section 1: Executive Summary -->
+<div class="card p-5 md:p-6 mb-4">
+  <h2 class="text-lg font-bold text-gray-900 mb-2">종합 요약</h2>
+  <div class="text-sm text-gray-600 leading-relaxed space-y-2">
+    <p><strong>분석 대상:</strong> 2026년 2월 4일~13일, 총 8거래일 동안 발생한 실제 조건검색 신호를 기반으로 한 백테스트 시뮬레이션입니다. 4개 전략(골든10분v1, 골든10분v2, 굿모닝, 세력감지)에 걸쳐 발생한 모든 신호를 대상으로 1분봉 캔들 데이터를 사용하여 진입~청산까지의 전 과정을 재현했습니다.</p>
+    <p><strong>최적화 방법:</strong> 9개 파라미터 차원(되돌림 규칙, 손절, 익절 1~4단계, 트레일링 스탑, 시간대, 2차 매수)에 대해 총 1,427회의 그리드 서치 시뮬레이션을 수행했습니다. 각 파라미터를 독립적으로 스윕한 후, 탐욕적 순차 최적화(Greedy Sequential Optimization)로 최적 조합을 도출했습니다.</p>
+    <p><strong>수익률 모델:</strong> 100만원 시작 자본 기준 복리 계산. 각 거래의 수익률을 순차적으로 잔고에 적용하는 방식입니다. 실제 동시 보유 포지션, 슬리피지, 수수료는 미반영되어 있어 실전 결과와 차이가 있을 수 있습니다.</p>
+    <p class="text-xs text-gray-400">아래 3개 카드는 현행 전략 vs 최적화 전략의 핵심 지표 비교입니다. PNL = 개별 거래 수익률 합산, 승률 = 수익 거래 비율, 손절 = 손절매 발동 횟수.</p>
+  </div>
+</div>
 <div id="exec-summary" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"></div>
 
 <!-- Section 2: Greedy Steps -->
 <div class="card p-5 md:p-6 mb-8">
   <h2 class="text-lg font-bold text-gray-900 mb-1">최적화 경로</h2>
-  <p class="text-sm text-gray-500 mb-4">탐욕적 순차 최적화 (Greedy Sequential Optimization) | 각 단계에서 최적 파라미터를 고정하고 다음 단계로 이동</p>
+  <p class="text-sm text-gray-500 mb-3">탐욕적 순차 최적화 (Greedy Sequential Optimization) | 각 단계에서 최적 파라미터를 고정하고 다음 단계로 이동</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>작동 원리:</strong> 9개 파라미터를 한 번에 모두 최적화하면 조합 수가 폭발적으로 증가합니다(수십억 개). 대신 좌표 하강법(Coordinate Descent)을 사용합니다 — 한 번에 하나의 파라미터만 스윕하고, 가장 좋은 값을 고정한 후 다음 파라미터로 넘어갑니다.</p>
+    <p><strong>읽는 법:</strong> 각 행은 하나의 최적화 단계입니다. <strong>"단계별 개선"</strong>은 직전 단계 대비 PNL 변화, <strong>"누적 개선"</strong>은 최초 BASELINE 대비 총 변화입니다. 녹색 배경이 진할수록 해당 단계에서 큰 개선이 발생한 것입니다.</p>
+    <p><strong>주의점:</strong> 순서에 따라 결과가 달라질 수 있습니다. 예를 들어 손절을 먼저 최적화하면 이후 익절의 최적값이 바뀔 수 있습니다. 이 보고서에서는 영향력이 큰 파라미터(되돌림→손절→트레일링)부터 순차 처리합니다.</p>
+  </div>
   <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
     <table id="greedy-table">
       <thead>
@@ -96,44 +110,89 @@ tr:hover td { background: #f9fafb; }
 <!-- Section 3: Heatmaps -->
 <div class="card p-5 md:p-6 mb-8">
   <h2 class="text-lg font-bold text-gray-900 mb-1">손절 히트맵</h2>
-  <p class="text-sm text-gray-500 mb-4">1차매수 손절(FO) x 2차매수 후 손절(AS) | 셀 = 합산 PNL% | 현행: FO=-3.1% / AS=-2.1%</p>
+  <p class="text-sm text-gray-500 mb-3">1차매수 손절(FO) x 2차매수 후 손절(AS) | 셀 = 합산 PNL% | 현행: FO=-3.1% / AS=-2.1%</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>FO (First Only):</strong> 1차 매수만 한 상태에서의 손절 기준입니다. 매수 평균가 대비 이 비율만큼 하락하면 전량 손절매합니다. "없음"은 1차 매수 상태에서 손절을 비활성화한다는 뜻입니다.</p>
+    <p><strong>AS (After Second):</strong> 2차 매수(물타기) 완료 후의 손절 기준입니다. 평균 매수가 대비 이 비율만큼 하락하면 전량 손절합니다. "없음"은 2차 매수 후에도 손절을 비활성화합니다.</p>
+    <p><strong>읽는 법:</strong> 행(↓)은 FO 값, 열(→)은 AS 값입니다. 셀의 숫자는 해당 손절 조합을 적용했을 때의 합산 PNL%입니다. <span class="inline-block w-3 h-3 rounded border-2 border-yellow-400 bg-yellow-50 align-middle"></span> 금색 테두리 = 최고 PNL, <span class="inline-block w-3 h-3 rounded border-2 border-blue-500 border-dashed bg-blue-50 align-middle"></span> 파란 점선 = 현행 설정. 녹색이 진할수록 수익이 높고, 빨간색이 진할수록 손실이 큽니다.</p>
+    <p><strong>핵심 발견:</strong> 손절을 완전히 비활성화("없음/없음")했을 때 PNL이 가장 높습니다. 이는 10일간 백테스트에서 손절이 오히려 V자 반등 기회를 차단했다는 의미입니다. 단, 실전에서는 큰 손실 방어를 위해 넉넉한 손절(-5% 이상)을 권장합니다.</p>
+  </div>
   <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6" id="sl-heatmap"></div>
 </div>
 
 <div class="card p-5 md:p-6 mb-8">
   <h2 class="text-lg font-bold text-gray-900 mb-1">익절 1단계 히트맵</h2>
-  <p class="text-sm text-gray-500 mb-4">TP1 수익 임계값(%) x 매도 비율(%) | 현행: +2.5% / 25%</p>
+  <p class="text-sm text-gray-500 mb-3">TP1 수익 임계값(%) x 매도 비율(%) | 현행: +2.5% / 25%</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>TP1 (Take Profit 1단계):</strong> 매수 후 가격이 처음으로 목표 수익률에 도달했을 때 일부 물량을 매도하는 규칙입니다. 예: "+3.0% / 50%" = 수익률 +3% 도달 시 보유 수량의 50%를 매도합니다.</p>
+    <p><strong>행(↓):</strong> 수익 임계값(profit) — 매수 평균가 대비 몇 % 올랐을 때 TP1을 발동할 것인지. 낮을수록 빨리 익절하고, 높을수록 더 큰 수익을 노립니다.</p>
+    <p><strong>열(→):</strong> 매도 비율(sell_ratio) — 보유 수량 중 몇 %를 매도할 것인지. 100%이면 전량 매도(= 1단계에서 청산 완료). 낮을수록 남은 물량으로 추가 상승을 노릴 수 있습니다.</p>
+    <p><strong>핵심 발견:</strong> +3.0%/100%(전량매도)가 최적으로 나왔습니다. 이는 복잡한 4단계 분할매도보다 +3%에서 깔끔하게 전량 익절하는 것이 10일 데이터에서 더 나은 성과를 보였다는 의미입니다.</p>
+  </div>
   <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6" id="tp1-heatmap"></div>
 </div>
 
 <div class="card p-5 md:p-6 mb-8">
   <h2 class="text-lg font-bold text-gray-900 mb-1">익절 2단계 히트맵</h2>
-  <p class="text-sm text-gray-500 mb-4">TP2 수익 임계값(%) x 매도 비율(%) | 현행: +4.9% / 40%</p>
+  <p class="text-sm text-gray-500 mb-3">TP2 수익 임계값(%) x 매도 비율(%) | 현행: +4.9% / 40%</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>TP2 (Take Profit 2단계):</strong> TP1 이후 남은 물량에 대해 적용되는 두 번째 익절 단계입니다. TP1에서 일부를 매도한 후 가격이 더 올라서 TP2 임계값에 도달하면 남은 물량의 일정 비율을 추가 매도합니다.</p>
+    <p><strong>TP1이 100% 매도일 경우:</strong> 최적화 결과에서 TP1이 전량 매도(100%)로 결정되면 TP2~TP4는 발동할 기회가 없습니다. 이 경우 히트맵은 "만약 TP1에서 전량 매도하지 않았다면" 각 설정이 어떤 성과를 보였을지를 참고용으로 보여줍니다.</p>
+    <p><strong>읽는 법:</strong> TP1 히트맵과 동일합니다. 행(↓) = 수익 임계값, 열(→) = 매도 비율. TP1 이후 남은 물량 기준으로 계산됩니다.</p>
+  </div>
   <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6" id="tp2-heatmap"></div>
 </div>
 
 <div class="card p-5 md:p-6 mb-8">
   <h2 class="text-lg font-bold text-gray-900 mb-1">익절 3단계 히트맵</h2>
-  <p class="text-sm text-gray-500 mb-4">TP3 수익 임계값(%) x 매도 비율(%) | 현행: +6.3% / 50%</p>
+  <p class="text-sm text-gray-500 mb-3">TP3 수익 임계값(%) x 매도 비율(%) | 현행: +6.3% / 50%</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>TP3 (Take Profit 3단계):</strong> TP1, TP2를 거쳐 남은 물량에 대한 세 번째 익절 단계입니다. 일반적으로 강한 상승 추세에서만 도달하는 높은 수익 구간입니다.</p>
+    <p><strong>되돌림 규칙과의 관계:</strong> TP3 이상 도달 후 가격이 하락하면 "되돌림(retracement)" 규칙이 발동할 수 있습니다. 예: TP3 도달 후 평균가까지 하락하면 잔여 물량을 청산하는 규칙입니다.</p>
+    <p><strong>읽는 법:</strong> TP1/TP2와 동일. TP1+TP2에서 이미 매도한 물량을 제외한 잔여분에 대해 계산됩니다.</p>
+  </div>
   <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6" id="tp3-heatmap"></div>
 </div>
 
 <div class="card p-5 md:p-6 mb-8">
   <h2 class="text-lg font-bold text-gray-900 mb-1">익절 4단계 히트맵</h2>
-  <p class="text-sm text-gray-500 mb-4">TP4 수익 임계값(%) x 매도 비율(%) | 현행: +8.5% / 50%</p>
+  <p class="text-sm text-gray-500 mb-3">TP4 수익 임계값(%) x 매도 비율(%) | 현행: +8.5% / 50%</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>TP4 (Take Profit 4단계):</strong> 마지막 익절 단계로, 이전 3개 단계를 모두 통과하고도 남은 최종 잔여 물량에 대한 청산 규칙입니다. 극히 강한 상승(+8% 이상)에서만 도달합니다.</p>
+    <p><strong>잔여 물량 관리:</strong> TP4까지 도달하지 않고 장이 마감되면 남은 물량은 15:25에 강제 청산(시장가 매도)됩니다. TP4의 매도 비율이 100%가 아니면 일부가 트레일링 스탑이나 강제 청산에 의해 처리됩니다.</p>
+    <p><strong>읽는 법:</strong> TP1~3과 동일. 앞선 단계에서 매도하고 남은 최종 잔여분에 대해 계산됩니다.</p>
+  </div>
   <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6" id="tp4-heatmap"></div>
 </div>
 
 <div class="card p-5 md:p-6 mb-8">
   <h2 class="text-lg font-bold text-gray-900 mb-1">트레일링 스탑 히트맵</h2>
-  <p class="text-sm text-gray-500 mb-4">트리거 수익(%) x 하락폭(%) | 현행: +7% / -2.5%</p>
+  <p class="text-sm text-gray-500 mb-3">트리거 수익(%) x 하락폭(%) | 현행: +7% / -2.5%</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>트레일링 스탑이란:</strong> 가격이 일정 수준 이상 올라가면(트리거) 활성화되고, 이후 최고가 대비 일정 비율 이상 하락하면(하락폭) 잔여 물량을 전량 매도하는 규칙입니다. 상승 추세를 따라가면서 이익을 보호합니다.</p>
+    <p><strong>행(↓) 트리거 수익:</strong> 매수 평균가 대비 몇 % 상승해야 트레일링 모드가 활성화되는지. 예: +7%이면 주가가 7% 오를 때까지 트레일링이 작동하지 않습니다.</p>
+    <p><strong>열(→) 하락폭:</strong> 트레일링 활성화 후, 당일 최고가 대비 몇 % 하락하면 매도하는지. 예: -2.5%이면 최고가에서 2.5% 빠지면 즉시 매도합니다. 값이 작을수록(-1%) 빨리 매도하고, 클수록(-4%) 더 많은 하락을 허용합니다.</p>
+    <p><strong>핵심 발견:</strong> +7%/-1.0%(현행 트리거, 더 타이트한 하락폭)이 최적입니다. 현행 -2.5%보다 더 빠르게 수익을 확정하는 것이 유리했습니다.</p>
+  </div>
   <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6" id="trailing-heatmap"></div>
 </div>
 
 <!-- Section 4: Retracement -->
 <div class="card p-5 md:p-6 mb-8">
   <h2 class="text-lg font-bold text-gray-900 mb-1">되돌림 규칙</h2>
-  <p class="text-sm text-gray-500 mb-4">익절 후 되돌림 규칙 조합별 성과 비교</p>
+  <p class="text-sm text-gray-500 mb-3">익절 후 되돌림 규칙 조합별 성과 비교</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>되돌림(Retracement) 규칙이란:</strong> 익절 단계(TP1~TP4) 중 하나를 달성한 후, 가격이 다시 하락했을 때 남은 물량을 청산하는 규칙입니다. "올라갔다가 다시 내려오면 남은 것도 팔자"는 전략입니다.</p>
+    <p><strong>규칙 예시:</strong></p>
+    <ul class="list-disc list-inside text-xs space-y-1 ml-2">
+      <li><strong>1: 0.0</strong> — TP1 달성 후 매수 평균가까지 내려오면 잔여 전량 매도</li>
+      <li><strong>3: tier_2</strong> — TP3 달성 후 TP2 가격까지 내려오면 잔여 전량 매도</li>
+      <li><strong>3: avg(0.0)</strong> — TP3 달성 후 매수 평균가까지 내려오면 잔여 전량 매도</li>
+      <li><strong>전부제거</strong> — 모든 되돌림 규칙 비활성화 (트레일링/강제청산에만 의존)</li>
+    </ul>
+    <p><strong>현행 설정:</strong> {1: 0.0, 3: tier_2} — TP1 후 평단가 하락 시 청산, TP3 후 TP2 가격 하락 시 청산.</p>
+    <p><strong>핵심 발견:</strong> "3:avg" 조합이 가장 좋습니다. TP1 되돌림(ret_1)을 유지하되, TP3 되돌림 기준을 tier_2 대신 평균가(avg)로 바꾸면 소폭 개선됩니다.</p>
+  </div>
   <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
     <table>
       <thead>
@@ -155,7 +214,18 @@ tr:hover td { background: #f9fafb; }
 <!-- Section 5: Time Windows -->
 <div class="card p-5 md:p-6 mb-8">
   <h2 class="text-lg font-bold text-gray-900 mb-1">시간대 최적화</h2>
-  <p class="text-sm text-gray-500 mb-4">골든10분 / 굿모닝 / 세력감지 종료시간 조합 TOP 20</p>
+  <p class="text-sm text-gray-500 mb-3">골든10분 / 굿모닝 / 세력감지 종료시간 조합 TOP 20</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>시간대 필터란:</strong> 각 조건식은 정해진 시간 범위 내에서만 매수 신호를 접수합니다. 범위 밖에서 발생한 신호는 무시됩니다.</p>
+    <p><strong>현행 설정:</strong></p>
+    <ul class="list-disc list-inside text-xs space-y-1 ml-2">
+      <li><strong>골든10분:</strong> 09:00~09:10 (장 시작 후 10분간만 매수)</li>
+      <li><strong>굿모닝:</strong> 09:00~09:15 (장 시작 후 15분간)</li>
+      <li><strong>세력감지:</strong> 09:00~14:30 (거의 종일)</li>
+    </ul>
+    <p><strong>최적화 대상:</strong> 각 조건식의 <strong>종료 시간</strong>을 변경하여 매수 기회를 늘리거나 줄입니다. 시간을 늘리면 거래 수가 증가하지만, 늦은 시간대 신호의 품질이 낮을 수 있습니다.</p>
+    <p><strong>거래수 변화 주목:</strong> 시간대를 확장하면 거래 건수가 크게 늘어납니다(20건→32건). 이 추가 12건의 평균 수익률이 기존보다 높은지가 핵심입니다.</p>
+  </div>
   <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
     <table>
       <thead>
@@ -179,7 +249,14 @@ tr:hover td { background: #f9fafb; }
 <!-- Section 6: Second Buy -->
 <div class="card p-5 md:p-6 mb-8">
   <h2 class="text-lg font-bold text-gray-900 mb-1">2차 매수 최적화</h2>
-  <p class="text-sm text-gray-500 mb-4">트리거 하락폭 x 수량 배수 조합 TOP 15</p>
+  <p class="text-sm text-gray-500 mb-3">트리거 하락폭 x 수량 배수 조합 TOP 15</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>2차 매수(물타기)란:</strong> 1차 매수 후 가격이 일정 수준 하락하면 추가 매수하여 평균 매수가를 낮추는 전략입니다. 이후 가격이 반등하면 더 낮은 가격에서 수익이 시작됩니다.</p>
+    <p><strong>트리거 하락폭(trigger_drop):</strong> 1차 매수가 대비 몇 % 하락해야 2차 매수가 발동하는지. 예: -2.9%이면 1차 매수가에서 2.9% 빠지면 추가 매수합니다. 값이 클수록 더 깊은 하락을 기다립니다.</p>
+    <p><strong>수량 배수(qty_ratio):</strong> 1차 매수 수량 대비 몇 배를 추가 매수하는지. 예: 2.0x이면 1차에 100주 매수했으면 2차에 200주를 추가합니다. 높을수록 평균가가 많이 내려가지만, 손실 시 손실 규모도 커집니다.</p>
+    <p><strong>"비활성화" 행:</strong> 2차 매수를 아예 하지 않는 경우입니다. 물타기 없이 1차 매수분만으로 운영합니다.</p>
+    <p><strong>현행 설정:</strong> trigger -2.9%, qty_ratio 2.0x (direct 방식). 1차 매수가 대비 2.9% 하락 시 1차의 2배 수량을 즉시 추가 매수.</p>
+  </div>
   <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
     <table>
       <thead>
@@ -201,7 +278,18 @@ tr:hover td { background: #f9fafb; }
 <!-- Section 7: Final Config -->
 <div class="card p-5 md:p-6 mb-8">
   <h2 class="text-lg font-bold text-gray-900 mb-1">최종 추천 설정</h2>
-  <p class="text-sm text-gray-500 mb-4">모든 최적화 단계를 적용한 최종 파라미터 구성</p>
+  <p class="text-sm text-gray-500 mb-3">모든 최적화 단계를 적용한 최종 파라미터 구성</p>
+  <div class="text-sm text-gray-600 leading-relaxed mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+    <p><strong>이 설정은:</strong> 위의 모든 최적화 단계(되돌림→손절→트레일링→익절→시간대→2차매수)를 순차적으로 적용한 최종 결과입니다. 각 전략(골든10분v1, v2, 굿모닝, 세력감지)에 대해 개별적으로 적용된 파라미터가 표시됩니다.</p>
+    <p><strong>적용 방법:</strong> 이 설정을 실전에 적용하려면 <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">strategy.json</code> 파일의 해당 값들을 수정합니다. 장중(09:00~15:30)에는 절대 배포하지 않으며, 장 종료 후 적용→다음 날 검증하는 방식을 권장합니다.</p>
+    <p><strong>주의사항:</strong></p>
+    <ul class="list-disc list-inside text-xs space-y-1 ml-2">
+      <li>8거래일(Feb 4~13) 데이터 기반이므로 <strong>과적합(overfitting)</strong> 위험이 있습니다</li>
+      <li>손절 비활성화는 이 기간에 최적이었지만, 급락장에서 큰 손실을 초래할 수 있습니다</li>
+      <li>점진적 적용을 권장합니다 — 먼저 영향이 작은 파라미터(되돌림, 트레일링)부터 변경하고 결과를 관찰한 후, 손절/익절 등 영향이 큰 파라미터를 조정하세요</li>
+      <li>새로운 데이터가 쌓이면 주기적으로 재최적화하여 파라미터를 업데이트하세요</li>
+    </ul>
+  </div>
   <div id="final-config"></div>
 </div>
 
