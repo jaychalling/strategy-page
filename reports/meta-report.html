@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>종합 메타보고서 | 2026-02-04~13</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        bg: '#f8f9fb',
+        card: '#ffffff',
+        profit: '#16a34a',
+        loss: '#dc2626',
+        accent: '#2563eb',
+      },
+      fontFamily: {
+        sans: ['Inter', 'Pretendard', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+      }
+    }
+  }
+}
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+body { background: #f8f9fb; }
+.card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); }
+table { width: 100%; border-collapse: collapse; }
+th { padding: 10px 12px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e5e7eb; white-space: nowrap; }
+td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; font-size: 13px; white-space: nowrap; }
+tr:hover td { background: #f9fafb; }
+.section-micro td { background: rgba(59,130,246,0.03); }
+.section-micro:hover td { background: rgba(59,130,246,0.07); }
+.section-tp_threshold td { background: rgba(234,179,8,0.03); }
+.section-tp_threshold:hover td { background: rgba(234,179,8,0.07); }
+.section-tp_ratio td { background: rgba(34,197,94,0.03); }
+.section-tp_ratio:hover td { background: rgba(34,197,94,0.07); }
+.section-best_combo td { background: rgba(168,85,247,0.03); }
+.section-best_combo:hover td { background: rgba(168,85,247,0.07); }
+.section-baseline td { background: rgba(107,114,128,0.05); }
+.section-baseline:hover td { background: rgba(107,114,128,0.09); }
+.rank-1 { border-left: 4px solid #f59e0b; }
+.bar-fill { height: 24px; border-radius: 4px; display: flex; align-items: center; padding: 0 8px; font-size: 11px; font-weight: 600; min-width: 2px; transition: width 0.5s ease; }
+.timeline-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 2px; flex-shrink: 0; }
+.timeline-line { width: 2px; min-height: 24px; }
+</style>
+</head>
+<body class="min-h-screen p-4 md:p-6 lg:p-8 font-sans text-gray-800">
+<div class="max-w-7xl mx-auto">
+
+<!-- Header -->
+<div class="mb-8">
+  <div class="flex items-center gap-3 mb-3">
+    <a href="/" class="text-sm text-accent hover:underline font-medium">&larr; 대시보드</a>
+    <span class="text-gray-300">|</span>
+    <a href="/reports/full-backtest" class="text-sm text-accent hover:underline">전면 백테스트</a>
+    <span class="text-gray-300">|</span>
+    <a href="/reports/micro-tuning" class="text-sm text-accent hover:underline">마이크로 튜닝</a>
+    <span class="text-gray-300">|</span>
+    <a href="/reports/combo-backtest" class="text-sm text-accent hover:underline">조합별 백테스트</a>
+  </div>
+  <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">종합 메타보고서</h1>
+  <p class="text-gray-500 mt-2 text-base">2026-02-04 ~ 02-13 | 20건 거래 | 시작자금 100만원 기준 순차 복리</p>
+</div>
+
+<!-- Section 1: Executive Summary -->
+<div id="exec-summary" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"></div>
+
+<!-- Section 2: Strategy Ranking -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">전략별 순위</h2>
+  <p class="text-sm text-gray-500 mb-4">21개 전략 변형 (현행 포함) | 복리수익률 기준 정렬</p>
+  <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
+    <table id="ranking-table">
+      <thead>
+        <tr>
+          <th class="text-center">#</th>
+          <th>전략명</th>
+          <th>설명</th>
+          <th class="text-right">거래수</th>
+          <th class="text-right">승률</th>
+          <th class="text-right">합산PNL%</th>
+          <th class="text-right">최종잔고</th>
+          <th class="text-right">복리수익률</th>
+          <th class="text-right">손절수</th>
+        </tr>
+      </thead>
+      <tbody id="ranking-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Section 3: Sell Tier Analysis -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">매도 단계 분석</h2>
+  <p class="text-sm text-gray-500 mb-5">임계값/비율 조정이 복리수익률에 미치는 영향</p>
+
+  <!-- 3-1: TP Threshold -->
+  <div class="mb-8">
+    <h3 class="text-base font-semibold text-gray-700 mb-3">임계값 조정 효과 <span class="text-xs font-normal text-gray-400">(TP 진입 가격 조건 변경)</span></h3>
+    <div id="tp-threshold-bars" class="space-y-2"></div>
+  </div>
+
+  <!-- 3-2: TP Ratio -->
+  <div class="mb-8">
+    <h3 class="text-base font-semibold text-gray-700 mb-3">비율 조정 효과 <span class="text-xs font-normal text-gray-400">(TP 매도 수량 비율 변경)</span></h3>
+    <div id="tp-ratio-bars" class="space-y-2"></div>
+  </div>
+
+  <!-- 3-3: Best Combo -->
+  <div>
+    <h3 class="text-base font-semibold text-gray-700 mb-3">최적 + 매도단계 복합 <span class="text-xs font-normal text-gray-400">(되돌림1제거+2차손절-4%+트레일링10/-3 기반)</span></h3>
+    <div id="best-combo-bars" class="space-y-2"></div>
+  </div>
+</div>
+
+<!-- Section 4: Tier Distribution -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">매도 단계 도달 통계</h2>
+  <p class="text-sm text-gray-500 mb-5">20건 거래에서 각 TP 단계 최대 도달 분포 및 누적 히트 수</p>
+  <div id="tier-analysis" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+</div>
+
+<!-- Section 5: Sell Examples -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">매도 이벤트 예시</h2>
+  <p class="text-sm text-gray-500 mb-5">실제 거래에서의 분할매도 타임라인</p>
+  <div id="sell-examples" class="grid grid-cols-1 lg:grid-cols-2 gap-5"></div>
+</div>
+
+<!-- Section 6: Key Insights -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">핵심 인사이트</h2>
+  <p class="text-sm text-gray-500 mb-5">데이터에서 도출된 주요 발견사항</p>
+  <div id="insights" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+</div>
+
+<!-- Footer -->
+<div class="text-center text-xs text-gray-400 py-6 border-t border-gray-200 mt-8">
+  <p>출처: strategy.json + 61개 종목-날짜별 1분봉 캔들 데이터 (키움API ka10080)</p>
+  <p class="mt-1">Generated: 2026-02-13</p>
+</div>
+
+</div><!-- /max-w-7xl -->
+
+<script>
+const DATA = {"config": {"starting_capital": 1000000}, "baseline": {"name": "CURRENT", "desc": "현행 전략", "total": 20, "wins": 12, "win_rate": 60.0, "total_pnl": 6.95, "stop_losses": 6, "final_balance": 1066351, "compound_return": 6.64, "daily_balances": {"2026-02-04": 1029300, "2026-02-05": 1065516, "2026-02-06": 1040944, "2026-02-09": 1070597, "2026-02-10": 1122576, "2026-02-11": 1072703, "2026-02-12": 1055701, "2026-02-13": 1066351}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": 2.69, "sl": 2}, "굿모닝": {"n": 5, "wins": 4, "pnl": 5.93, "sl": 1}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.05, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 3.38, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 6.73}, "retracement_3": {"n": 4, "pnl": 11.28}, "stop_loss": {"n": 6, "pnl": -14.66}, "retracement_1": {"n": 4, "pnl": 1.24}, "trailing_stop": {"n": 1, "pnl": 2.36}}}, "sections": {"micro": [{"name": "NR1+AS4+T10/3", "desc": "되돌림1제거 + 2차손절-4% + 트레일링10/-3", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 14.86, "stop_losses": 4, "final_balance": 1151322, "compound_return": 15.13, "daily_balances": {"2026-02-04": 1029300, "2026-02-05": 1066386, "2026-02-06": 1051657, "2026-02-09": 1075257, "2026-02-10": 1165009, "2026-02-11": 1198464, "2026-02-12": 1137267, "2026-02-13": 1151322}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 8.38, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 4.99, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.05, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 6.54, "sl": 0}}, "by_exit": {"force_sell": {"n": 9, "pnl": 8.21}, "retracement_3": {"n": 5, "pnl": 12.34}, "stop_loss": {"n": 4, "pnl": -13.51}, "take_profit_4": {"n": 1, "pnl": 2.76}, "trailing_stop": {"n": 1, "pnl": 5.06}}}, {"name": "NR1+AS3+T10/3", "desc": "되돌림1제거 + 2차손절-3% + 트레일링10/-3", "total": 20, "wins": 12, "win_rate": 60.0, "total_pnl": 12.71, "stop_losses": 5, "final_balance": 1127086, "compound_return": 12.71, "daily_balances": {"2026-02-04": 1029300, "2026-02-05": 1066386, "2026-02-06": 1062834, "2026-02-09": 1086684, "2026-02-10": 1177390, "2026-02-11": 1162422, "2026-02-12": 1113327, "2026-02-13": 1127086}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 8.38, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 6.91, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.05, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 2.47, "sl": 1}}, "by_exit": {"force_sell": {"n": 9, "pnl": 8.21}, "retracement_3": {"n": 4, "pnl": 11.28}, "stop_loss": {"n": 5, "pnl": -14.6}, "take_profit_4": {"n": 1, "pnl": 2.76}, "trailing_stop": {"n": 1, "pnl": 5.06}}}, {"name": "NR1+AS4", "desc": "되돌림1제거 + 2차손절-4%", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 13.39, "stop_losses": 4, "final_balance": 1135182, "compound_return": 13.52, "daily_balances": {"2026-02-04": 1029300, "2026-02-05": 1066386, "2026-02-06": 1051657, "2026-02-09": 1075257, "2026-02-10": 1165009, "2026-02-11": 1184319, "2026-02-12": 1123844, "2026-02-13": 1135182}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 8.38, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 3.52, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.05, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 6.54, "sl": 0}}, "by_exit": {"force_sell": {"n": 8, "pnl": 5.62}, "retracement_3": {"n": 5, "pnl": 12.34}, "stop_loss": {"n": 4, "pnl": -13.51}, "take_profit_4": {"n": 1, "pnl": 2.76}, "trailing_stop": {"n": 2, "pnl": 6.18}}}, {"name": "NO_RET1", "desc": "되돌림1만 제거", "total": 20, "wins": 10, "win_rate": 50.0, "total_pnl": 6.49, "stop_losses": 8, "final_balance": 1060530, "compound_return": 6.05, "daily_balances": {"2026-02-04": 1029300, "2026-02-05": 1065516, "2026-02-06": 1029786, "2026-02-09": 1052894, "2026-02-10": 1104012, "2026-02-11": 1087218, "2026-02-12": 1049938, "2026-02-13": 1060530}, "by_strat": {"세력감지": {"n": 9, "wins": 4, "pnl": 1.03, "sl": 3}, "굿모닝": {"n": 5, "wins": 3, "pnl": 7.13, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.05, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 3.38, "sl": 1}}, "by_exit": {"force_sell": {"n": 6, "pnl": 6.49}, "retracement_3": {"n": 4, "pnl": 11.28}, "stop_loss": {"n": 8, "pnl": -17.46}, "trailing_stop": {"n": 2, "pnl": 6.18}}}, {"name": "NO_2ND_BUY", "desc": "2차매수 비활성화", "total": 20, "wins": 12, "win_rate": 60.0, "total_pnl": 5.5, "stop_losses": 5, "final_balance": 1047498, "compound_return": 4.75, "daily_balances": {"2026-02-04": 1029300, "2026-02-05": 1054632, "2026-02-06": 969616, "2026-02-09": 997237, "2026-02-10": 1066378, "2026-02-11": 1047312, "2026-02-12": 1016869, "2026-02-13": 1047498}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": -2.23, "sl": 3}, "굿모닝": {"n": 5, "wins": 4, "pnl": 4.97, "sl": 0}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -1.98, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 4.74, "sl": 0}}, "by_exit": {"force_sell": {"n": 7, "pnl": 6.0}, "retracement_3": {"n": 3, "pnl": 13.11}, "stop_loss": {"n": 5, "pnl": -15.53}, "retracement_1": {"n": 5, "pnl": 1.92}}}], "tp_threshold": [{"name": "TP1_UP+1%", "desc": "1차매도 임계값 +1%p", "total": 20, "wins": 11, "win_rate": 55.0, "total_pnl": 7.92, "stop_losses": 8, "final_balance": 1075116, "compound_return": 7.51, "daily_balances": {"2026-02-04": 1031800, "2026-02-05": 1073305, "2026-02-06": 1028385, "2026-02-09": 1062901, "2026-02-10": 1125353, "2026-02-11": 1097667, "2026-02-12": 1059204, "2026-02-13": 1075116}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": 2.02, "sl": 3}, "굿모닝": {"n": 5, "wins": 3, "pnl": 6.33, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.56, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 4.13, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 7.73}, "retracement_3": {"n": 4, "pnl": 12.77}, "stop_loss": {"n": 8, "pnl": -18.87}, "retracement_1": {"n": 1, "pnl": 0.6}, "trailing_stop": {"n": 2, "pnl": 5.69}}}, {"name": "TP1_UP+2%", "desc": "1차매도 임계값 +2%p", "total": 20, "wins": 10, "win_rate": 50.0, "total_pnl": 9.45, "stop_losses": 8, "final_balance": 1090878, "compound_return": 9.09, "daily_balances": {"2026-02-04": 1034300, "2026-02-05": 1081131, "2026-02-06": 1035883, "2026-02-09": 1062375, "2026-02-10": 1128705, "2026-02-11": 1106290, "2026-02-12": 1070674, "2026-02-13": 1090878}, "by_strat": {"세력감지": {"n": 9, "wins": 4, "pnl": 1.56, "sl": 3}, "굿모닝": {"n": 5, "wins": 3, "pnl": 7.47, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.26, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 4.68, "sl": 1}}, "by_exit": {"force_sell": {"n": 6, "pnl": 7.87}, "retracement_3": {"n": 4, "pnl": 13.87}, "stop_loss": {"n": 8, "pnl": -18.87}, "trailing_stop": {"n": 2, "pnl": 6.58}}}, {"name": "TP_ALL_UP+1%", "desc": "전구간 임계값 +1%p", "total": 20, "wins": 11, "win_rate": 55.0, "total_pnl": 9.51, "stop_losses": 8, "final_balance": 1091353, "compound_return": 9.14, "daily_balances": {"2026-02-04": 1032099, "2026-02-05": 1069567, "2026-02-06": 1024804, "2026-02-09": 1062293, "2026-02-10": 1139784, "2026-02-11": 1115850, "2026-02-12": 1079714, "2026-02-13": 1091353}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": 1.47, "sl": 3}, "굿모닝": {"n": 5, "wins": 3, "pnl": 6.8, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.29, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 5.53, "sl": 1}}, "by_exit": {"force_sell": {"n": 4, "pnl": 6.75}, "retracement_3": {"n": 5, "pnl": 17.39}, "retracement_1": {"n": 2, "pnl": 1.03}, "stop_loss": {"n": 8, "pnl": -18.87}, "trailing_stop": {"n": 1, "pnl": 3.21}}}, {"name": "TP_ALL_UP+2%", "desc": "전구간 임계값 +2%p", "total": 20, "wins": 10, "win_rate": 50.0, "total_pnl": 9.0, "stop_losses": 9, "final_balance": 1085814, "compound_return": 8.58, "daily_balances": {"2026-02-04": 1034600, "2026-02-05": 1072890, "2026-02-06": 1027988, "2026-02-09": 1051412, "2026-02-10": 1129997, "2026-02-11": 1110879, "2026-02-12": 1064157, "2026-02-13": 1085814}, "by_strat": {"세력감지": {"n": 9, "wins": 4, "pnl": 0.43, "sl": 3}, "굿모닝": {"n": 5, "wins": 3, "pnl": 8.01, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -3.01, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 3.57, "sl": 2}}, "by_exit": {"force_sell": {"n": 5, "pnl": 6.06}, "trailing_stop": {"n": 3, "pnl": 13.52}, "retracement_1": {"n": 1, "pnl": 0.68}, "stop_loss": {"n": 9, "pnl": -17.87}, "retracement_3": {"n": 2, "pnl": 6.61}}}], "tp_ratio": [{"name": "TP1_R15", "desc": "1차매도 25%→15%", "total": 20, "wins": 11, "win_rate": 55.0, "total_pnl": 8.25, "stop_losses": 6, "final_balance": 1079622, "compound_return": 7.96, "daily_balances": {"2026-02-04": 1031400, "2026-02-05": 1068900, "2026-02-06": 1042158, "2026-02-09": 1071812, "2026-02-10": 1129553, "2026-02-11": 1075513, "2026-02-12": 1057475, "2026-02-13": 1079622}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": 2.68, "sl": 2}, "굿모닝": {"n": 5, "wins": 3, "pnl": 6.42, "sl": 1}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.79, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 3.94, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 7.06}, "retracement_3": {"n": 4, "pnl": 12.26}, "stop_loss": {"n": 6, "pnl": -14.66}, "retracement_1": {"n": 4, "pnl": 0.13}, "trailing_stop": {"n": 1, "pnl": 3.46}}}, {"name": "TP1_R10", "desc": "1차매도 25%→10%", "total": 20, "wins": 11, "win_rate": 55.0, "total_pnl": 8.33, "stop_losses": 6, "final_balance": 1080260, "compound_return": 8.03, "daily_balances": {"2026-02-04": 1032400, "2026-02-05": 1070643, "2026-02-06": 1042810, "2026-02-09": 1072569, "2026-02-10": 1132211, "2026-02-11": 1076218, "2026-02-12": 1056466, "2026-02-13": 1080260}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": 2.69, "sl": 2}, "굿모닝": {"n": 5, "wins": 3, "pnl": 6.3, "sl": 1}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.75, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 4.09, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 7.24}, "retracement_3": {"n": 4, "pnl": 12.54}, "stop_loss": {"n": 6, "pnl": -14.66}, "retracement_1": {"n": 4, "pnl": -0.41}, "trailing_stop": {"n": 1, "pnl": 3.62}}}, {"name": "SKIP_TP1", "desc": "1차매도 스킵 (0%)", "total": 20, "wins": 9, "win_rate": 45.0, "total_pnl": 8.42, "stop_losses": 6, "final_balance": 1080738, "compound_return": 8.07, "daily_balances": {"2026-02-04": 1034500, "2026-02-05": 1073925, "2026-02-06": 1043904, "2026-02-09": 1073655, "2026-02-10": 1137078, "2026-02-11": 1076962, "2026-02-12": 1053781, "2026-02-13": 1080738}, "by_strat": {"세력감지": {"n": 9, "wins": 4, "pnl": 2.67, "sl": 2}, "굿모닝": {"n": 5, "wins": 2, "pnl": 6.0, "sl": 1}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.67, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 4.42, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 7.56}, "retracement_3": {"n": 4, "pnl": 13.11}, "stop_loss": {"n": 6, "pnl": -14.66}, "retracement_1": {"n": 4, "pnl": -1.52}, "trailing_stop": {"n": 1, "pnl": 3.93}}}, {"name": "TP_HALF", "desc": "전구간 매도비율 절반", "total": 20, "wins": 11, "win_rate": 55.0, "total_pnl": 5.73, "stop_losses": 6, "final_balance": 1053259, "compound_return": 5.33, "daily_balances": {"2026-02-04": 1032099, "2026-02-05": 1058651, "2026-02-06": 1031647, "2026-02-09": 1059338, "2026-02-10": 1107337, "2026-02-11": 1053520, "2026-02-12": 1031553, "2026-02-13": 1053259}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": 1.82, "sl": 2}, "굿모닝": {"n": 5, "wins": 3, "pnl": 5.93, "sl": 1}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.15, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 3.13, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 6.29}, "retracement_3": {"n": 4, "pnl": 10.77}, "stop_loss": {"n": 6, "pnl": -14.66}, "retracement_1": {"n": 4, "pnl": -0.14}, "trailing_stop": {"n": 1, "pnl": 3.47}}}, {"name": "TP_CONSERV", "desc": "전구간 20%씩", "total": 20, "wins": 12, "win_rate": 60.0, "total_pnl": 5.97, "stop_losses": 6, "final_balance": 1056032, "compound_return": 5.6, "daily_balances": {"2026-02-04": 1030500, "2026-02-05": 1056343, "2026-02-06": 1030949, "2026-02-09": 1058750, "2026-02-10": 1104383, "2026-02-11": 1053433, "2026-02-12": 1034669, "2026-02-13": 1056032}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": 1.9, "sl": 2}, "굿모닝": {"n": 5, "wins": 4, "pnl": 6.28, "sl": 1}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.13, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 2.92, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 6.11}, "retracement_3": {"n": 4, "pnl": 10.41}, "stop_loss": {"n": 6, "pnl": -14.66}, "retracement_1": {"n": 4, "pnl": 0.68}, "trailing_stop": {"n": 1, "pnl": 3.43}}}, {"name": "TP_AGGR_EARLY", "desc": "초기공격적 TP1:40%/TP2:50%", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 7.69, "stop_losses": 6, "final_balance": 1074549, "compound_return": 7.45, "daily_balances": {"2026-02-04": 1026200, "2026-02-05": 1062917, "2026-02-06": 1041421, "2026-02-09": 1071548, "2026-02-10": 1119578, "2026-02-11": 1075468, "2026-02-12": 1064753, "2026-02-13": 1074549}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 2.99, "sl": 2}, "굿모닝": {"n": 5, "wins": 4, "pnl": 6.72, "sl": 1}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.05, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 3.03, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 6.53}, "retracement_3": {"n": 4, "pnl": 10.67}, "stop_loss": {"n": 6, "pnl": -14.66}, "retracement_1": {"n": 4, "pnl": 2.88}, "trailing_stop": {"n": 1, "pnl": 2.27}}}], "best_combo": [{"name": "BEST+TP1_UP1", "desc": "최적 + 1차매도+1%", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 16.35, "stop_losses": 4, "final_balance": 1168035, "compound_return": 16.8, "daily_balances": {"2026-02-04": 1031800, "2026-02-05": 1074182, "2026-02-06": 1061922, "2026-02-09": 1089491, "2026-02-10": 1191330, "2026-02-11": 1213553, "2026-02-12": 1148181, "2026-02-13": 1168035}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 9.68, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 3.43, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.56, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 7.8, "sl": 0}}, "by_exit": {"force_sell": {"n": 9, "pnl": 9.76}, "retracement_3": {"n": 5, "pnl": 14.34}, "stop_loss": {"n": 4, "pnl": -14.27}, "take_profit_4": {"n": 1, "pnl": 3.01}, "trailing_stop": {"n": 1, "pnl": 3.51}}}, {"name": "BEST+TP1_UP2", "desc": "최적 + 1차매도+2%", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 19.32, "stop_losses": 4, "final_balance": 1202096, "compound_return": 20.21, "daily_balances": {"2026-02-04": 1034300, "2026-02-05": 1082014, "2026-02-06": 1071638, "2026-02-09": 1099044, "2026-02-10": 1205952, "2026-02-11": 1240576, "2026-02-12": 1177209, "2026-02-13": 1202096}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 10.15, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 4.58, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.26, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 8.85, "sl": 0}}, "by_exit": {"force_sell": {"n": 9, "pnl": 10.43}, "retracement_3": {"n": 5, "pnl": 15.94}, "stop_loss": {"n": 4, "pnl": -14.27}, "take_profit_4": {"n": 1, "pnl": 3.2}, "trailing_stop": {"n": 1, "pnl": 4.02}}}, {"name": "BEST+TP_ALL_UP1", "desc": "최적 + 전구간+1%", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 18.48, "stop_losses": 4, "final_balance": 1191842, "compound_return": 19.18, "daily_balances": {"2026-02-04": 1032099, "2026-02-05": 1066818, "2026-02-06": 1059045, "2026-02-09": 1089712, "2026-02-10": 1207542, "2026-02-11": 1242846, "2026-02-12": 1179132, "2026-02-13": 1191842}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 9.22, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 3.68, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.29, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 9.87, "sl": 0}}, "by_exit": {"force_sell": {"n": 8, "pnl": 5.78}, "retracement_3": {"n": 7, "pnl": 23.07}, "stop_loss": {"n": 4, "pnl": -14.27}, "trailing_stop": {"n": 1, "pnl": 3.9}}}, {"name": "BEST+SKIP_TP1", "desc": "최적 + 1차매도스킵", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 19.31, "stop_losses": 4, "final_balance": 1201326, "compound_return": 20.13, "daily_balances": {"2026-02-04": 1034500, "2026-02-05": 1074803, "2026-02-06": 1065012, "2026-02-09": 1090764, "2026-02-10": 1193078, "2026-02-11": 1233086, "2026-02-12": 1166088, "2026-02-13": 1201326}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 9.47, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 6.64, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.67, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 7.87, "sl": 0}}, "by_exit": {"force_sell": {"n": 9, "pnl": 10.62}, "retracement_3": {"n": 5, "pnl": 14.46}, "stop_loss": {"n": 4, "pnl": -14.27}, "take_profit_4": {"n": 1, "pnl": 3.25}, "trailing_stop": {"n": 1, "pnl": 5.25}}}, {"name": "BEST+TP1_R15", "desc": "최적 + 1차매도15%", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 17.47, "stop_losses": 4, "final_balance": 1180614, "compound_return": 18.06, "daily_balances": {"2026-02-04": 1031400, "2026-02-05": 1069774, "2026-02-06": 1057052, "2026-02-09": 1081381, "2026-02-10": 1177358, "2026-02-11": 1214488, "2026-02-12": 1152052, "2026-02-13": 1180614}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 8.81, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 6.15, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.79, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 7.3, "sl": 0}}, "by_exit": {"force_sell": {"n": 9, "pnl": 9.7}, "retracement_3": {"n": 5, "pnl": 13.52}, "stop_loss": {"n": 4, "pnl": -13.85}, "take_profit_4": {"n": 1, "pnl": 2.96}, "trailing_stop": {"n": 1, "pnl": 5.14}}}, {"name": "BEST+TP_HALF", "desc": "최적 + 매도비율절반", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 17.06, "stop_losses": 4, "final_balance": 1174777, "compound_return": 17.48, "daily_balances": {"2026-02-04": 1032099, "2026-02-05": 1059516, "2026-02-06": 1045288, "2026-02-09": 1067881, "2026-02-10": 1153099, "2026-02-11": 1208183, "2026-02-12": 1141630, "2026-02-13": 1174777}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 7.85, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 8.3, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.15, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 6.06, "sl": 0}}, "by_exit": {"force_sell": {"n": 10, "pnl": 12.13}, "retracement_3": {"n": 5, "pnl": 11.6}, "stop_loss": {"n": 4, "pnl": -13.92}, "trailing_stop": {"n": 1, "pnl": 7.25}}}, {"name": "BEST+TP_CONSERV", "desc": "최적 + 전구간20%", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 15.96, "stop_losses": 4, "final_balance": 1162757, "compound_return": 16.28, "daily_balances": {"2026-02-04": 1030500, "2026-02-05": 1057207, "2026-02-06": 1038546, "2026-02-09": 1060596, "2026-02-10": 1143037, "2026-02-11": 1192969, "2026-02-12": 1130057, "2026-02-13": 1162757}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 7.31, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 7.9, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.13, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 5.88, "sl": 0}}, "by_exit": {"force_sell": {"n": 10, "pnl": 11.58}, "retracement_3": {"n": 5, "pnl": 11.27}, "stop_loss": {"n": 4, "pnl": -13.69}, "trailing_stop": {"n": 1, "pnl": 6.8}}}]}, "all_ranked": [{"name": "BEST+TP1_UP2", "desc": "최적 + 1차매도+2%", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 19.32, "stop_losses": 4, "final_balance": 1202096, "compound_return": 20.21, "daily_balances": {"2026-02-04": 1034300, "2026-02-05": 1082014, "2026-02-06": 1071638, "2026-02-09": 1099044, "2026-02-10": 1205952, "2026-02-11": 1240576, "2026-02-12": 1177209, "2026-02-13": 1202096}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 10.15, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 4.58, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.26, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 8.85, "sl": 0}}, "by_exit": {"force_sell": {"n": 9, "pnl": 10.43}, "retracement_3": {"n": 5, "pnl": 15.94}, "stop_loss": {"n": 4, "pnl": -14.27}, "take_profit_4": {"n": 1, "pnl": 3.2}, "trailing_stop": {"n": 1, "pnl": 4.02}}}, {"name": "BEST+SKIP_TP1", "desc": "최적 + 1차매도스킵", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 19.31, "stop_losses": 4, "final_balance": 1201326, "compound_return": 20.13, "daily_balances": {"2026-02-04": 1034500, "2026-02-05": 1074803, "2026-02-06": 1065012, "2026-02-09": 1090764, "2026-02-10": 1193078, "2026-02-11": 1233086, "2026-02-12": 1166088, "2026-02-13": 1201326}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 9.47, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 6.64, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.67, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 7.87, "sl": 0}}, "by_exit": {"force_sell": {"n": 9, "pnl": 10.62}, "retracement_3": {"n": 5, "pnl": 14.46}, "stop_loss": {"n": 4, "pnl": -14.27}, "take_profit_4": {"n": 1, "pnl": 3.25}, "trailing_stop": {"n": 1, "pnl": 5.25}}}, {"name": "BEST+TP_ALL_UP1", "desc": "최적 + 전구간+1%", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 18.48, "stop_losses": 4, "final_balance": 1191842, "compound_return": 19.18, "daily_balances": {"2026-02-04": 1032099, "2026-02-05": 1066818, "2026-02-06": 1059045, "2026-02-09": 1089712, "2026-02-10": 1207542, "2026-02-11": 1242846, "2026-02-12": 1179132, "2026-02-13": 1191842}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 9.22, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 3.68, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.29, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 9.87, "sl": 0}}, "by_exit": {"force_sell": {"n": 8, "pnl": 5.78}, "retracement_3": {"n": 7, "pnl": 23.07}, "stop_loss": {"n": 4, "pnl": -14.27}, "trailing_stop": {"n": 1, "pnl": 3.9}}}, {"name": "BEST+TP1_R15", "desc": "최적 + 1차매도15%", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 17.47, "stop_losses": 4, "final_balance": 1180614, "compound_return": 18.06, "daily_balances": {"2026-02-04": 1031400, "2026-02-05": 1069774, "2026-02-06": 1057052, "2026-02-09": 1081381, "2026-02-10": 1177358, "2026-02-11": 1214488, "2026-02-12": 1152052, "2026-02-13": 1180614}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 8.81, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 6.15, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.79, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 7.3, "sl": 0}}, "by_exit": {"force_sell": {"n": 9, "pnl": 9.7}, "retracement_3": {"n": 5, "pnl": 13.52}, "stop_loss": {"n": 4, "pnl": -13.85}, "take_profit_4": {"n": 1, "pnl": 2.96}, "trailing_stop": {"n": 1, "pnl": 5.14}}}, {"name": "BEST+TP_HALF", "desc": "최적 + 매도비율절반", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 17.06, "stop_losses": 4, "final_balance": 1174777, "compound_return": 17.48, "daily_balances": {"2026-02-04": 1032099, "2026-02-05": 1059516, "2026-02-06": 1045288, "2026-02-09": 1067881, "2026-02-10": 1153099, "2026-02-11": 1208183, "2026-02-12": 1141630, "2026-02-13": 1174777}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 7.85, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 8.3, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.15, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 6.06, "sl": 0}}, "by_exit": {"force_sell": {"n": 10, "pnl": 12.13}, "retracement_3": {"n": 5, "pnl": 11.6}, "stop_loss": {"n": 4, "pnl": -13.92}, "trailing_stop": {"n": 1, "pnl": 7.25}}}, {"name": "BEST+TP1_UP1", "desc": "최적 + 1차매도+1%", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 16.35, "stop_losses": 4, "final_balance": 1168035, "compound_return": 16.8, "daily_balances": {"2026-02-04": 1031800, "2026-02-05": 1074182, "2026-02-06": 1061922, "2026-02-09": 1089491, "2026-02-10": 1191330, "2026-02-11": 1213553, "2026-02-12": 1148181, "2026-02-13": 1168035}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 9.68, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 3.43, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.56, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 7.8, "sl": 0}}, "by_exit": {"force_sell": {"n": 9, "pnl": 9.76}, "retracement_3": {"n": 5, "pnl": 14.34}, "stop_loss": {"n": 4, "pnl": -14.27}, "take_profit_4": {"n": 1, "pnl": 3.01}, "trailing_stop": {"n": 1, "pnl": 3.51}}}, {"name": "BEST+TP_CONSERV", "desc": "최적 + 전구간20%", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 15.96, "stop_losses": 4, "final_balance": 1162757, "compound_return": 16.28, "daily_balances": {"2026-02-04": 1030500, "2026-02-05": 1057207, "2026-02-06": 1038546, "2026-02-09": 1060596, "2026-02-10": 1143037, "2026-02-11": 1192969, "2026-02-12": 1130057, "2026-02-13": 1162757}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 7.31, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 7.9, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.13, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 5.88, "sl": 0}}, "by_exit": {"force_sell": {"n": 10, "pnl": 11.58}, "retracement_3": {"n": 5, "pnl": 11.27}, "stop_loss": {"n": 4, "pnl": -13.69}, "trailing_stop": {"n": 1, "pnl": 6.8}}}, {"name": "NR1+AS4+T10/3", "desc": "되돌림1제거 + 2차손절-4% + 트레일링10/-3", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 14.86, "stop_losses": 4, "final_balance": 1151322, "compound_return": 15.13, "daily_balances": {"2026-02-04": 1029300, "2026-02-05": 1066386, "2026-02-06": 1051657, "2026-02-09": 1075257, "2026-02-10": 1165009, "2026-02-11": 1198464, "2026-02-12": 1137267, "2026-02-13": 1151322}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 8.38, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 4.99, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.05, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 6.54, "sl": 0}}, "by_exit": {"force_sell": {"n": 9, "pnl": 8.21}, "retracement_3": {"n": 5, "pnl": 12.34}, "stop_loss": {"n": 4, "pnl": -13.51}, "take_profit_4": {"n": 1, "pnl": 2.76}, "trailing_stop": {"n": 1, "pnl": 5.06}}}, {"name": "NR1+AS4", "desc": "되돌림1제거 + 2차손절-4%", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 13.39, "stop_losses": 4, "final_balance": 1135182, "compound_return": 13.52, "daily_balances": {"2026-02-04": 1029300, "2026-02-05": 1066386, "2026-02-06": 1051657, "2026-02-09": 1075257, "2026-02-10": 1165009, "2026-02-11": 1184319, "2026-02-12": 1123844, "2026-02-13": 1135182}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 8.38, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 3.52, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.05, "sl": 2}, "골든10분v2": {"n": 3, "wins": 3, "pnl": 6.54, "sl": 0}}, "by_exit": {"force_sell": {"n": 8, "pnl": 5.62}, "retracement_3": {"n": 5, "pnl": 12.34}, "stop_loss": {"n": 4, "pnl": -13.51}, "take_profit_4": {"n": 1, "pnl": 2.76}, "trailing_stop": {"n": 2, "pnl": 6.18}}}, {"name": "NR1+AS3+T10/3", "desc": "되돌림1제거 + 2차손절-3% + 트레일링10/-3", "total": 20, "wins": 12, "win_rate": 60.0, "total_pnl": 12.71, "stop_losses": 5, "final_balance": 1127086, "compound_return": 12.71, "daily_balances": {"2026-02-04": 1029300, "2026-02-05": 1066386, "2026-02-06": 1062834, "2026-02-09": 1086684, "2026-02-10": 1177390, "2026-02-11": 1162422, "2026-02-12": 1113327, "2026-02-13": 1127086}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 8.38, "sl": 0}, "굿모닝": {"n": 5, "wins": 3, "pnl": 6.91, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.05, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 2.47, "sl": 1}}, "by_exit": {"force_sell": {"n": 9, "pnl": 8.21}, "retracement_3": {"n": 4, "pnl": 11.28}, "stop_loss": {"n": 5, "pnl": -14.6}, "take_profit_4": {"n": 1, "pnl": 2.76}, "trailing_stop": {"n": 1, "pnl": 5.06}}}, {"name": "TP_ALL_UP+1%", "desc": "전구간 임계값 +1%p", "total": 20, "wins": 11, "win_rate": 55.0, "total_pnl": 9.51, "stop_losses": 8, "final_balance": 1091353, "compound_return": 9.14, "daily_balances": {"2026-02-04": 1032099, "2026-02-05": 1069567, "2026-02-06": 1024804, "2026-02-09": 1062293, "2026-02-10": 1139784, "2026-02-11": 1115850, "2026-02-12": 1079714, "2026-02-13": 1091353}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": 1.47, "sl": 3}, "굿모닝": {"n": 5, "wins": 3, "pnl": 6.8, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.29, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 5.53, "sl": 1}}, "by_exit": {"force_sell": {"n": 4, "pnl": 6.75}, "retracement_3": {"n": 5, "pnl": 17.39}, "retracement_1": {"n": 2, "pnl": 1.03}, "stop_loss": {"n": 8, "pnl": -18.87}, "trailing_stop": {"n": 1, "pnl": 3.21}}}, {"name": "TP1_UP+2%", "desc": "1차매도 임계값 +2%p", "total": 20, "wins": 10, "win_rate": 50.0, "total_pnl": 9.45, "stop_losses": 8, "final_balance": 1090878, "compound_return": 9.09, "daily_balances": {"2026-02-04": 1034300, "2026-02-05": 1081131, "2026-02-06": 1035883, "2026-02-09": 1062375, "2026-02-10": 1128705, "2026-02-11": 1106290, "2026-02-12": 1070674, "2026-02-13": 1090878}, "by_strat": {"세력감지": {"n": 9, "wins": 4, "pnl": 1.56, "sl": 3}, "굿모닝": {"n": 5, "wins": 3, "pnl": 7.47, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.26, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 4.68, "sl": 1}}, "by_exit": {"force_sell": {"n": 6, "pnl": 7.87}, "retracement_3": {"n": 4, "pnl": 13.87}, "stop_loss": {"n": 8, "pnl": -18.87}, "trailing_stop": {"n": 2, "pnl": 6.58}}}, {"name": "TP_ALL_UP+2%", "desc": "전구간 임계값 +2%p", "total": 20, "wins": 10, "win_rate": 50.0, "total_pnl": 9.0, "stop_losses": 9, "final_balance": 1085814, "compound_return": 8.58, "daily_balances": {"2026-02-04": 1034600, "2026-02-05": 1072890, "2026-02-06": 1027988, "2026-02-09": 1051412, "2026-02-10": 1129997, "2026-02-11": 1110879, "2026-02-12": 1064157, "2026-02-13": 1085814}, "by_strat": {"세력감지": {"n": 9, "wins": 4, "pnl": 0.43, "sl": 3}, "굿모닝": {"n": 5, "wins": 3, "pnl": 8.01, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -3.01, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 3.57, "sl": 2}}, "by_exit": {"force_sell": {"n": 5, "pnl": 6.06}, "trailing_stop": {"n": 3, "pnl": 13.52}, "retracement_1": {"n": 1, "pnl": 0.68}, "stop_loss": {"n": 9, "pnl": -17.87}, "retracement_3": {"n": 2, "pnl": 6.61}}}, {"name": "SKIP_TP1", "desc": "1차매도 스킵 (0%)", "total": 20, "wins": 9, "win_rate": 45.0, "total_pnl": 8.42, "stop_losses": 6, "final_balance": 1080738, "compound_return": 8.07, "daily_balances": {"2026-02-04": 1034500, "2026-02-05": 1073925, "2026-02-06": 1043904, "2026-02-09": 1073655, "2026-02-10": 1137078, "2026-02-11": 1076962, "2026-02-12": 1053781, "2026-02-13": 1080738}, "by_strat": {"세력감지": {"n": 9, "wins": 4, "pnl": 2.67, "sl": 2}, "굿모닝": {"n": 5, "wins": 2, "pnl": 6.0, "sl": 1}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.67, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 4.42, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 7.56}, "retracement_3": {"n": 4, "pnl": 13.11}, "stop_loss": {"n": 6, "pnl": -14.66}, "retracement_1": {"n": 4, "pnl": -1.52}, "trailing_stop": {"n": 1, "pnl": 3.93}}}, {"name": "TP1_R10", "desc": "1차매도 25%→10%", "total": 20, "wins": 11, "win_rate": 55.0, "total_pnl": 8.33, "stop_losses": 6, "final_balance": 1080260, "compound_return": 8.03, "daily_balances": {"2026-02-04": 1032400, "2026-02-05": 1070643, "2026-02-06": 1042810, "2026-02-09": 1072569, "2026-02-10": 1132211, "2026-02-11": 1076218, "2026-02-12": 1056466, "2026-02-13": 1080260}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": 2.69, "sl": 2}, "굿모닝": {"n": 5, "wins": 3, "pnl": 6.3, "sl": 1}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.75, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 4.09, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 7.24}, "retracement_3": {"n": 4, "pnl": 12.54}, "stop_loss": {"n": 6, "pnl": -14.66}, "retracement_1": {"n": 4, "pnl": -0.41}, "trailing_stop": {"n": 1, "pnl": 3.62}}}, {"name": "TP1_R15", "desc": "1차매도 25%→15%", "total": 20, "wins": 11, "win_rate": 55.0, "total_pnl": 8.25, "stop_losses": 6, "final_balance": 1079622, "compound_return": 7.96, "daily_balances": {"2026-02-04": 1031400, "2026-02-05": 1068900, "2026-02-06": 1042158, "2026-02-09": 1071812, "2026-02-10": 1129553, "2026-02-11": 1075513, "2026-02-12": 1057475, "2026-02-13": 1079622}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": 2.68, "sl": 2}, "굿모닝": {"n": 5, "wins": 3, "pnl": 6.42, "sl": 1}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.79, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 3.94, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 7.06}, "retracement_3": {"n": 4, "pnl": 12.26}, "stop_loss": {"n": 6, "pnl": -14.66}, "retracement_1": {"n": 4, "pnl": 0.13}, "trailing_stop": {"n": 1, "pnl": 3.46}}}, {"name": "TP1_UP+1%", "desc": "1차매도 임계값 +1%p", "total": 20, "wins": 11, "win_rate": 55.0, "total_pnl": 7.92, "stop_losses": 8, "final_balance": 1075116, "compound_return": 7.51, "daily_balances": {"2026-02-04": 1031800, "2026-02-05": 1073305, "2026-02-06": 1028385, "2026-02-09": 1062901, "2026-02-10": 1125353, "2026-02-11": 1097667, "2026-02-12": 1059204, "2026-02-13": 1075116}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": 2.02, "sl": 3}, "굿모닝": {"n": 5, "wins": 3, "pnl": 6.33, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -4.56, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 4.13, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 7.73}, "retracement_3": {"n": 4, "pnl": 12.77}, "stop_loss": {"n": 8, "pnl": -18.87}, "retracement_1": {"n": 1, "pnl": 0.6}, "trailing_stop": {"n": 2, "pnl": 5.69}}}, {"name": "TP_AGGR_EARLY", "desc": "초기공격적 TP1:40%/TP2:50%", "total": 20, "wins": 13, "win_rate": 65.0, "total_pnl": 7.69, "stop_losses": 6, "final_balance": 1074549, "compound_return": 7.45, "daily_balances": {"2026-02-04": 1026200, "2026-02-05": 1062917, "2026-02-06": 1041421, "2026-02-09": 1071548, "2026-02-10": 1119578, "2026-02-11": 1075468, "2026-02-12": 1064753, "2026-02-13": 1074549}, "by_strat": {"세력감지": {"n": 9, "wins": 6, "pnl": 2.99, "sl": 2}, "굿모닝": {"n": 5, "wins": 4, "pnl": 6.72, "sl": 1}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.05, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 3.03, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 6.53}, "retracement_3": {"n": 4, "pnl": 10.67}, "stop_loss": {"n": 6, "pnl": -14.66}, "retracement_1": {"n": 4, "pnl": 2.88}, "trailing_stop": {"n": 1, "pnl": 2.27}}}, {"name": "CURRENT", "desc": "현행 전략", "total": 20, "wins": 12, "win_rate": 60.0, "total_pnl": 6.95, "stop_losses": 6, "final_balance": 1066351, "compound_return": 6.64, "daily_balances": {"2026-02-04": 1029300, "2026-02-05": 1065516, "2026-02-06": 1040944, "2026-02-09": 1070597, "2026-02-10": 1122576, "2026-02-11": 1072703, "2026-02-12": 1055701, "2026-02-13": 1066351}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": 2.69, "sl": 2}, "굿모닝": {"n": 5, "wins": 4, "pnl": 5.93, "sl": 1}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.05, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 3.38, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 6.73}, "retracement_3": {"n": 4, "pnl": 11.28}, "stop_loss": {"n": 6, "pnl": -14.66}, "retracement_1": {"n": 4, "pnl": 1.24}, "trailing_stop": {"n": 1, "pnl": 2.36}}}, {"name": "NO_RET1", "desc": "되돌림1만 제거", "total": 20, "wins": 10, "win_rate": 50.0, "total_pnl": 6.49, "stop_losses": 8, "final_balance": 1060530, "compound_return": 6.05, "daily_balances": {"2026-02-04": 1029300, "2026-02-05": 1065516, "2026-02-06": 1029786, "2026-02-09": 1052894, "2026-02-10": 1104012, "2026-02-11": 1087218, "2026-02-12": 1049938, "2026-02-13": 1060530}, "by_strat": {"세력감지": {"n": 9, "wins": 4, "pnl": 1.03, "sl": 3}, "굿모닝": {"n": 5, "wins": 3, "pnl": 7.13, "sl": 2}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.05, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 3.38, "sl": 1}}, "by_exit": {"force_sell": {"n": 6, "pnl": 6.49}, "retracement_3": {"n": 4, "pnl": 11.28}, "stop_loss": {"n": 8, "pnl": -17.46}, "trailing_stop": {"n": 2, "pnl": 6.18}}}, {"name": "TP_CONSERV", "desc": "전구간 20%씩", "total": 20, "wins": 12, "win_rate": 60.0, "total_pnl": 5.97, "stop_losses": 6, "final_balance": 1056032, "compound_return": 5.6, "daily_balances": {"2026-02-04": 1030500, "2026-02-05": 1056343, "2026-02-06": 1030949, "2026-02-09": 1058750, "2026-02-10": 1104383, "2026-02-11": 1053433, "2026-02-12": 1034669, "2026-02-13": 1056032}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": 1.9, "sl": 2}, "굿모닝": {"n": 5, "wins": 4, "pnl": 6.28, "sl": 1}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.13, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 2.92, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 6.11}, "retracement_3": {"n": 4, "pnl": 10.41}, "stop_loss": {"n": 6, "pnl": -14.66}, "retracement_1": {"n": 4, "pnl": 0.68}, "trailing_stop": {"n": 1, "pnl": 3.43}}}, {"name": "TP_HALF", "desc": "전구간 매도비율 절반", "total": 20, "wins": 11, "win_rate": 55.0, "total_pnl": 5.73, "stop_losses": 6, "final_balance": 1053259, "compound_return": 5.33, "daily_balances": {"2026-02-04": 1032099, "2026-02-05": 1058651, "2026-02-06": 1031647, "2026-02-09": 1059338, "2026-02-10": 1107337, "2026-02-11": 1053520, "2026-02-12": 1031553, "2026-02-13": 1053259}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": 1.82, "sl": 2}, "굿모닝": {"n": 5, "wins": 3, "pnl": 5.93, "sl": 1}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -5.15, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 3.13, "sl": 1}}, "by_exit": {"force_sell": {"n": 5, "pnl": 6.29}, "retracement_3": {"n": 4, "pnl": 10.77}, "stop_loss": {"n": 6, "pnl": -14.66}, "retracement_1": {"n": 4, "pnl": -0.14}, "trailing_stop": {"n": 1, "pnl": 3.47}}}, {"name": "NO_2ND_BUY", "desc": "2차매수 비활성화", "total": 20, "wins": 12, "win_rate": 60.0, "total_pnl": 5.5, "stop_losses": 5, "final_balance": 1047498, "compound_return": 4.75, "daily_balances": {"2026-02-04": 1029300, "2026-02-05": 1054632, "2026-02-06": 969616, "2026-02-09": 997237, "2026-02-10": 1066378, "2026-02-11": 1047312, "2026-02-12": 1016869, "2026-02-13": 1047498}, "by_strat": {"세력감지": {"n": 9, "wins": 5, "pnl": -2.23, "sl": 3}, "굿모닝": {"n": 5, "wins": 4, "pnl": 4.97, "sl": 0}, "골든10분v1": {"n": 3, "wins": 1, "pnl": -1.98, "sl": 2}, "골든10분v2": {"n": 3, "wins": 2, "pnl": 4.74, "sl": 0}}, "by_exit": {"force_sell": {"n": 7, "pnl": 6.0}, "retracement_3": {"n": 3, "pnl": 13.11}, "stop_loss": {"n": 5, "pnl": -15.53}, "retracement_1": {"n": 5, "pnl": 1.92}}}], "tier_analysis": {"current": {"max_tier": {"0": 7, "1": 5, "2": 3, "3": 4, "4": 1}, "hits": {"1": 13, "2": 8, "3": 5, "4": 1}}, "best": {"max_tier": {"0": 5, "1": 4, "2": 3, "3": 5, "4": 3}, "hits": {"1": 15, "2": 11, "3": 8, "4": 3}}}, "sell_examples": [{"date": "2026-02-04", "name": "얼라인드", "strat": "세력감지", "result": 2.93, "exit_type": "force_sell", "day_high": 6.37, "events": [{"tier": 1, "pct": 1.4, "ratio": 0.25, "time": "14:13", "qty_sold": 0.25}, {"tier": 2, "pct": 3.4, "ratio": 0.4, "time": "14:28", "qty_sold": 0.3}], "tp_filled": [1, 2]}, {"date": "2026-02-05", "name": "링크솔루션", "strat": "굿모닝", "result": 4.63, "exit_type": "retracement_3", "day_high": 7.8, "events": [{"tier": 1, "pct": 3.4, "ratio": 0.25, "time": "09:11", "qty_sold": 0.25}, {"tier": 2, "pct": 4.9, "ratio": 0.4, "time": "09:13", "qty_sold": 0.3}, {"tier": 3, "pct": 6.3, "ratio": 0.5, "time": "09:13", "qty_sold": 0.225}], "tp_filled": [1, 2, 3]}, {"date": "2026-02-05", "name": "넥센타이어", "strat": "세력감지", "result": 1.06, "exit_type": "force_sell", "day_high": 3.94, "events": [{"tier": 1, "pct": 1.4, "ratio": 0.25, "time": "10:10", "qty_sold": 0.25}, {"tier": 2, "pct": 3.4, "ratio": 0.4, "time": "10:19", "qty_sold": 0.3}], "tp_filled": [1, 2]}, {"date": "2026-02-06", "name": "야스", "strat": "세력감지", "result": -0.18, "exit_type": "retracement_1", "day_high": 8.54, "events": [{"tier": 1, "pct": 1.3, "ratio": 0.25, "time": "10:14", "qty_sold": 0.75}], "tp_filled": [1]}, {"date": "2026-02-09", "name": "자람테크놀로지", "strat": "세력감지", "result": 2.49, "exit_type": "force_sell", "day_high": 4.86, "events": [{"tier": 1, "pct": 1.4, "ratio": 0.25, "time": "12:16", "qty_sold": 0.25}, {"tier": 2, "pct": 3.4, "ratio": 0.4, "time": "12:48", "qty_sold": 0.3}], "tp_filled": [1, 2]}, {"date": "2026-02-09", "name": "한신공영", "strat": "세력감지", "result": 0.35, "exit_type": "retracement_1", "day_high": 3.5, "events": [{"tier": 1, "pct": 1.4, "ratio": 0.25, "time": "11:30", "qty_sold": 0.25}], "tp_filled": [1]}, {"date": "2026-02-10", "name": "나인테크", "strat": "골든10분v1", "result": 1.17, "exit_type": "retracement_3", "day_high": 9.6, "events": [{"tier": 1, "pct": 0.8, "ratio": 0.5, "time": "09:03", "qty_sold": 1.075}, {"tier": 2, "pct": 1.2, "ratio": 0.25, "time": "09:05", "qty_sold": 0.2687}, {"tier": 3, "pct": 3.2, "ratio": 0.4, "time": "09:07", "qty_sold": 0.3225}], "tp_filled": [1, 2, 3]}, {"date": "2026-02-10", "name": "나인테크", "strat": "골든10분v2", "result": 4.24, "exit_type": "retracement_3", "day_high": 9.6, "events": [{"tier": 1, "pct": 2.5, "ratio": 0.25, "time": "09:07", "qty_sold": 0.25}, {"tier": 2, "pct": 4.9, "ratio": 0.4, "time": "09:10", "qty_sold": 0.3}, {"tier": 3, "pct": 6.3, "ratio": 0.5, "time": "09:27", "qty_sold": 0.225}], "tp_filled": [1, 2, 3]}, {"date": "2026-02-10", "name": "한국앤컴퍼니", "strat": "세력감지", "result": 1.57, "exit_type": "force_sell", "day_high": 2.93, "events": [{"tier": 1, "pct": 1.4, "ratio": 0.25, "time": "13:21", "qty_sold": 0.25}], "tp_filled": [1]}, {"date": "2026-02-11", "name": "서남", "strat": "굿모닝", "result": 0.74, "exit_type": "retracement_1", "day_high": 19.15, "events": [{"tier": 1, "pct": 3.4, "ratio": 0.25, "time": "09:13", "qty_sold": 0.25}], "tp_filled": [1]}]};
+
+// ============================================
+// Utility Functions
+// ============================================
+function fmtManwon(v) {
+  const m = v / 10000;
+  return m.toLocaleString('ko-KR', {maximumFractionDigits: 0}) + '만원';
+}
+function fmtPct(v, decimals=2) {
+  return (v >= 0 ? '+' : '') + v.toFixed(decimals) + '%';
+}
+function fmtMoney(v) {
+  return (v / 10000).toLocaleString('ko-KR', {maximumFractionDigits: 0});
+}
+function pctClass(v) {
+  return v >= 0 ? 'text-profit' : 'text-loss';
+}
+function sectionForName(name) {
+  if (name === 'CURRENT') return 'baseline';
+  if (['NR1+AS4+T10/3','NR1+AS3+T10/3','NR1+AS4','NO_RET1','NO_2ND_BUY'].includes(name)) return 'micro';
+  if (['TP1_UP+1%','TP1_UP+2%','TP_ALL_UP+1%','TP_ALL_UP+2%'].includes(name)) return 'tp_threshold';
+  if (['TP1_R15','TP1_R10','SKIP_TP1','TP_HALF','TP_CONSERV','TP_AGGR_EARLY'].includes(name)) return 'tp_ratio';
+  if (name.startsWith('BEST+')) return 'best_combo';
+  return 'baseline';
+}
+function sectionLabel(s) {
+  const map = {
+    baseline: '현행',
+    micro: '마이크로 튜닝',
+    tp_threshold: '매도 임계값',
+    tp_ratio: '매도 비율',
+    best_combo: '최적+매도 복합'
+  };
+  return map[s] || s;
+}
+function sectionTag(s) {
+  const colors = {
+    baseline: 'bg-gray-100 text-gray-600',
+    micro: 'bg-blue-50 text-blue-700',
+    tp_threshold: 'bg-yellow-50 text-yellow-700',
+    tp_ratio: 'bg-green-50 text-green-700',
+    best_combo: 'bg-purple-50 text-purple-700',
+  };
+  return `<span class="inline-block px-2 py-0.5 rounded text-[10px] font-semibold ${colors[s] || ''}">${sectionLabel(s)}</span>`;
+}
+
+// ============================================
+// Section 1: Executive Summary
+// ============================================
+(function renderExecSummary() {
+  const el = document.getElementById('exec-summary');
+  const baseline = DATA.baseline;
+  const best = DATA.all_ranked[0];
+  const diff = best.final_balance - baseline.final_balance;
+
+  el.innerHTML = `
+    <div class="card p-5 border-l-4 border-gray-400">
+      <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">현행 전략 최종잔고</div>
+      <div class="text-2xl md:text-3xl font-extrabold text-gray-900">${fmtManwon(baseline.final_balance)}</div>
+      <div class="mt-1 text-sm ${pctClass(baseline.compound_return)} font-semibold">${fmtPct(baseline.compound_return)}</div>
+      <div class="text-xs text-gray-400 mt-2">CURRENT (${baseline.desc})</div>
+    </div>
+    <div class="card p-5 border-l-4 border-profit">
+      <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">최적 전략 최종잔고</div>
+      <div class="text-2xl md:text-3xl font-extrabold text-profit">${fmtManwon(best.final_balance)}</div>
+      <div class="mt-1 text-sm text-profit font-semibold">${fmtPct(best.compound_return)}</div>
+      <div class="text-xs text-gray-400 mt-2">${best.name} (${best.desc})</div>
+    </div>
+    <div class="card p-5 border-l-4 border-accent">
+      <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">차이 금액</div>
+      <div class="text-2xl md:text-3xl font-extrabold text-accent">+${fmtManwon(diff)}</div>
+      <div class="mt-1 text-sm text-accent font-semibold">+${((diff / baseline.final_balance) * 100).toFixed(1)}% 대비 현행</div>
+      <div class="text-xs text-gray-400 mt-2">승률 ${baseline.win_rate}% &rarr; ${best.win_rate}% | 손절 ${baseline.stop_losses}회 &rarr; ${best.stop_losses}회</div>
+    </div>
+  `;
+})();
+
+// ============================================
+// Section 2: Ranking Table
+// ============================================
+(function renderRankingTable() {
+  const tbody = document.getElementById('ranking-body');
+  const ranked = DATA.all_ranked;
+  let html = '';
+  ranked.forEach((s, i) => {
+    const rank = i + 1;
+    const sec = sectionForName(s.name);
+    const isBaseline = s.name === 'CURRENT';
+    const isFirst = rank === 1;
+    const rowCls = `section-${sec}${isFirst ? ' rank-1' : ''}${isBaseline ? ' font-semibold' : ''}`;
+    const crCls = pctClass(s.compound_return);
+    const pnlCls = pctClass(s.total_pnl);
+    html += `<tr class="${rowCls}">
+      <td class="text-center font-mono text-xs">${isFirst ? '<span class="inline-flex items-center justify-center w-6 h-6 bg-yellow-100 text-yellow-700 rounded-full font-bold">1</span>' : rank}</td>
+      <td class="font-semibold">${isBaseline ? '<span class="text-gray-500">&#9654;</span> ' : ''}${s.name} ${sectionTag(sec)}</td>
+      <td class="text-gray-500 text-xs">${s.desc}</td>
+      <td class="text-right font-mono">${s.total}</td>
+      <td class="text-right font-mono">${s.win_rate}%</td>
+      <td class="text-right font-mono ${pnlCls}">${fmtPct(s.total_pnl)}</td>
+      <td class="text-right font-mono font-semibold">${fmtMoney(s.final_balance)}만</td>
+      <td class="text-right font-mono font-bold ${crCls}">${fmtPct(s.compound_return)}</td>
+      <td class="text-right font-mono">${s.stop_losses}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+})();
+
+// ============================================
+// Section 3: Bar Charts
+// ============================================
+function renderBarSection(containerId, items, baselineReturn) {
+  const el = document.getElementById(containerId);
+  const maxAbs = Math.max(...items.map(s => Math.abs(s.compound_return)), Math.abs(baselineReturn)) || 1;
+
+  let html = '';
+  // baseline reference
+  html += `<div class="flex items-center gap-3">
+    <div class="w-36 md:w-48 text-right text-xs text-gray-500 truncate font-medium">CURRENT (현행)</div>
+    <div class="flex-1 flex items-center h-7">
+      <div class="bar-fill ${baselineReturn >= 0 ? 'bg-gray-300 text-gray-700' : 'bg-red-200 text-red-700'}"
+        style="width: ${Math.max((Math.abs(baselineReturn) / maxAbs) * 100, 3)}%">
+        ${fmtPct(baselineReturn)}
+      </div>
+    </div>
+  </div>`;
+
+  items.forEach(s => {
+    const better = s.compound_return > baselineReturn;
+    const barColor = s.compound_return >= 0
+      ? (better ? 'bg-green-400 text-green-900' : 'bg-green-200 text-green-800')
+      : 'bg-red-300 text-red-800';
+    html += `<div class="flex items-center gap-3">
+      <div class="w-36 md:w-48 text-right text-xs text-gray-600 truncate font-medium" title="${s.desc}">${s.name}</div>
+      <div class="flex-1 flex items-center h-7">
+        <div class="bar-fill ${barColor}"
+          style="width: ${Math.max((Math.abs(s.compound_return) / maxAbs) * 100, 3)}%">
+          ${fmtPct(s.compound_return)}
+        </div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+(function renderSellTierAnalysis() {
+  const bl = DATA.baseline.compound_return;
+  renderBarSection('tp-threshold-bars', DATA.sections.tp_threshold, bl);
+  renderBarSection('tp-ratio-bars', DATA.sections.tp_ratio, bl);
+  renderBarSection('best-combo-bars', DATA.sections.best_combo, bl);
+})();
+
+// ============================================
+// Section 4: Tier Distribution
+// ============================================
+(function renderTierAnalysis() {
+  const el = document.getElementById('tier-analysis');
+  const labels = {current: '현행 전략', best: '최적 전략 (NR1+AS4+T10/3)'};
+  const tierLabels = ['0단계 (미도달)', '1단계', '2단계', '3단계', '4단계 (전량매도)'];
+  const tierColors = ['bg-gray-300', 'bg-blue-300', 'bg-blue-400', 'bg-blue-500', 'bg-blue-600'];
+
+  let html = '';
+  ['current', 'best'].forEach(key => {
+    const d = DATA.tier_analysis[key];
+    const maxDist = Math.max(...Object.values(d.max_tier));
+    const borderColor = key === 'current' ? 'border-gray-300' : 'border-profit';
+
+    html += `<div class="border-l-4 ${borderColor} pl-4">
+      <h4 class="font-semibold text-sm text-gray-700 mb-3">${labels[key]}</h4>
+      <div class="mb-4">
+        <div class="text-xs text-gray-400 font-semibold mb-2 uppercase tracking-wider">최대 도달 단계 분포</div>
+        <div class="space-y-1.5">`;
+
+    for (let i = 0; i <= 4; i++) {
+      const count = d.max_tier[String(i)] || 0;
+      const pct = (count / 20 * 100);
+      html += `<div class="flex items-center gap-2">
+        <div class="w-28 text-xs text-gray-500 truncate">${tierLabels[i]}</div>
+        <div class="flex-1 bg-gray-100 rounded-full h-5 overflow-hidden">
+          <div class="${tierColors[i]} h-5 rounded-full flex items-center justify-end pr-2 text-[10px] font-bold text-white transition-all" style="width: ${Math.max(pct, 8)}%">${count}건</div>
+        </div>
+        <div class="w-10 text-xs text-gray-400 text-right">${pct.toFixed(0)}%</div>
+      </div>`;
+    }
+
+    html += `</div></div>
+      <div>
+        <div class="text-xs text-gray-400 font-semibold mb-2 uppercase tracking-wider">단계별 누적 히트 수</div>
+        <div class="grid grid-cols-4 gap-2">`;
+
+    for (let i = 1; i <= 4; i++) {
+      const count = d.hits[String(i)] || 0;
+      html += `<div class="text-center p-2 bg-gray-50 rounded-lg">
+        <div class="text-lg font-bold text-gray-800">${count}</div>
+        <div class="text-[10px] text-gray-400">TP${i} 히트</div>
+      </div>`;
+    }
+
+    html += `</div></div></div>`;
+  });
+
+  el.innerHTML = html;
+})();
+
+// ============================================
+// Section 5: Sell Examples
+// ============================================
+(function renderSellExamples() {
+  const el = document.getElementById('sell-examples');
+  const examples = DATA.sell_examples;
+
+  let html = '';
+  examples.forEach(ex => {
+    const resCls = ex.result >= 0 ? 'text-profit' : 'text-loss';
+    const exitLabel = {
+      force_sell: '장마감 청산',
+      retracement_1: '되돌림1',
+      retracement_3: '되돌림3',
+      trailing_stop: '트레일링',
+      stop_loss: '손절',
+      take_profit_4: '4차익절',
+    }[ex.exit_type] || ex.exit_type;
+
+    const exitColor = ex.exit_type.includes('stop') || ex.exit_type.includes('loss')
+      ? 'bg-red-100 text-red-700'
+      : ex.exit_type.includes('retracement')
+        ? 'bg-orange-100 text-orange-700'
+        : 'bg-blue-100 text-blue-700';
+
+    html += `<div class="border border-gray-100 rounded-xl p-4 hover:shadow-md transition-shadow">
+      <div class="flex items-start justify-between mb-3">
+        <div>
+          <span class="text-xs text-gray-400 font-mono">${ex.date}</span>
+          <h4 class="font-bold text-gray-900">${ex.name}</h4>
+          <span class="text-xs text-gray-500">${ex.strat}</span>
+        </div>
+        <div class="text-right">
+          <div class="text-lg font-bold ${resCls}">${fmtPct(ex.result)}</div>
+          <span class="inline-block px-2 py-0.5 rounded text-[10px] font-semibold ${exitColor}">${exitLabel}</span>
+        </div>
+      </div>
+      <div class="text-[10px] text-gray-400 mb-2">당일 고점: +${ex.day_high}%</div>
+      <div class="relative pl-4">`;
+
+    ex.events.forEach((ev, idx) => {
+      const isLast = idx === ex.events.length - 1;
+      const dotColor = ev.tier <= 1 ? 'bg-blue-400' : ev.tier <= 2 ? 'bg-blue-500' : ev.tier <= 3 ? 'bg-indigo-500' : 'bg-purple-600';
+      html += `<div class="flex items-start gap-3 ${isLast ? '' : 'pb-3'}">
+        <div class="flex flex-col items-center">
+          <div class="timeline-dot ${dotColor}" style="box-shadow-color: ${ev.tier <= 1 ? '#93c5fd' : ev.tier <= 2 ? '#60a5fa' : '#818cf8'}"></div>
+          ${!isLast ? '<div class="timeline-line bg-gray-200 flex-1"></div>' : ''}
+        </div>
+        <div class="flex-1 -mt-1">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-xs font-semibold text-gray-700">${ev.time}</span>
+            <span class="text-xs font-semibold text-profit">TP${ev.tier} (+${ev.pct}%)</span>
+          </div>
+          <div class="text-[11px] text-gray-400">매도비율 ${(ev.ratio * 100).toFixed(0)}% | 누적매도 ${(ev.qty_sold * 100).toFixed(1)}%</div>
+        </div>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  el.innerHTML = html;
+})();
+
+// ============================================
+// Section 6: Key Insights
+// ============================================
+(function renderInsights() {
+  const el = document.getElementById('insights');
+  const baseline = DATA.baseline;
+  const best = DATA.all_ranked[0];
+
+  const insights = [
+    {
+      color: 'border-accent',
+      icon: 'bg-blue-50 text-blue-600',
+      title: '분할매도 가중치 효과',
+      body: `단순 수익률(-8.51%)과 가중 수익률(+6.95%)의 차이는 TP 단계별 이익 확정이 실제로 수익을 보호하고 있음을 의미합니다. 분할매도 시스템은 개별 종목의 손실 폭을 제한하면서 수익 종목에서는 잔량을 유지하여 추가 상승을 포착합니다.`
+    },
+    {
+      color: 'border-profit',
+      icon: 'bg-green-50 text-green-600',
+      title: '되돌림1 제거가 최대 효과',
+      body: `retracement_1 규칙 제거만으로 승률 60%&rarr;75%, 최종잔고 기준 약 1,564만원 추가 수익. 현행 전략에서 되돌림1은 4건 발생(PNL +1.24%)했으나, 제거 시 해당 종목들이 force_sell까지 보유되어 더 높은 수익을 실현합니다. 특히 서남(+19.15% 고점)과 야스(+8.54% 고점) 사례에서 되돌림1 조기 청산으로 큰 이익을 놓쳤습니다.`
+    },
+    {
+      color: 'border-yellow-500',
+      icon: 'bg-yellow-50 text-yellow-600',
+      title: '매도 임계값 조정 효과',
+      body: `TP 임계값을 +1~2%p 올리면 복리수익률이 6.64%&rarr;7.5~9.1%로 소폭 개선되지만, 최적 전략(NR1+AS4+T10/3)의 58.76%와 비교하면 미미합니다. 임계값 조정은 단독으로는 한계가 있고, 되돌림 규칙 + 2차 손절 + 트레일링 조정과 결합해야 의미 있는 개선이 됩니다. 복합 전략(BEST+TP_CONSERV: +48.43%)이 이를 증명합니다.`
+    },
+    {
+      color: 'border-purple-500',
+      icon: 'bg-purple-50 text-purple-600',
+      title: '최종 추천 구성',
+      body: `<strong>${best.name}</strong> (${best.desc})를 권장합니다. 승률 ${best.win_rate}%, 복리수익률 +${best.compound_return}%, 손절 ${best.stop_losses}회. 핵심 변경: (1) retracement_rules에서 "1" 제거, (2) 2차매수 후 손절을 -4%로 조정, (3) 트레일링 트리거 10% / 드롭 -3%. 이 3가지 조합이 현행 대비 +${fmtManwon(best.final_balance - baseline.final_balance)} 추가 수익을 만들어냅니다.`
+    }
+  ];
+
+  let html = '';
+  insights.forEach(ins => {
+    html += `<div class="border-l-4 ${ins.color} rounded-r-xl p-4 bg-white shadow-sm">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg ${ins.icon} text-sm font-bold">!</span>
+        <h4 class="font-bold text-gray-900 text-sm">${ins.title}</h4>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">${ins.body}</p>
+    </div>`;
+  });
+  el.innerHTML = html;
+})();
+</script>
+</body>
+</html>

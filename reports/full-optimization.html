@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>전면 파라미터 최적화 보고서 | 2026-02-04~13</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        bg: '#f8f9fb',
+        card: '#ffffff',
+        profit: '#16a34a',
+        loss: '#dc2626',
+        accent: '#2563eb',
+      },
+      fontFamily: {
+        sans: ['Inter', 'Pretendard', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+      }
+    }
+  }
+}
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+body { background: #f8f9fb; }
+.card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); }
+table { width: 100%; border-collapse: collapse; }
+th { padding: 10px 12px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e5e7eb; white-space: nowrap; }
+td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; font-size: 13px; white-space: nowrap; }
+tr:hover td { background: #f9fafb; }
+.heatmap-cell {
+  padding: 6px 8px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  border: 1px solid #e5e7eb;
+  min-width: 60px;
+  transition: transform 0.1s;
+}
+.heatmap-cell:hover { transform: scale(1.05); z-index: 10; position: relative; }
+.cell-max { box-shadow: inset 0 0 0 3px #f59e0b; }
+.cell-current { box-shadow: inset 0 0 0 2px #2563eb; border-style: dashed; }
+.cell-max.cell-current { box-shadow: inset 0 0 0 3px #f59e0b, 0 0 0 2px #2563eb; }
+.step-improve { background: linear-gradient(90deg, rgba(22,163,74,0.08), transparent); }
+</style>
+</head>
+<body class="min-h-screen p-4 md:p-6 lg:p-8 font-sans text-gray-800">
+<div class="max-w-7xl mx-auto">
+
+<!-- Header -->
+<div class="mb-8">
+  <div class="flex items-center gap-3 mb-3">
+    <a href="/" class="text-sm text-accent hover:underline font-medium">&larr; 대시보드</a>
+    <span class="text-gray-300">|</span>
+    <a href="/reports/full-backtest" class="text-sm text-accent hover:underline">전면 백테스트</a>
+    <span class="text-gray-300">|</span>
+    <a href="/reports/meta-report" class="text-sm text-accent hover:underline">메타보고서</a>
+  </div>
+  <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">전면 파라미터 최적화 보고서</h1>
+  <p class="text-gray-500 mt-2 text-base">2026-02-04~13 | 모든 튜닝 파라미터 그리드 서치 | 100만원 기준</p>
+</div>
+
+<!-- Section 1: Executive Summary -->
+<div id="exec-summary" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"></div>
+
+<!-- Section 2: Greedy Steps -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">최적화 경로</h2>
+  <p class="text-sm text-gray-500 mb-4">탐욕적 순차 최적화 (Greedy Sequential Optimization) | 각 단계에서 최적 파라미터를 고정하고 다음 단계로 이동</p>
+  <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
+    <table id="greedy-table">
+      <thead>
+        <tr>
+          <th class="text-center">#</th>
+          <th>단계</th>
+          <th>설명</th>
+          <th class="text-right">거래수</th>
+          <th class="text-right">PNL%</th>
+          <th class="text-right">승률</th>
+          <th class="text-right">평균PNL</th>
+          <th class="text-right">손절</th>
+          <th class="text-right">단계별 개선</th>
+          <th class="text-right">누적 개선</th>
+        </tr>
+      </thead>
+      <tbody id="greedy-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Section 3: Heatmaps -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">손절 히트맵</h2>
+  <p class="text-sm text-gray-500 mb-4">1차매수 손절(FO) x 2차매수 후 손절(AS) | 셀 = 합산 PNL% | 현행: FO=-3.1% / AS=-2.1%</p>
+  <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6" id="sl-heatmap"></div>
+</div>
+
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">익절 1단계 히트맵</h2>
+  <p class="text-sm text-gray-500 mb-4">TP1 수익 임계값(%) x 매도 비율(%) | 현행: +2.5% / 25%</p>
+  <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6" id="tp1-heatmap"></div>
+</div>
+
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">익절 2단계 히트맵</h2>
+  <p class="text-sm text-gray-500 mb-4">TP2 수익 임계값(%) x 매도 비율(%) | 현행: +4.9% / 40%</p>
+  <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6" id="tp2-heatmap"></div>
+</div>
+
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">익절 3단계 히트맵</h2>
+  <p class="text-sm text-gray-500 mb-4">TP3 수익 임계값(%) x 매도 비율(%) | 현행: +6.3% / 50%</p>
+  <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6" id="tp3-heatmap"></div>
+</div>
+
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">익절 4단계 히트맵</h2>
+  <p class="text-sm text-gray-500 mb-4">TP4 수익 임계값(%) x 매도 비율(%) | 현행: +8.5% / 50%</p>
+  <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6" id="tp4-heatmap"></div>
+</div>
+
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">트레일링 스탑 히트맵</h2>
+  <p class="text-sm text-gray-500 mb-4">트리거 수익(%) x 하락폭(%) | 현행: +7% / -2.5%</p>
+  <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6" id="trailing-heatmap"></div>
+</div>
+
+<!-- Section 4: Retracement -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">되돌림 규칙</h2>
+  <p class="text-sm text-gray-500 mb-4">익절 후 되돌림 규칙 조합별 성과 비교</p>
+  <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
+    <table>
+      <thead>
+        <tr>
+          <th class="text-center">#</th>
+          <th>규칙 조합</th>
+          <th class="text-right">거래수</th>
+          <th class="text-right">PNL%</th>
+          <th class="text-right">승률</th>
+          <th class="text-right">평균PNL</th>
+          <th class="text-right">손절</th>
+        </tr>
+      </thead>
+      <tbody id="ret-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Section 5: Time Windows -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">시간대 최적화</h2>
+  <p class="text-sm text-gray-500 mb-4">골든10분 / 굿모닝 / 세력감지 종료시간 조합 TOP 20</p>
+  <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
+    <table>
+      <thead>
+        <tr>
+          <th class="text-center">#</th>
+          <th>골든10분 종료</th>
+          <th>굿모닝 종료</th>
+          <th>세력감지 종료</th>
+          <th class="text-right">거래수</th>
+          <th class="text-right">PNL%</th>
+          <th class="text-right">승률</th>
+          <th class="text-right">평균PNL</th>
+          <th class="text-right">손절</th>
+        </tr>
+      </thead>
+      <tbody id="tw-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Section 6: Second Buy -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">2차 매수 최적화</h2>
+  <p class="text-sm text-gray-500 mb-4">트리거 하락폭 x 수량 배수 조합 TOP 15</p>
+  <div class="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
+    <table>
+      <thead>
+        <tr>
+          <th class="text-center">#</th>
+          <th>설정</th>
+          <th class="text-right">거래수</th>
+          <th class="text-right">PNL%</th>
+          <th class="text-right">승률</th>
+          <th class="text-right">평균PNL</th>
+          <th class="text-right">손절</th>
+        </tr>
+      </thead>
+      <tbody id="sb-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Section 7: Final Config -->
+<div class="card p-5 md:p-6 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">최종 추천 설정</h2>
+  <p class="text-sm text-gray-500 mb-4">모든 최적화 단계를 적용한 최종 파라미터 구성</p>
+  <div id="final-config"></div>
+</div>
+
+</div>
+
+<script>
+const DATA = {"baseline": {"n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, "retracement": [{"name": "3:avg", "rules": {"1": 0.0, "3": 0.0}, "n": 20, "wr": 60.0, "pnl": 7.55, "avg": 0.38, "sl": 6}, {"name": "3만제거", "rules": {"1": 0.0}, "n": 20, "wr": 60.0, "pnl": 7.16, "avg": 0.36, "sl": 7}, {"name": "1+2+3", "rules": {"1": 0.0, "2": 0.0, "3": "tier_2"}, "n": 20, "wr": 60.0, "pnl": 7.15, "avg": 0.36, "sl": 6}, {"name": "현행 {1:0, 3:tier2}", "rules": {"1": 0.0, "3": "tier_2"}, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"name": "전부제거", "rules": {}, "n": 20, "wr": 50.0, "pnl": 6.7, "avg": 0.34, "sl": 9}, {"name": "2+3", "rules": {"2": 0.0, "3": "tier_2"}, "n": 20, "wr": 50.0, "pnl": 6.69, "avg": 0.33, "sl": 8}, {"name": "1만제거", "rules": {"3": "tier_2"}, "n": 20, "wr": 50.0, "pnl": 6.49, "avg": 0.32, "sl": 8}, {"name": "1:+0.5%", "rules": {"1": 0.005, "3": "tier_2"}, "n": 20, "wr": 50.0, "pnl": 6.49, "avg": 0.32, "sl": 8}, {"name": "1:+1%", "rules": {"1": 0.01, "3": "tier_2"}, "n": 20, "wr": 50.0, "pnl": 6.49, "avg": 0.32, "sl": 8}, {"name": "1:-1%", "rules": {"1": -0.01, "3": "tier_2"}, "n": 20, "wr": 50.0, "pnl": 6.49, "avg": 0.32, "sl": 8}], "stop_loss": {"grid": [{"fo": "없음", "as": "없음", "fo_v": null, "as_v": null, "n": 20, "wr": 75.0, "pnl": 21.07, "avg": 1.05, "sl": 0}, {"fo": "-6.0%", "as": "없음", "fo_v": -0.06, "as_v": null, "n": 20, "wr": 75.0, "pnl": 21.07, "avg": 1.05, "sl": 0}, {"fo": "없음", "as": "-5.0%", "fo_v": null, "as_v": -0.05, "n": 20, "wr": 75.0, "pnl": 16.7, "avg": 0.84, "sl": 2}, {"fo": "-6.0%", "as": "-5.0%", "fo_v": -0.06, "as_v": -0.05, "n": 20, "wr": 75.0, "pnl": 16.7, "avg": 0.84, "sl": 2}, {"fo": "-4.0%", "as": "없음", "fo_v": -0.04, "as_v": null, "n": 20, "wr": 70.0, "pnl": 15.83, "avg": 0.79, "sl": 1}, {"fo": "-3.0%", "as": "없음", "fo_v": -0.03, "as_v": null, "n": 20, "wr": 70.0, "pnl": 15.72, "avg": 0.79, "sl": 2}, {"fo": "-5.0%", "as": "없음", "fo_v": -0.05, "as_v": null, "n": 20, "wr": 70.0, "pnl": 14.82, "avg": 0.74, "sl": 1}, {"fo": "-3.5%", "as": "없음", "fo_v": -0.035, "as_v": null, "n": 20, "wr": 70.0, "pnl": 14.74, "avg": 0.74, "sl": 2}, {"fo": "없음", "as": "-3.5%", "fo_v": null, "as_v": -0.035, "n": 20, "wr": 70.0, "pnl": 13.99, "avg": 0.7, "sl": 3}, {"fo": "-6.0%", "as": "-3.5%", "fo_v": -0.06, "as_v": -0.035, "n": 20, "wr": 70.0, "pnl": 13.99, "avg": 0.7, "sl": 3}, {"fo": "-4.0%", "as": "-3.5%", "fo_v": -0.04, "as_v": -0.035, "n": 20, "wr": 70.0, "pnl": 13.51, "avg": 0.68, "sl": 3}, {"fo": "-4.0%", "as": "-4.0%", "fo_v": -0.04, "as_v": -0.04, "n": 20, "wr": 70.0, "pnl": 12.81, "avg": 0.64, "sl": 3}, {"fo": "없음", "as": "-4.0%", "fo_v": null, "as_v": -0.04, "n": 20, "wr": 70.0, "pnl": 12.79, "avg": 0.64, "sl": 3}, {"fo": "-6.0%", "as": "-4.0%", "fo_v": -0.06, "as_v": -0.04, "n": 20, "wr": 70.0, "pnl": 12.79, "avg": 0.64, "sl": 3}, {"fo": "-5.0%", "as": "-3.5%", "fo_v": -0.05, "as_v": -0.035, "n": 20, "wr": 70.0, "pnl": 12.5, "avg": 0.63, "sl": 3}, {"fo": "-3.0%", "as": "-3.5%", "fo_v": -0.03, "as_v": -0.035, "n": 20, "wr": 70.0, "pnl": 12.25, "avg": 0.61, "sl": 3}, {"fo": "-5.0%", "as": "-4.0%", "fo_v": -0.05, "as_v": -0.04, "n": 20, "wr": 70.0, "pnl": 11.8, "avg": 0.59, "sl": 3}, {"fo": "-3.0%", "as": "-4.0%", "fo_v": -0.03, "as_v": -0.04, "n": 20, "wr": 70.0, "pnl": 11.74, "avg": 0.59, "sl": 3}, {"fo": "-4.0%", "as": "-5.0%", "fo_v": -0.04, "as_v": -0.05, "n": 20, "wr": 70.0, "pnl": 11.46, "avg": 0.57, "sl": 3}, {"fo": "-2.5%", "as": "없음", "fo_v": -0.025, "as_v": null, "n": 20, "wr": 65.0, "pnl": 11.4, "avg": 0.57, "sl": 4}, {"fo": "-3.5%", "as": "-3.5%", "fo_v": -0.035, "as_v": -0.035, "n": 20, "wr": 70.0, "pnl": 11.27, "avg": 0.56, "sl": 3}, {"fo": "없음", "as": "-3.0%", "fo_v": null, "as_v": -0.03, "n": 20, "wr": 65.0, "pnl": 11.14, "avg": 0.56, "sl": 4}, {"fo": "-6.0%", "as": "-3.0%", "fo_v": -0.06, "as_v": -0.03, "n": 20, "wr": 65.0, "pnl": 11.14, "avg": 0.56, "sl": 4}, {"fo": "-3.0%", "as": "-5.0%", "fo_v": -0.03, "as_v": -0.05, "n": 20, "wr": 70.0, "pnl": 10.76, "avg": 0.54, "sl": 3}, {"fo": "-3.5%", "as": "-4.0%", "fo_v": -0.035, "as_v": -0.04, "n": 20, "wr": 70.0, "pnl": 10.76, "avg": 0.54, "sl": 3}, {"fo": "없음", "as": "-2.5%", "fo_v": null, "as_v": -0.025, "n": 20, "wr": 65.0, "pnl": 10.7, "avg": 0.54, "sl": 4}, {"fo": "-6.0%", "as": "-2.5%", "fo_v": -0.06, "as_v": -0.025, "n": 20, "wr": 65.0, "pnl": 10.7, "avg": 0.54, "sl": 4}, {"fo": "-5.0%", "as": "-5.0%", "fo_v": -0.05, "as_v": -0.05, "n": 20, "wr": 70.0, "pnl": 10.45, "avg": 0.52, "sl": 3}, {"fo": "-2.0%", "as": "없음", "fo_v": -0.02, "as_v": null, "n": 20, "wr": 60.0, "pnl": 10.38, "avg": 0.52, "sl": 6}, {"fo": "-4.0%", "as": "-3.0%", "fo_v": -0.04, "as_v": -0.03, "n": 20, "wr": 65.0, "pnl": 10.14, "avg": 0.51, "sl": 4}, {"fo": "-3.5%", "as": "-5.0%", "fo_v": -0.035, "as_v": -0.05, "n": 20, "wr": 70.0, "pnl": 9.78, "avg": 0.49, "sl": 3}, {"fo": "-3.0%", "as": "-2.5%", "fo_v": -0.03, "as_v": -0.025, "n": 20, "wr": 65.0, "pnl": 9.69, "avg": 0.48, "sl": 4}, {"fo": "-4.0%", "as": "-2.5%", "fo_v": -0.04, "as_v": -0.025, "n": 20, "wr": 65.0, "pnl": 9.21, "avg": 0.46, "sl": 4}, {"fo": "-5.0%", "as": "-3.0%", "fo_v": -0.05, "as_v": -0.03, "n": 20, "wr": 65.0, "pnl": 9.13, "avg": 0.46, "sl": 4}, {"fo": "-3.5%", "as": "-2.5%", "fo_v": -0.035, "as_v": -0.025, "n": 20, "wr": 65.0, "pnl": 8.71, "avg": 0.44, "sl": 4}, {"fo": "-3.0%", "as": "-3.0%", "fo_v": -0.03, "as_v": -0.03, "n": 20, "wr": 65.0, "pnl": 8.69, "avg": 0.43, "sl": 4}, {"fo": "-5.0%", "as": "-2.5%", "fo_v": -0.05, "as_v": -0.025, "n": 20, "wr": 65.0, "pnl": 8.2, "avg": 0.41, "sl": 4}, {"fo": "-2.5%", "as": "-3.5%", "fo_v": -0.025, "as_v": -0.035, "n": 20, "wr": 65.0, "pnl": 7.93, "avg": 0.4, "sl": 5}, {"fo": "-3.5%", "as": "-3.0%", "fo_v": -0.035, "as_v": -0.03, "n": 20, "wr": 65.0, "pnl": 7.71, "avg": 0.39, "sl": 4}, {"fo": "-2.5%", "as": "-4.0%", "fo_v": -0.025, "as_v": -0.04, "n": 20, "wr": 65.0, "pnl": 7.42, "avg": 0.37, "sl": 5}, {"fo": "-2.0%", "as": "-3.5%", "fo_v": -0.02, "as_v": -0.035, "n": 20, "wr": 60.0, "pnl": 6.91, "avg": 0.35, "sl": 7}, {"fo": "-2.5%", "as": "-5.0%", "fo_v": -0.025, "as_v": -0.05, "n": 20, "wr": 65.0, "pnl": 6.44, "avg": 0.32, "sl": 5}, {"fo": "-2.0%", "as": "-4.0%", "fo_v": -0.02, "as_v": -0.04, "n": 20, "wr": 60.0, "pnl": 6.4, "avg": 0.32, "sl": 7}, {"fo": "없음", "as": "-2.0%", "fo_v": null, "as_v": -0.02, "n": 20, "wr": 55.0, "pnl": 6.38, "avg": 0.32, "sl": 7}, {"fo": "-6.0%", "as": "-2.0%", "fo_v": -0.06, "as_v": -0.02, "n": 20, "wr": 55.0, "pnl": 6.38, "avg": 0.32, "sl": 7}, {"fo": "-2.0%", "as": "-5.0%", "fo_v": -0.02, "as_v": -0.05, "n": 20, "wr": 60.0, "pnl": 5.42, "avg": 0.27, "sl": 7}, {"fo": "-2.5%", "as": "-2.5%", "fo_v": -0.025, "as_v": -0.025, "n": 20, "wr": 60.0, "pnl": 5.37, "avg": 0.27, "sl": 6}, {"fo": "-4.0%", "as": "-2.0%", "fo_v": -0.04, "as_v": -0.02, "n": 20, "wr": 55.0, "pnl": 4.39, "avg": 0.22, "sl": 7}, {"fo": "-2.5%", "as": "-3.0%", "fo_v": -0.025, "as_v": -0.03, "n": 20, "wr": 60.0, "pnl": 4.37, "avg": 0.22, "sl": 6}, {"fo": "-3.0%", "as": "-2.0%", "fo_v": -0.03, "as_v": -0.02, "n": 20, "wr": 55.0, "pnl": 4.37, "avg": 0.22, "sl": 7}, {"fo": "-2.0%", "as": "-2.5%", "fo_v": -0.02, "as_v": -0.025, "n": 20, "wr": 55.0, "pnl": 4.35, "avg": 0.22, "sl": 8}, {"fo": "-3.5%", "as": "-2.0%", "fo_v": -0.035, "as_v": -0.02, "n": 20, "wr": 55.0, "pnl": 3.39, "avg": 0.17, "sl": 7}, {"fo": "-5.0%", "as": "-2.0%", "fo_v": -0.05, "as_v": -0.02, "n": 20, "wr": 55.0, "pnl": 3.38, "avg": 0.17, "sl": 7}, {"fo": "-2.0%", "as": "-3.0%", "fo_v": -0.02, "as_v": -0.03, "n": 20, "wr": 55.0, "pnl": 3.35, "avg": 0.17, "sl": 8}, {"fo": "없음", "as": "-1.5%", "fo_v": null, "as_v": -0.015, "n": 20, "wr": 45.0, "pnl": 1.91, "avg": 0.1, "sl": 10}, {"fo": "-6.0%", "as": "-1.5%", "fo_v": -0.06, "as_v": -0.015, "n": 20, "wr": 45.0, "pnl": 1.91, "avg": 0.1, "sl": 10}, {"fo": "-2.5%", "as": "-2.0%", "fo_v": -0.025, "as_v": -0.02, "n": 20, "wr": 50.0, "pnl": 0.03, "avg": 0.0, "sl": 8}, {"fo": "-4.0%", "as": "-1.5%", "fo_v": -0.04, "as_v": -0.015, "n": 20, "wr": 45.0, "pnl": -0.57, "avg": -0.03, "sl": 10}, {"fo": "-2.0%", "as": "-2.0%", "fo_v": -0.02, "as_v": -0.02, "n": 20, "wr": 45.0, "pnl": -0.99, "avg": -0.05, "sl": 10}, {"fo": "-3.0%", "as": "-1.5%", "fo_v": -0.03, "as_v": -0.015, "n": 20, "wr": 45.0, "pnl": -1.09, "avg": -0.05, "sl": 10}, {"fo": "-5.0%", "as": "-1.5%", "fo_v": -0.05, "as_v": -0.015, "n": 20, "wr": 45.0, "pnl": -1.58, "avg": -0.08, "sl": 10}, {"fo": "-2.5%", "as": "-1.5%", "fo_v": -0.025, "as_v": -0.015, "n": 20, "wr": 45.0, "pnl": -2.07, "avg": -0.1, "sl": 10}, {"fo": "-3.5%", "as": "-1.5%", "fo_v": -0.035, "as_v": -0.015, "n": 20, "wr": 45.0, "pnl": -2.07, "avg": -0.1, "sl": 10}, {"fo": "-2.0%", "as": "-1.5%", "fo_v": -0.02, "as_v": -0.015, "n": 20, "wr": 40.0, "pnl": -3.09, "avg": -0.15, "sl": 12}], "fo_values": ["없음", "-2.0%", "-2.5%", "-3.0%", "-3.5%", "-4.0%", "-5.0%", "-6.0%"], "as_values": ["없음", "-1.5%", "-2.0%", "-2.5%", "-3.0%", "-3.5%", "-4.0%", "-5.0%"]}, "tp1": {"grid": [{"profit": 3.0, "ratio": 100.0, "p_v": 0.03, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 14.18, "avg": 0.71, "sl": 6}, {"profit": 3.0, "ratio": 75.0, "p_v": 0.03, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 12.43, "avg": 0.62, "sl": 6}, {"profit": 3.0, "ratio": 60.0, "p_v": 0.03, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 11.39, "avg": 0.57, "sl": 6}, {"profit": 2.5, "ratio": 100.0, "p_v": 0.025, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 11.09, "avg": 0.55, "sl": 6}, {"profit": 3.0, "ratio": 50.0, "p_v": 0.03, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 10.68, "avg": 0.53, "sl": 6}, {"profit": 3.0, "ratio": 40.0, "p_v": 0.03, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 10.0, "avg": 0.5, "sl": 6}, {"profit": 3.0, "ratio": 30.0, "p_v": 0.03, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 9.31, "avg": 0.47, "sl": 6}, {"profit": 3.0, "ratio": 25.0, "p_v": 0.03, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 8.96, "avg": 0.45, "sl": 6}, {"profit": 3.5, "ratio": 100.0, "p_v": 0.035, "r_v": 1.0, "n": 20, "wr": 50.0, "pnl": 8.65, "avg": 0.43, "sl": 7}, {"profit": 2.5, "ratio": 75.0, "p_v": 0.025, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 8.62, "avg": 0.43, "sl": 6}, {"profit": 3.0, "ratio": 20.0, "p_v": 0.03, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 8.6, "avg": 0.43, "sl": 6}, {"profit": 3.0, "ratio": 15.0, "p_v": 0.03, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 8.25, "avg": 0.41, "sl": 6}, {"profit": 3.0, "ratio": 10.0, "p_v": 0.03, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 7.91, "avg": 0.4, "sl": 6}, {"profit": 3.5, "ratio": 75.0, "p_v": 0.035, "r_v": 0.75, "n": 20, "wr": 50.0, "pnl": 7.66, "avg": 0.38, "sl": 7}, {"profit": 3.0, "ratio": 5.0, "p_v": 0.03, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 7.55, "avg": 0.38, "sl": 6}, {"profit": 3.0, "ratio": 0.0, "p_v": 0.03, "r_v": 0.0, "n": 20, "wr": 45.0, "pnl": 7.21, "avg": 0.36, "sl": 6}, {"profit": 2.5, "ratio": 60.0, "p_v": 0.025, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 7.14, "avg": 0.36, "sl": 6}, {"profit": 3.5, "ratio": 60.0, "p_v": 0.035, "r_v": 0.6, "n": 20, "wr": 50.0, "pnl": 7.06, "avg": 0.35, "sl": 7}, {"profit": 6.0, "ratio": 100.0, "p_v": 0.06, "r_v": 1.0, "n": 20, "wr": 50.0, "pnl": 6.85, "avg": 0.34, "sl": 7}, {"profit": 3.5, "ratio": 50.0, "p_v": 0.035, "r_v": 0.5, "n": 20, "wr": 50.0, "pnl": 6.67, "avg": 0.33, "sl": 7}, {"profit": 2.0, "ratio": 100.0, "p_v": 0.02, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 6.56, "avg": 0.33, "sl": 6}, {"profit": 6.0, "ratio": 75.0, "p_v": 0.06, "r_v": 0.75, "n": 20, "wr": 50.0, "pnl": 6.43, "avg": 0.32, "sl": 7}, {"profit": 3.5, "ratio": 40.0, "p_v": 0.035, "r_v": 0.4, "n": 20, "wr": 50.0, "pnl": 6.26, "avg": 0.31, "sl": 7}, {"profit": 6.0, "ratio": 60.0, "p_v": 0.06, "r_v": 0.6, "n": 20, "wr": 50.0, "pnl": 6.19, "avg": 0.31, "sl": 7}, {"profit": 2.5, "ratio": 50.0, "p_v": 0.025, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 6.16, "avg": 0.31, "sl": 6}, {"profit": 6.0, "ratio": 50.0, "p_v": 0.06, "r_v": 0.5, "n": 20, "wr": 50.0, "pnl": 6.01, "avg": 0.3, "sl": 7}, {"profit": 3.5, "ratio": 30.0, "p_v": 0.035, "r_v": 0.3, "n": 20, "wr": 50.0, "pnl": 5.87, "avg": 0.29, "sl": 7}, {"profit": 6.0, "ratio": 40.0, "p_v": 0.06, "r_v": 0.4, "n": 20, "wr": 50.0, "pnl": 5.84, "avg": 0.29, "sl": 7}, {"profit": 6.0, "ratio": 30.0, "p_v": 0.06, "r_v": 0.3, "n": 20, "wr": 50.0, "pnl": 5.68, "avg": 0.28, "sl": 7}, {"profit": 3.5, "ratio": 25.0, "p_v": 0.035, "r_v": 0.25, "n": 20, "wr": 50.0, "pnl": 5.67, "avg": 0.28, "sl": 7}, {"profit": 6.0, "ratio": 25.0, "p_v": 0.06, "r_v": 0.25, "n": 20, "wr": 50.0, "pnl": 5.59, "avg": 0.28, "sl": 7}, {"profit": 6.0, "ratio": 20.0, "p_v": 0.06, "r_v": 0.2, "n": 20, "wr": 50.0, "pnl": 5.51, "avg": 0.28, "sl": 7}, {"profit": 3.5, "ratio": 20.0, "p_v": 0.035, "r_v": 0.2, "n": 20, "wr": 50.0, "pnl": 5.47, "avg": 0.27, "sl": 7}, {"profit": 6.0, "ratio": 15.0, "p_v": 0.06, "r_v": 0.15, "n": 20, "wr": 50.0, "pnl": 5.42, "avg": 0.27, "sl": 7}, {"profit": 6.0, "ratio": 10.0, "p_v": 0.06, "r_v": 0.1, "n": 20, "wr": 50.0, "pnl": 5.35, "avg": 0.27, "sl": 7}, {"profit": 5.0, "ratio": 100.0, "p_v": 0.05, "r_v": 1.0, "n": 20, "wr": 50.0, "pnl": 5.3, "avg": 0.27, "sl": 7}, {"profit": 3.5, "ratio": 15.0, "p_v": 0.035, "r_v": 0.15, "n": 20, "wr": 50.0, "pnl": 5.27, "avg": 0.26, "sl": 7}, {"profit": 5.0, "ratio": 75.0, "p_v": 0.05, "r_v": 0.75, "n": 20, "wr": 50.0, "pnl": 5.27, "avg": 0.26, "sl": 7}, {"profit": 5.0, "ratio": 60.0, "p_v": 0.05, "r_v": 0.6, "n": 20, "wr": 50.0, "pnl": 5.26, "avg": 0.26, "sl": 7}, {"profit": 6.0, "ratio": 5.0, "p_v": 0.06, "r_v": 0.05, "n": 20, "wr": 50.0, "pnl": 5.26, "avg": 0.26, "sl": 7}, {"profit": 5.0, "ratio": 50.0, "p_v": 0.05, "r_v": 0.5, "n": 20, "wr": 50.0, "pnl": 5.24, "avg": 0.26, "sl": 7}, {"profit": 2.0, "ratio": 75.0, "p_v": 0.02, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 5.22, "avg": 0.26, "sl": 6}, {"profit": 5.0, "ratio": 30.0, "p_v": 0.05, "r_v": 0.3, "n": 20, "wr": 50.0, "pnl": 5.22, "avg": 0.26, "sl": 7}, {"profit": 5.0, "ratio": 40.0, "p_v": 0.05, "r_v": 0.4, "n": 20, "wr": 50.0, "pnl": 5.22, "avg": 0.26, "sl": 7}, {"profit": 5.0, "ratio": 25.0, "p_v": 0.05, "r_v": 0.25, "n": 20, "wr": 50.0, "pnl": 5.21, "avg": 0.26, "sl": 7}, {"profit": 5.0, "ratio": 20.0, "p_v": 0.05, "r_v": 0.2, "n": 20, "wr": 50.0, "pnl": 5.2, "avg": 0.26, "sl": 7}, {"profit": 5.0, "ratio": 10.0, "p_v": 0.05, "r_v": 0.1, "n": 20, "wr": 50.0, "pnl": 5.19, "avg": 0.26, "sl": 7}, {"profit": 5.0, "ratio": 15.0, "p_v": 0.05, "r_v": 0.15, "n": 20, "wr": 50.0, "pnl": 5.19, "avg": 0.26, "sl": 7}, {"profit": 4.0, "ratio": 0.0, "p_v": 0.04, "r_v": 0.0, "n": 20, "wr": 50.0, "pnl": 5.18, "avg": 0.26, "sl": 7}, {"profit": 5.0, "ratio": 0.0, "p_v": 0.05, "r_v": 0.0, "n": 20, "wr": 50.0, "pnl": 5.18, "avg": 0.26, "sl": 7}, {"profit": 5.0, "ratio": 5.0, "p_v": 0.05, "r_v": 0.05, "n": 20, "wr": 50.0, "pnl": 5.18, "avg": 0.26, "sl": 7}, {"profit": 6.0, "ratio": 0.0, "p_v": 0.06, "r_v": 0.0, "n": 20, "wr": 50.0, "pnl": 5.18, "avg": 0.26, "sl": 7}, {"profit": 2.5, "ratio": 40.0, "p_v": 0.025, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 5.17, "avg": 0.26, "sl": 6}, {"profit": 4.0, "ratio": 5.0, "p_v": 0.04, "r_v": 0.05, "n": 20, "wr": 50.0, "pnl": 5.13, "avg": 0.26, "sl": 7}, {"profit": 3.5, "ratio": 10.0, "p_v": 0.035, "r_v": 0.1, "n": 20, "wr": 50.0, "pnl": 5.08, "avg": 0.25, "sl": 7}, {"profit": 4.0, "ratio": 10.0, "p_v": 0.04, "r_v": 0.1, "n": 20, "wr": 50.0, "pnl": 5.08, "avg": 0.25, "sl": 7}, {"profit": 4.0, "ratio": 15.0, "p_v": 0.04, "r_v": 0.15, "n": 20, "wr": 50.0, "pnl": 5.03, "avg": 0.25, "sl": 7}, {"profit": 4.0, "ratio": 20.0, "p_v": 0.04, "r_v": 0.2, "n": 20, "wr": 50.0, "pnl": 4.98, "avg": 0.25, "sl": 7}, {"profit": 4.0, "ratio": 25.0, "p_v": 0.04, "r_v": 0.25, "n": 20, "wr": 50.0, "pnl": 4.93, "avg": 0.25, "sl": 7}, {"profit": 3.5, "ratio": 5.0, "p_v": 0.035, "r_v": 0.05, "n": 20, "wr": 50.0, "pnl": 4.88, "avg": 0.24, "sl": 7}, {"profit": 4.0, "ratio": 30.0, "p_v": 0.04, "r_v": 0.3, "n": 20, "wr": 50.0, "pnl": 4.88, "avg": 0.24, "sl": 7}, {"profit": 4.0, "ratio": 40.0, "p_v": 0.04, "r_v": 0.4, "n": 20, "wr": 50.0, "pnl": 4.78, "avg": 0.24, "sl": 7}, {"profit": 4.0, "ratio": 50.0, "p_v": 0.04, "r_v": 0.5, "n": 20, "wr": 50.0, "pnl": 4.69, "avg": 0.23, "sl": 7}, {"profit": 3.5, "ratio": 0.0, "p_v": 0.035, "r_v": 0.0, "n": 20, "wr": 45.0, "pnl": 4.68, "avg": 0.23, "sl": 7}, {"profit": 4.0, "ratio": 60.0, "p_v": 0.04, "r_v": 0.6, "n": 20, "wr": 50.0, "pnl": 4.6, "avg": 0.23, "sl": 7}, {"profit": 4.0, "ratio": 75.0, "p_v": 0.04, "r_v": 0.75, "n": 20, "wr": 50.0, "pnl": 4.44, "avg": 0.22, "sl": 7}, {"profit": 2.0, "ratio": 60.0, "p_v": 0.02, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 4.43, "avg": 0.22, "sl": 6}, {"profit": 2.5, "ratio": 30.0, "p_v": 0.025, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 4.2, "avg": 0.21, "sl": 6}, {"profit": 4.0, "ratio": 100.0, "p_v": 0.04, "r_v": 1.0, "n": 20, "wr": 50.0, "pnl": 4.2, "avg": 0.21, "sl": 7}, {"profit": 2.0, "ratio": 50.0, "p_v": 0.02, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 3.89, "avg": 0.19, "sl": 6}, {"profit": 2.5, "ratio": 25.0, "p_v": 0.025, "r_v": 0.25, "n": 20, "wr": 55.0, "pnl": 3.69, "avg": 0.18, "sl": 6}, {"profit": 2.0, "ratio": 40.0, "p_v": 0.02, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 3.37, "avg": 0.17, "sl": 6}, {"profit": 2.5, "ratio": 20.0, "p_v": 0.025, "r_v": 0.2, "n": 20, "wr": 55.0, "pnl": 3.21, "avg": 0.16, "sl": 6}, {"profit": 2.0, "ratio": 30.0, "p_v": 0.02, "r_v": 0.3, "n": 20, "wr": 55.0, "pnl": 2.83, "avg": 0.14, "sl": 6}, {"profit": 2.5, "ratio": 15.0, "p_v": 0.025, "r_v": 0.15, "n": 20, "wr": 55.0, "pnl": 2.72, "avg": 0.14, "sl": 6}, {"profit": 2.0, "ratio": 25.0, "p_v": 0.02, "r_v": 0.25, "n": 20, "wr": 55.0, "pnl": 2.57, "avg": 0.13, "sl": 6}, {"profit": 2.0, "ratio": 20.0, "p_v": 0.02, "r_v": 0.2, "n": 20, "wr": 55.0, "pnl": 2.31, "avg": 0.12, "sl": 6}, {"profit": 2.5, "ratio": 10.0, "p_v": 0.025, "r_v": 0.1, "n": 20, "wr": 55.0, "pnl": 2.24, "avg": 0.11, "sl": 6}, {"profit": 1.5, "ratio": 100.0, "p_v": 0.015, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 2.05, "avg": 0.1, "sl": 6}, {"profit": 2.0, "ratio": 15.0, "p_v": 0.02, "r_v": 0.15, "n": 20, "wr": 55.0, "pnl": 2.03, "avg": 0.1, "sl": 6}, {"profit": 1.5, "ratio": 75.0, "p_v": 0.015, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 1.84, "avg": 0.09, "sl": 6}, {"profit": 2.0, "ratio": 10.0, "p_v": 0.02, "r_v": 0.1, "n": 20, "wr": 55.0, "pnl": 1.78, "avg": 0.09, "sl": 6}, {"profit": 1.5, "ratio": 60.0, "p_v": 0.015, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 1.73, "avg": 0.09, "sl": 6}, {"profit": 2.5, "ratio": 5.0, "p_v": 0.025, "r_v": 0.05, "n": 20, "wr": 50.0, "pnl": 1.73, "avg": 0.09, "sl": 6}, {"profit": 1.5, "ratio": 50.0, "p_v": 0.015, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 1.63, "avg": 0.08, "sl": 6}, {"profit": 1.5, "ratio": 40.0, "p_v": 0.015, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 1.56, "avg": 0.08, "sl": 6}, {"profit": 2.0, "ratio": 5.0, "p_v": 0.02, "r_v": 0.05, "n": 20, "wr": 50.0, "pnl": 1.5, "avg": 0.08, "sl": 6}, {"profit": 1.5, "ratio": 30.0, "p_v": 0.015, "r_v": 0.3, "n": 20, "wr": 55.0, "pnl": 1.49, "avg": 0.07, "sl": 6}, {"profit": 1.5, "ratio": 25.0, "p_v": 0.015, "r_v": 0.25, "n": 20, "wr": 55.0, "pnl": 1.44, "avg": 0.07, "sl": 6}, {"profit": 1.5, "ratio": 20.0, "p_v": 0.015, "r_v": 0.2, "n": 20, "wr": 55.0, "pnl": 1.41, "avg": 0.07, "sl": 6}, {"profit": 1.5, "ratio": 15.0, "p_v": 0.015, "r_v": 0.15, "n": 20, "wr": 55.0, "pnl": 1.35, "avg": 0.07, "sl": 6}, {"profit": 1.5, "ratio": 10.0, "p_v": 0.015, "r_v": 0.1, "n": 20, "wr": 55.0, "pnl": 1.34, "avg": 0.07, "sl": 6}, {"profit": 1.5, "ratio": 5.0, "p_v": 0.015, "r_v": 0.05, "n": 20, "wr": 50.0, "pnl": 1.28, "avg": 0.06, "sl": 6}, {"profit": 1.5, "ratio": 0.0, "p_v": 0.015, "r_v": 0.0, "n": 20, "wr": 40.0, "pnl": 1.24, "avg": 0.06, "sl": 6}, {"profit": 2.0, "ratio": 0.0, "p_v": 0.02, "r_v": 0.0, "n": 20, "wr": 40.0, "pnl": 1.24, "avg": 0.06, "sl": 6}, {"profit": 2.5, "ratio": 0.0, "p_v": 0.025, "r_v": 0.0, "n": 20, "wr": 40.0, "pnl": 1.24, "avg": 0.06, "sl": 6}, {"profit": 1.0, "ratio": 0.0, "p_v": 0.01, "r_v": 0.0, "n": 20, "wr": 35.0, "pnl": -0.61, "avg": -0.03, "sl": 6}, {"profit": 1.0, "ratio": 5.0, "p_v": 0.01, "r_v": 0.05, "n": 20, "wr": 45.0, "pnl": -0.71, "avg": -0.04, "sl": 6}, {"profit": 1.0, "ratio": 10.0, "p_v": 0.01, "r_v": 0.1, "n": 20, "wr": 45.0, "pnl": -0.78, "avg": -0.04, "sl": 6}, {"profit": 1.0, "ratio": 15.0, "p_v": 0.01, "r_v": 0.15, "n": 20, "wr": 50.0, "pnl": -0.9, "avg": -0.05, "sl": 6}, {"profit": 1.0, "ratio": 20.0, "p_v": 0.01, "r_v": 0.2, "n": 20, "wr": 50.0, "pnl": -0.98, "avg": -0.05, "sl": 6}, {"profit": 1.0, "ratio": 25.0, "p_v": 0.01, "r_v": 0.25, "n": 20, "wr": 50.0, "pnl": -1.06, "avg": -0.05, "sl": 6}, {"profit": 1.0, "ratio": 30.0, "p_v": 0.01, "r_v": 0.3, "n": 20, "wr": 50.0, "pnl": -1.15, "avg": -0.06, "sl": 6}, {"profit": 1.0, "ratio": 40.0, "p_v": 0.01, "r_v": 0.4, "n": 20, "wr": 50.0, "pnl": -1.35, "avg": -0.07, "sl": 6}, {"profit": 1.0, "ratio": 50.0, "p_v": 0.01, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": -1.53, "avg": -0.08, "sl": 6}, {"profit": 1.0, "ratio": 60.0, "p_v": 0.01, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": -1.72, "avg": -0.09, "sl": 6}, {"profit": 1.0, "ratio": 75.0, "p_v": 0.01, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": -1.98, "avg": -0.1, "sl": 6}, {"profit": 1.0, "ratio": 100.0, "p_v": 0.01, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": -2.45, "avg": -0.12, "sl": 6}, {"profit": 0.5, "ratio": 0.0, "p_v": 0.005, "r_v": 0.0, "n": 20, "wr": 25.0, "pnl": -4.79, "avg": -0.24, "sl": 5}, {"profit": 0.5, "ratio": 5.0, "p_v": 0.005, "r_v": 0.05, "n": 20, "wr": 35.0, "pnl": -4.86, "avg": -0.24, "sl": 5}, {"profit": 0.5, "ratio": 10.0, "p_v": 0.005, "r_v": 0.1, "n": 20, "wr": 35.0, "pnl": -4.92, "avg": -0.25, "sl": 5}, {"profit": 0.5, "ratio": 15.0, "p_v": 0.005, "r_v": 0.15, "n": 20, "wr": 35.0, "pnl": -5.0, "avg": -0.25, "sl": 5}, {"profit": 0.5, "ratio": 20.0, "p_v": 0.005, "r_v": 0.2, "n": 20, "wr": 40.0, "pnl": -5.08, "avg": -0.25, "sl": 5}, {"profit": 0.5, "ratio": 25.0, "p_v": 0.005, "r_v": 0.25, "n": 20, "wr": 45.0, "pnl": -5.15, "avg": -0.26, "sl": 5}, {"profit": 0.5, "ratio": 30.0, "p_v": 0.005, "r_v": 0.3, "n": 20, "wr": 45.0, "pnl": -5.2, "avg": -0.26, "sl": 5}, {"profit": 0.5, "ratio": 40.0, "p_v": 0.005, "r_v": 0.4, "n": 20, "wr": 50.0, "pnl": -5.37, "avg": -0.27, "sl": 5}, {"profit": 0.5, "ratio": 50.0, "p_v": 0.005, "r_v": 0.5, "n": 20, "wr": 50.0, "pnl": -5.5, "avg": -0.28, "sl": 5}, {"profit": 0.5, "ratio": 60.0, "p_v": 0.005, "r_v": 0.6, "n": 20, "wr": 55.0, "pnl": -5.64, "avg": -0.28, "sl": 5}, {"profit": 0.5, "ratio": 75.0, "p_v": 0.005, "r_v": 0.75, "n": 20, "wr": 65.0, "pnl": -5.85, "avg": -0.29, "sl": 5}, {"profit": 0.5, "ratio": 100.0, "p_v": 0.005, "r_v": 1.0, "n": 20, "wr": 65.0, "pnl": -6.21, "avg": -0.31, "sl": 5}], "profits": [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 6.0], "ratios": [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 40.0, 50.0, 60.0, 75.0, 100.0]}, "tp2": {"grid": [{"profit": 3.0, "ratio": 100.0, "p_v": 0.03, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 12.6, "avg": 0.63, "sl": 6}, {"profit": 3.5, "ratio": 100.0, "p_v": 0.035, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 9.93, "avg": 0.5, "sl": 6}, {"profit": 2.5, "ratio": 100.0, "p_v": 0.025, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 9.91, "avg": 0.5, "sl": 6}, {"profit": 3.5, "ratio": 75.0, "p_v": 0.035, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 9.32, "avg": 0.47, "sl": 6}, {"profit": 3.0, "ratio": 75.0, "p_v": 0.03, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 9.3, "avg": 0.47, "sl": 7}, {"profit": 3.5, "ratio": 60.0, "p_v": 0.035, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 9.0, "avg": 0.45, "sl": 6}, {"profit": 3.5, "ratio": 50.0, "p_v": 0.035, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 8.79, "avg": 0.44, "sl": 6}, {"profit": 3.5, "ratio": 40.0, "p_v": 0.035, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 8.59, "avg": 0.43, "sl": 6}, {"profit": 3.5, "ratio": 30.0, "p_v": 0.035, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 8.39, "avg": 0.42, "sl": 6}, {"profit": 7.0, "ratio": 100.0, "p_v": 0.07, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 8.39, "avg": 0.42, "sl": 6}, {"profit": 3.5, "ratio": 25.0, "p_v": 0.035, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 8.29, "avg": 0.41, "sl": 6}, {"profit": 7.0, "ratio": 75.0, "p_v": 0.07, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 8.27, "avg": 0.41, "sl": 6}, {"profit": 3.5, "ratio": 20.0, "p_v": 0.035, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 8.22, "avg": 0.41, "sl": 6}, {"profit": 7.0, "ratio": 60.0, "p_v": 0.07, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 8.19, "avg": 0.41, "sl": 6}, {"profit": 7.0, "ratio": 50.0, "p_v": 0.07, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 8.14, "avg": 0.41, "sl": 6}, {"profit": 3.5, "ratio": 15.0, "p_v": 0.035, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 8.12, "avg": 0.41, "sl": 6}, {"profit": 7.0, "ratio": 40.0, "p_v": 0.07, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 8.09, "avg": 0.4, "sl": 6}, {"profit": 3.0, "ratio": 60.0, "p_v": 0.03, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 8.06, "avg": 0.4, "sl": 7}, {"profit": 7.0, "ratio": 30.0, "p_v": 0.07, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 8.04, "avg": 0.4, "sl": 6}, {"profit": 3.5, "ratio": 10.0, "p_v": 0.035, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 8.02, "avg": 0.4, "sl": 6}, {"profit": 7.0, "ratio": 25.0, "p_v": 0.07, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 8.02, "avg": 0.4, "sl": 6}, {"profit": 7.0, "ratio": 20.0, "p_v": 0.07, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 7.99, "avg": 0.4, "sl": 6}, {"profit": 7.0, "ratio": 15.0, "p_v": 0.07, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 7.97, "avg": 0.4, "sl": 6}, {"profit": 7.0, "ratio": 10.0, "p_v": 0.07, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 7.94, "avg": 0.4, "sl": 6}, {"profit": 3.5, "ratio": 5.0, "p_v": 0.035, "r_v": 0.05, "n": 20, "wr": 55.0, "pnl": 7.93, "avg": 0.4, "sl": 6}, {"profit": 7.0, "ratio": 5.0, "p_v": 0.07, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 7.92, "avg": 0.4, "sl": 6}, {"profit": 7.0, "ratio": 0.0, "p_v": 0.07, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 7.89, "avg": 0.39, "sl": 6}, {"profit": 3.5, "ratio": 0.0, "p_v": 0.035, "r_v": 0.0, "n": 20, "wr": 55.0, "pnl": 7.82, "avg": 0.39, "sl": 6}, {"profit": 6.0, "ratio": 0.0, "p_v": 0.06, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 7.58, "avg": 0.38, "sl": 6}, {"profit": 6.0, "ratio": 5.0, "p_v": 0.06, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 7.58, "avg": 0.38, "sl": 6}, {"profit": 6.0, "ratio": 10.0, "p_v": 0.06, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 7.56, "avg": 0.38, "sl": 6}, {"profit": 6.0, "ratio": 15.0, "p_v": 0.06, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 7.56, "avg": 0.38, "sl": 6}, {"profit": 6.0, "ratio": 20.0, "p_v": 0.06, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 7.56, "avg": 0.38, "sl": 6}, {"profit": 2.5, "ratio": 75.0, "p_v": 0.025, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 7.55, "avg": 0.38, "sl": 7}, {"profit": 6.0, "ratio": 25.0, "p_v": 0.06, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 7.54, "avg": 0.38, "sl": 6}, {"profit": 6.0, "ratio": 30.0, "p_v": 0.06, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 7.54, "avg": 0.38, "sl": 6}, {"profit": 6.0, "ratio": 40.0, "p_v": 0.06, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 7.52, "avg": 0.38, "sl": 6}, {"profit": 6.0, "ratio": 50.0, "p_v": 0.06, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 7.5, "avg": 0.38, "sl": 6}, {"profit": 6.0, "ratio": 60.0, "p_v": 0.06, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 7.48, "avg": 0.37, "sl": 6}, {"profit": 6.0, "ratio": 75.0, "p_v": 0.06, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 7.45, "avg": 0.37, "sl": 6}, {"profit": 3.0, "ratio": 50.0, "p_v": 0.03, "r_v": 0.5, "n": 20, "wr": 55.0, "pnl": 7.41, "avg": 0.37, "sl": 7}, {"profit": 6.0, "ratio": 100.0, "p_v": 0.06, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 7.41, "avg": 0.37, "sl": 6}, {"profit": 3.0, "ratio": 40.0, "p_v": 0.03, "r_v": 0.4, "n": 20, "wr": 55.0, "pnl": 6.87, "avg": 0.34, "sl": 7}, {"profit": 2.5, "ratio": 60.0, "p_v": 0.025, "r_v": 0.6, "n": 20, "wr": 55.0, "pnl": 6.73, "avg": 0.34, "sl": 7}, {"profit": 5.5, "ratio": 100.0, "p_v": 0.055, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 6.66, "avg": 0.33, "sl": 6}, {"profit": 5.5, "ratio": 75.0, "p_v": 0.055, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 6.47, "avg": 0.32, "sl": 6}, {"profit": 3.0, "ratio": 30.0, "p_v": 0.03, "r_v": 0.3, "n": 20, "wr": 55.0, "pnl": 6.41, "avg": 0.32, "sl": 7}, {"profit": 2.5, "ratio": 50.0, "p_v": 0.025, "r_v": 0.5, "n": 20, "wr": 55.0, "pnl": 6.35, "avg": 0.32, "sl": 7}, {"profit": 5.5, "ratio": 60.0, "p_v": 0.055, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 6.34, "avg": 0.32, "sl": 6}, {"profit": 5.5, "ratio": 50.0, "p_v": 0.055, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 6.27, "avg": 0.31, "sl": 6}, {"profit": 3.0, "ratio": 25.0, "p_v": 0.03, "r_v": 0.25, "n": 20, "wr": 55.0, "pnl": 6.21, "avg": 0.31, "sl": 7}, {"profit": 5.5, "ratio": 40.0, "p_v": 0.055, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 6.18, "avg": 0.31, "sl": 6}, {"profit": 2.0, "ratio": 100.0, "p_v": 0.02, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 6.15, "avg": 0.31, "sl": 6}, {"profit": 5.5, "ratio": 30.0, "p_v": 0.055, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 6.1, "avg": 0.31, "sl": 6}, {"profit": 5.5, "ratio": 25.0, "p_v": 0.055, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 6.07, "avg": 0.3, "sl": 6}, {"profit": 2.5, "ratio": 40.0, "p_v": 0.025, "r_v": 0.4, "n": 20, "wr": 55.0, "pnl": 6.05, "avg": 0.3, "sl": 7}, {"profit": 5.5, "ratio": 20.0, "p_v": 0.055, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 6.03, "avg": 0.3, "sl": 6}, {"profit": 3.0, "ratio": 20.0, "p_v": 0.03, "r_v": 0.2, "n": 20, "wr": 55.0, "pnl": 6.02, "avg": 0.3, "sl": 7}, {"profit": 5.5, "ratio": 15.0, "p_v": 0.055, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 5.98, "avg": 0.3, "sl": 6}, {"profit": 5.5, "ratio": 10.0, "p_v": 0.055, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 5.95, "avg": 0.3, "sl": 6}, {"profit": 5.5, "ratio": 5.0, "p_v": 0.055, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 5.9, "avg": 0.3, "sl": 6}, {"profit": 4.0, "ratio": 0.0, "p_v": 0.04, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 4.9, "ratio": 0.0, "p_v": 0.049, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 4.9, "ratio": 5.0, "p_v": 0.049, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 5.5, "ratio": 0.0, "p_v": 0.055, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 0.0, "p_v": 0.08, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 5.0, "p_v": 0.08, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 10.0, "p_v": 0.08, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 15.0, "p_v": 0.08, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 20.0, "p_v": 0.08, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 25.0, "p_v": 0.08, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 30.0, "p_v": 0.08, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 40.0, "p_v": 0.08, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 50.0, "p_v": 0.08, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 60.0, "p_v": 0.08, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 75.0, "p_v": 0.08, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 100.0, "p_v": 0.08, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 5.86, "avg": 0.29, "sl": 6}, {"profit": 4.0, "ratio": 5.0, "p_v": 0.04, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 5.85, "avg": 0.29, "sl": 6}, {"profit": 4.9, "ratio": 10.0, "p_v": 0.049, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 5.85, "avg": 0.29, "sl": 6}, {"profit": 4.9, "ratio": 15.0, "p_v": 0.049, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 5.85, "avg": 0.29, "sl": 6}, {"profit": 4.0, "ratio": 10.0, "p_v": 0.04, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 5.84, "avg": 0.29, "sl": 6}, {"profit": 4.9, "ratio": 20.0, "p_v": 0.049, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 5.84, "avg": 0.29, "sl": 6}, {"profit": 4.9, "ratio": 25.0, "p_v": 0.049, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 5.84, "avg": 0.29, "sl": 6}, {"profit": 4.9, "ratio": 30.0, "p_v": 0.049, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 5.84, "avg": 0.29, "sl": 6}, {"profit": 3.0, "ratio": 15.0, "p_v": 0.03, "r_v": 0.15, "n": 20, "wr": 50.0, "pnl": 5.83, "avg": 0.29, "sl": 7}, {"profit": 4.9, "ratio": 40.0, "p_v": 0.049, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 5.82, "avg": 0.29, "sl": 6}, {"profit": 2.5, "ratio": 30.0, "p_v": 0.025, "r_v": 0.3, "n": 20, "wr": 55.0, "pnl": 5.81, "avg": 0.29, "sl": 7}, {"profit": 4.0, "ratio": 15.0, "p_v": 0.04, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 5.81, "avg": 0.29, "sl": 6}, {"profit": 4.9, "ratio": 50.0, "p_v": 0.049, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 5.81, "avg": 0.29, "sl": 6}, {"profit": 4.0, "ratio": 20.0, "p_v": 0.04, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 5.8, "avg": 0.29, "sl": 6}, {"profit": 4.9, "ratio": 60.0, "p_v": 0.049, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 5.8, "avg": 0.29, "sl": 6}, {"profit": 4.0, "ratio": 25.0, "p_v": 0.04, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 5.79, "avg": 0.29, "sl": 6}, {"profit": 4.9, "ratio": 75.0, "p_v": 0.049, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 5.79, "avg": 0.29, "sl": 6}, {"profit": 4.0, "ratio": 30.0, "p_v": 0.04, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 5.77, "avg": 0.29, "sl": 6}, {"profit": 4.9, "ratio": 100.0, "p_v": 0.049, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 4.0, "ratio": 40.0, "p_v": 0.04, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 5.74, "avg": 0.29, "sl": 6}, {"profit": 2.5, "ratio": 25.0, "p_v": 0.025, "r_v": 0.25, "n": 20, "wr": 55.0, "pnl": 5.71, "avg": 0.29, "sl": 7}, {"profit": 4.0, "ratio": 50.0, "p_v": 0.04, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 5.7, "avg": 0.28, "sl": 6}, {"profit": 4.0, "ratio": 60.0, "p_v": 0.04, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 5.68, "avg": 0.28, "sl": 6}, {"profit": 3.0, "ratio": 10.0, "p_v": 0.03, "r_v": 0.1, "n": 20, "wr": 50.0, "pnl": 5.66, "avg": 0.28, "sl": 7}, {"profit": 4.0, "ratio": 75.0, "p_v": 0.04, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 5.63, "avg": 0.28, "sl": 6}, {"profit": 2.5, "ratio": 20.0, "p_v": 0.025, "r_v": 0.2, "n": 20, "wr": 50.0, "pnl": 5.61, "avg": 0.28, "sl": 7}, {"profit": 2.5, "ratio": 15.0, "p_v": 0.025, "r_v": 0.15, "n": 20, "wr": 50.0, "pnl": 5.55, "avg": 0.28, "sl": 7}, {"profit": 4.0, "ratio": 100.0, "p_v": 0.04, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 5.55, "avg": 0.28, "sl": 6}, {"profit": 3.0, "ratio": 5.0, "p_v": 0.03, "r_v": 0.05, "n": 20, "wr": 45.0, "pnl": 5.5, "avg": 0.28, "sl": 7}, {"profit": 2.5, "ratio": 10.0, "p_v": 0.025, "r_v": 0.1, "n": 20, "wr": 50.0, "pnl": 5.48, "avg": 0.27, "sl": 7}, {"profit": 2.5, "ratio": 5.0, "p_v": 0.025, "r_v": 0.05, "n": 20, "wr": 45.0, "pnl": 5.4, "avg": 0.27, "sl": 7}, {"profit": 2.0, "ratio": 0.0, "p_v": 0.02, "r_v": 0.0, "n": 20, "wr": 45.0, "pnl": 5.35, "avg": 0.27, "sl": 7}, {"profit": 2.5, "ratio": 0.0, "p_v": 0.025, "r_v": 0.0, "n": 20, "wr": 45.0, "pnl": 5.35, "avg": 0.27, "sl": 7}, {"profit": 3.0, "ratio": 0.0, "p_v": 0.03, "r_v": 0.0, "n": 20, "wr": 45.0, "pnl": 5.35, "avg": 0.27, "sl": 7}, {"profit": 2.0, "ratio": 5.0, "p_v": 0.02, "r_v": 0.05, "n": 20, "wr": 45.0, "pnl": 5.27, "avg": 0.26, "sl": 7}, {"profit": 2.0, "ratio": 10.0, "p_v": 0.02, "r_v": 0.1, "n": 20, "wr": 50.0, "pnl": 5.16, "avg": 0.26, "sl": 7}, {"profit": 2.0, "ratio": 15.0, "p_v": 0.02, "r_v": 0.15, "n": 20, "wr": 50.0, "pnl": 5.07, "avg": 0.25, "sl": 7}, {"profit": 2.0, "ratio": 20.0, "p_v": 0.02, "r_v": 0.2, "n": 20, "wr": 50.0, "pnl": 4.99, "avg": 0.25, "sl": 7}, {"profit": 2.0, "ratio": 75.0, "p_v": 0.02, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 4.97, "avg": 0.25, "sl": 7}, {"profit": 2.0, "ratio": 25.0, "p_v": 0.02, "r_v": 0.25, "n": 20, "wr": 55.0, "pnl": 4.91, "avg": 0.25, "sl": 7}, {"profit": 2.0, "ratio": 30.0, "p_v": 0.02, "r_v": 0.3, "n": 20, "wr": 55.0, "pnl": 4.84, "avg": 0.24, "sl": 7}, {"profit": 2.0, "ratio": 40.0, "p_v": 0.02, "r_v": 0.4, "n": 20, "wr": 55.0, "pnl": 4.76, "avg": 0.24, "sl": 7}, {"profit": 2.0, "ratio": 60.0, "p_v": 0.02, "r_v": 0.6, "n": 20, "wr": 55.0, "pnl": 4.75, "avg": 0.24, "sl": 7}, {"profit": 2.0, "ratio": 50.0, "p_v": 0.02, "r_v": 0.5, "n": 20, "wr": 55.0, "pnl": 4.7, "avg": 0.23, "sl": 7}], "profits": [2.0, 2.5, 3.0, 3.5, 4.0, 4.9, 5.5, 6.0, 7.0, 8.0], "ratios": [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 40.0, 50.0, 60.0, 75.0, 100.0]}, "tp3": {"grid": [{"profit": 3.0, "ratio": 100.0, "p_v": 0.03, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 12.96, "avg": 0.65, "sl": 6}, {"profit": 3.0, "ratio": 75.0, "p_v": 0.03, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 11.68, "avg": 0.58, "sl": 6}, {"profit": 3.0, "ratio": 60.0, "p_v": 0.03, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 10.92, "avg": 0.55, "sl": 6}, {"profit": 3.0, "ratio": 50.0, "p_v": 0.03, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 10.41, "avg": 0.52, "sl": 6}, {"profit": 3.0, "ratio": 40.0, "p_v": 0.03, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 9.91, "avg": 0.5, "sl": 6}, {"profit": 3.0, "ratio": 30.0, "p_v": 0.03, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 9.38, "avg": 0.47, "sl": 6}, {"profit": 3.0, "ratio": 25.0, "p_v": 0.03, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 9.12, "avg": 0.46, "sl": 6}, {"profit": 3.0, "ratio": 20.0, "p_v": 0.03, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 8.88, "avg": 0.44, "sl": 6}, {"profit": 7.0, "ratio": 100.0, "p_v": 0.07, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 8.79, "avg": 0.44, "sl": 6}, {"profit": 3.0, "ratio": 15.0, "p_v": 0.03, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 8.63, "avg": 0.43, "sl": 6}, {"profit": 3.0, "ratio": 10.0, "p_v": 0.03, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 8.37, "avg": 0.42, "sl": 6}, {"profit": 6.3, "ratio": 100.0, "p_v": 0.063, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 8.15, "avg": 0.41, "sl": 6}, {"profit": 3.0, "ratio": 5.0, "p_v": 0.03, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 8.14, "avg": 0.41, "sl": 6}, {"profit": 7.0, "ratio": 75.0, "p_v": 0.07, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 8.03, "avg": 0.4, "sl": 6}, {"profit": 3.0, "ratio": 0.0, "p_v": 0.03, "r_v": 0.0, "n": 20, "wr": 55.0, "pnl": 7.86, "avg": 0.39, "sl": 6}, {"profit": 7.0, "ratio": 60.0, "p_v": 0.07, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 7.57, "avg": 0.38, "sl": 6}, {"profit": 6.3, "ratio": 75.0, "p_v": 0.063, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 7.55, "avg": 0.38, "sl": 6}, {"profit": 5.5, "ratio": 100.0, "p_v": 0.055, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 7.43, "avg": 0.37, "sl": 6}, {"profit": 7.0, "ratio": 50.0, "p_v": 0.07, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 7.27, "avg": 0.36, "sl": 6}, {"profit": 6.3, "ratio": 60.0, "p_v": 0.063, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 7.19, "avg": 0.36, "sl": 6}, {"profit": 5.5, "ratio": 75.0, "p_v": 0.055, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 7.09, "avg": 0.35, "sl": 6}, {"profit": 5.0, "ratio": 100.0, "p_v": 0.05, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 6.99, "avg": 0.35, "sl": 6}, {"profit": 7.0, "ratio": 40.0, "p_v": 0.07, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 6.97, "avg": 0.35, "sl": 6}, {"profit": 6.3, "ratio": 50.0, "p_v": 0.063, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 5.5, "ratio": 60.0, "p_v": 0.055, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 6.89, "avg": 0.34, "sl": 6}, {"profit": 4.0, "ratio": 0.0, "p_v": 0.04, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 6.84, "avg": 0.34, "sl": 6}, {"profit": 5.0, "ratio": 75.0, "p_v": 0.05, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 6.84, "avg": 0.34, "sl": 6}, {"profit": 4.0, "ratio": 5.0, "p_v": 0.04, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 6.83, "avg": 0.34, "sl": 6}, {"profit": 4.0, "ratio": 10.0, "p_v": 0.04, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 6.81, "avg": 0.34, "sl": 6}, {"profit": 4.0, "ratio": 15.0, "p_v": 0.04, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 6.79, "avg": 0.34, "sl": 6}, {"profit": 4.0, "ratio": 20.0, "p_v": 0.04, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 6.77, "avg": 0.34, "sl": 6}, {"profit": 5.0, "ratio": 60.0, "p_v": 0.05, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 6.76, "avg": 0.34, "sl": 6}, {"profit": 4.0, "ratio": 25.0, "p_v": 0.04, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 6.75, "avg": 0.34, "sl": 6}, {"profit": 5.5, "ratio": 50.0, "p_v": 0.055, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 6.75, "avg": 0.34, "sl": 6}, {"profit": 4.0, "ratio": 30.0, "p_v": 0.04, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 6.74, "avg": 0.34, "sl": 6}, {"profit": 5.0, "ratio": 50.0, "p_v": 0.05, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 6.71, "avg": 0.34, "sl": 6}, {"profit": 6.3, "ratio": 40.0, "p_v": 0.063, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 6.71, "avg": 0.34, "sl": 6}, {"profit": 4.0, "ratio": 40.0, "p_v": 0.04, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 6.69, "avg": 0.33, "sl": 6}, {"profit": 4.0, "ratio": 50.0, "p_v": 0.04, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 6.66, "avg": 0.33, "sl": 6}, {"profit": 7.0, "ratio": 30.0, "p_v": 0.07, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 6.66, "avg": 0.33, "sl": 6}, {"profit": 5.0, "ratio": 40.0, "p_v": 0.05, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 6.65, "avg": 0.33, "sl": 6}, {"profit": 4.0, "ratio": 60.0, "p_v": 0.04, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 6.62, "avg": 0.33, "sl": 6}, {"profit": 5.5, "ratio": 40.0, "p_v": 0.055, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 6.61, "avg": 0.33, "sl": 6}, {"profit": 5.0, "ratio": 30.0, "p_v": 0.05, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 6.6, "avg": 0.33, "sl": 6}, {"profit": 4.0, "ratio": 75.0, "p_v": 0.04, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 6.58, "avg": 0.33, "sl": 6}, {"profit": 5.0, "ratio": 25.0, "p_v": 0.05, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 6.57, "avg": 0.33, "sl": 6}, {"profit": 5.0, "ratio": 20.0, "p_v": 0.05, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 6.55, "avg": 0.33, "sl": 6}, {"profit": 5.0, "ratio": 15.0, "p_v": 0.05, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 6.52, "avg": 0.33, "sl": 6}, {"profit": 7.0, "ratio": 25.0, "p_v": 0.07, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 6.52, "avg": 0.33, "sl": 6}, {"profit": 4.0, "ratio": 100.0, "p_v": 0.04, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 6.49, "avg": 0.32, "sl": 6}, {"profit": 5.0, "ratio": 10.0, "p_v": 0.05, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 6.49, "avg": 0.32, "sl": 6}, {"profit": 5.5, "ratio": 30.0, "p_v": 0.055, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 6.47, "avg": 0.32, "sl": 6}, {"profit": 6.3, "ratio": 30.0, "p_v": 0.063, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 6.47, "avg": 0.32, "sl": 6}, {"profit": 5.0, "ratio": 5.0, "p_v": 0.05, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 6.46, "avg": 0.32, "sl": 6}, {"profit": 5.0, "ratio": 0.0, "p_v": 0.05, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 6.44, "avg": 0.32, "sl": 6}, {"profit": 5.5, "ratio": 25.0, "p_v": 0.055, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 6.41, "avg": 0.32, "sl": 6}, {"profit": 6.3, "ratio": 25.0, "p_v": 0.063, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 6.36, "avg": 0.32, "sl": 6}, {"profit": 7.0, "ratio": 20.0, "p_v": 0.07, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 6.36, "avg": 0.32, "sl": 6}, {"profit": 5.5, "ratio": 20.0, "p_v": 0.055, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 6.34, "avg": 0.32, "sl": 6}, {"profit": 5.5, "ratio": 15.0, "p_v": 0.055, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 6.27, "avg": 0.31, "sl": 6}, {"profit": 6.3, "ratio": 20.0, "p_v": 0.063, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 6.24, "avg": 0.31, "sl": 6}, {"profit": 7.0, "ratio": 15.0, "p_v": 0.07, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 6.21, "avg": 0.31, "sl": 6}, {"profit": 5.5, "ratio": 10.0, "p_v": 0.055, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 6.2, "avg": 0.31, "sl": 6}, {"profit": 5.5, "ratio": 5.0, "p_v": 0.055, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 6.13, "avg": 0.31, "sl": 6}, {"profit": 6.3, "ratio": 15.0, "p_v": 0.063, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 6.11, "avg": 0.31, "sl": 6}, {"profit": 5.5, "ratio": 0.0, "p_v": 0.055, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 6.07, "avg": 0.3, "sl": 6}, {"profit": 7.0, "ratio": 10.0, "p_v": 0.07, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 6.06, "avg": 0.3, "sl": 6}, {"profit": 6.3, "ratio": 10.0, "p_v": 0.063, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 6.0, "avg": 0.3, "sl": 6}, {"profit": 7.0, "ratio": 5.0, "p_v": 0.07, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 5.9, "avg": 0.3, "sl": 6}, {"profit": 6.3, "ratio": 5.0, "p_v": 0.063, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 5.88, "avg": 0.29, "sl": 6}, {"profit": 6.3, "ratio": 0.0, "p_v": 0.063, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 7.0, "ratio": 0.0, "p_v": 0.07, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 0.0, "p_v": 0.08, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 5.0, "p_v": 0.08, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 10.0, "p_v": 0.08, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 15.0, "p_v": 0.08, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 20.0, "p_v": 0.08, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 25.0, "p_v": 0.08, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 30.0, "p_v": 0.08, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 40.0, "p_v": 0.08, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 50.0, "p_v": 0.08, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 60.0, "p_v": 0.08, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 75.0, "p_v": 0.08, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 8.0, "ratio": 100.0, "p_v": 0.08, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 9.0, "ratio": 0.0, "p_v": 0.09, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 9.0, "ratio": 5.0, "p_v": 0.09, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 9.0, "ratio": 10.0, "p_v": 0.09, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 9.0, "ratio": 15.0, "p_v": 0.09, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 9.0, "ratio": 20.0, "p_v": 0.09, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 9.0, "ratio": 25.0, "p_v": 0.09, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 9.0, "ratio": 30.0, "p_v": 0.09, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 9.0, "ratio": 40.0, "p_v": 0.09, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 9.0, "ratio": 50.0, "p_v": 0.09, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 9.0, "ratio": 60.0, "p_v": 0.09, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 9.0, "ratio": 75.0, "p_v": 0.09, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 9.0, "ratio": 100.0, "p_v": 0.09, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 10.0, "ratio": 0.0, "p_v": 0.1, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 10.0, "ratio": 5.0, "p_v": 0.1, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 10.0, "ratio": 10.0, "p_v": 0.1, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 10.0, "ratio": 15.0, "p_v": 0.1, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 10.0, "ratio": 20.0, "p_v": 0.1, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 10.0, "ratio": 25.0, "p_v": 0.1, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 10.0, "ratio": 30.0, "p_v": 0.1, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 10.0, "ratio": 40.0, "p_v": 0.1, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 10.0, "ratio": 50.0, "p_v": 0.1, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 10.0, "ratio": 60.0, "p_v": 0.1, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 10.0, "ratio": 75.0, "p_v": 0.1, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 10.0, "ratio": 100.0, "p_v": 0.1, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 12.0, "ratio": 0.0, "p_v": 0.12, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 12.0, "ratio": 5.0, "p_v": 0.12, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 12.0, "ratio": 10.0, "p_v": 0.12, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 12.0, "ratio": 15.0, "p_v": 0.12, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 12.0, "ratio": 20.0, "p_v": 0.12, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 12.0, "ratio": 25.0, "p_v": 0.12, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 12.0, "ratio": 30.0, "p_v": 0.12, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 12.0, "ratio": 40.0, "p_v": 0.12, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 12.0, "ratio": 50.0, "p_v": 0.12, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 12.0, "ratio": 60.0, "p_v": 0.12, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 12.0, "ratio": 75.0, "p_v": 0.12, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}, {"profit": 12.0, "ratio": 100.0, "p_v": 0.12, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 5.76, "avg": 0.29, "sl": 6}], "profits": [3.0, 4.0, 5.0, 5.5, 6.3, 7.0, 8.0, 9.0, 10.0, 12.0], "ratios": [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 40.0, 50.0, 60.0, 75.0, 100.0]}, "tp4": {"grid": [{"profit": 7.0, "ratio": 100.0, "p_v": 0.07, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 8.47, "avg": 0.42, "sl": 6}, {"profit": 7.0, "ratio": 75.0, "p_v": 0.07, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 8.09, "avg": 0.4, "sl": 6}, {"profit": 6.0, "ratio": 100.0, "p_v": 0.06, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 8.02, "avg": 0.4, "sl": 6}, {"profit": 7.0, "ratio": 60.0, "p_v": 0.07, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 7.86, "avg": 0.39, "sl": 6}, {"profit": 6.0, "ratio": 75.0, "p_v": 0.06, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 7.75, "avg": 0.39, "sl": 6}, {"profit": 7.0, "ratio": 50.0, "p_v": 0.07, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 7.71, "avg": 0.39, "sl": 6}, {"profit": 6.0, "ratio": 60.0, "p_v": 0.06, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 7.59, "avg": 0.38, "sl": 6}, {"profit": 7.0, "ratio": 40.0, "p_v": 0.07, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 7.56, "avg": 0.38, "sl": 6}, {"profit": 6.0, "ratio": 50.0, "p_v": 0.06, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 7.49, "avg": 0.37, "sl": 6}, {"profit": 7.0, "ratio": 30.0, "p_v": 0.07, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 7.4, "avg": 0.37, "sl": 6}, {"profit": 6.0, "ratio": 40.0, "p_v": 0.06, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 7.38, "avg": 0.37, "sl": 6}, {"profit": 7.0, "ratio": 25.0, "p_v": 0.07, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 7.33, "avg": 0.37, "sl": 6}, {"profit": 5.0, "ratio": 100.0, "p_v": 0.05, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 7.28, "avg": 0.36, "sl": 6}, {"profit": 6.0, "ratio": 30.0, "p_v": 0.06, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 7.27, "avg": 0.36, "sl": 6}, {"profit": 7.0, "ratio": 20.0, "p_v": 0.07, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 7.26, "avg": 0.36, "sl": 6}, {"profit": 6.0, "ratio": 25.0, "p_v": 0.06, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 7.21, "avg": 0.36, "sl": 6}, {"profit": 5.0, "ratio": 75.0, "p_v": 0.05, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 7.19, "avg": 0.36, "sl": 6}, {"profit": 7.0, "ratio": 15.0, "p_v": 0.07, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"profit": 6.0, "ratio": 20.0, "p_v": 0.06, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 7.16, "avg": 0.36, "sl": 6}, {"profit": 5.0, "ratio": 60.0, "p_v": 0.05, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 7.15, "avg": 0.36, "sl": 6}, {"profit": 5.0, "ratio": 50.0, "p_v": 0.05, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 7.12, "avg": 0.36, "sl": 6}, {"profit": 6.0, "ratio": 15.0, "p_v": 0.06, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 7.11, "avg": 0.36, "sl": 6}, {"profit": 7.0, "ratio": 10.0, "p_v": 0.07, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 7.11, "avg": 0.36, "sl": 6}, {"profit": 5.0, "ratio": 40.0, "p_v": 0.05, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 7.08, "avg": 0.35, "sl": 6}, {"profit": 6.0, "ratio": 10.0, "p_v": 0.06, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 7.06, "avg": 0.35, "sl": 6}, {"profit": 5.0, "ratio": 30.0, "p_v": 0.05, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 7.05, "avg": 0.35, "sl": 6}, {"profit": 5.0, "ratio": 25.0, "p_v": 0.05, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 7.04, "avg": 0.35, "sl": 6}, {"profit": 7.0, "ratio": 5.0, "p_v": 0.07, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 7.03, "avg": 0.35, "sl": 6}, {"profit": 5.0, "ratio": 20.0, "p_v": 0.05, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 7.02, "avg": 0.35, "sl": 6}, {"profit": 5.0, "ratio": 15.0, "p_v": 0.05, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 7.0, "avg": 0.35, "sl": 6}, {"profit": 6.0, "ratio": 5.0, "p_v": 0.06, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 7.0, "avg": 0.35, "sl": 6}, {"profit": 5.0, "ratio": 10.0, "p_v": 0.05, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 6.98, "avg": 0.35, "sl": 6}, {"profit": 5.0, "ratio": 5.0, "p_v": 0.05, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 6.97, "avg": 0.35, "sl": 6}, {"profit": 5.0, "ratio": 0.0, "p_v": 0.05, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 6.0, "ratio": 0.0, "p_v": 0.06, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 7.0, "ratio": 0.0, "p_v": 0.07, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.0, "ratio": 0.0, "p_v": 0.08, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.0, "ratio": 5.0, "p_v": 0.08, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.0, "ratio": 10.0, "p_v": 0.08, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.0, "ratio": 15.0, "p_v": 0.08, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.0, "ratio": 20.0, "p_v": 0.08, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.0, "ratio": 25.0, "p_v": 0.08, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.0, "ratio": 30.0, "p_v": 0.08, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.0, "ratio": 40.0, "p_v": 0.08, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.0, "ratio": 50.0, "p_v": 0.08, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.0, "ratio": 60.0, "p_v": 0.08, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.0, "ratio": 75.0, "p_v": 0.08, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.0, "ratio": 100.0, "p_v": 0.08, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.5, "ratio": 0.0, "p_v": 0.085, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.5, "ratio": 5.0, "p_v": 0.085, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.5, "ratio": 10.0, "p_v": 0.085, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.5, "ratio": 15.0, "p_v": 0.085, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.5, "ratio": 20.0, "p_v": 0.085, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.5, "ratio": 25.0, "p_v": 0.085, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.5, "ratio": 30.0, "p_v": 0.085, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.5, "ratio": 40.0, "p_v": 0.085, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.5, "ratio": 50.0, "p_v": 0.085, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.5, "ratio": 60.0, "p_v": 0.085, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.5, "ratio": 75.0, "p_v": 0.085, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 8.5, "ratio": 100.0, "p_v": 0.085, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 9.0, "ratio": 0.0, "p_v": 0.09, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 9.0, "ratio": 5.0, "p_v": 0.09, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 9.0, "ratio": 10.0, "p_v": 0.09, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 9.0, "ratio": 15.0, "p_v": 0.09, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 9.0, "ratio": 20.0, "p_v": 0.09, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 9.0, "ratio": 25.0, "p_v": 0.09, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 9.0, "ratio": 30.0, "p_v": 0.09, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 9.0, "ratio": 40.0, "p_v": 0.09, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 9.0, "ratio": 50.0, "p_v": 0.09, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 9.0, "ratio": 60.0, "p_v": 0.09, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 9.0, "ratio": 75.0, "p_v": 0.09, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 9.0, "ratio": 100.0, "p_v": 0.09, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 10.0, "ratio": 0.0, "p_v": 0.1, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 10.0, "ratio": 5.0, "p_v": 0.1, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 10.0, "ratio": 10.0, "p_v": 0.1, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 10.0, "ratio": 15.0, "p_v": 0.1, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 10.0, "ratio": 20.0, "p_v": 0.1, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 10.0, "ratio": 25.0, "p_v": 0.1, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 10.0, "ratio": 30.0, "p_v": 0.1, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 10.0, "ratio": 40.0, "p_v": 0.1, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 10.0, "ratio": 50.0, "p_v": 0.1, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 10.0, "ratio": 60.0, "p_v": 0.1, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 10.0, "ratio": 75.0, "p_v": 0.1, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 10.0, "ratio": 100.0, "p_v": 0.1, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 12.0, "ratio": 0.0, "p_v": 0.12, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 12.0, "ratio": 5.0, "p_v": 0.12, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 12.0, "ratio": 10.0, "p_v": 0.12, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 12.0, "ratio": 15.0, "p_v": 0.12, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 12.0, "ratio": 20.0, "p_v": 0.12, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 12.0, "ratio": 25.0, "p_v": 0.12, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 12.0, "ratio": 30.0, "p_v": 0.12, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 12.0, "ratio": 40.0, "p_v": 0.12, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 12.0, "ratio": 50.0, "p_v": 0.12, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 12.0, "ratio": 60.0, "p_v": 0.12, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 12.0, "ratio": 75.0, "p_v": 0.12, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 12.0, "ratio": 100.0, "p_v": 0.12, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 15.0, "ratio": 0.0, "p_v": 0.15, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 15.0, "ratio": 5.0, "p_v": 0.15, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 15.0, "ratio": 10.0, "p_v": 0.15, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 15.0, "ratio": 15.0, "p_v": 0.15, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 15.0, "ratio": 20.0, "p_v": 0.15, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 15.0, "ratio": 25.0, "p_v": 0.15, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 15.0, "ratio": 30.0, "p_v": 0.15, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 15.0, "ratio": 40.0, "p_v": 0.15, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 15.0, "ratio": 50.0, "p_v": 0.15, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 15.0, "ratio": 60.0, "p_v": 0.15, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 15.0, "ratio": 75.0, "p_v": 0.15, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 15.0, "ratio": 100.0, "p_v": 0.15, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 18.0, "ratio": 0.0, "p_v": 0.18, "r_v": 0.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 18.0, "ratio": 5.0, "p_v": 0.18, "r_v": 0.05, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 18.0, "ratio": 10.0, "p_v": 0.18, "r_v": 0.1, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 18.0, "ratio": 15.0, "p_v": 0.18, "r_v": 0.15, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 18.0, "ratio": 20.0, "p_v": 0.18, "r_v": 0.2, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 18.0, "ratio": 25.0, "p_v": 0.18, "r_v": 0.25, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 18.0, "ratio": 30.0, "p_v": 0.18, "r_v": 0.3, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 18.0, "ratio": 40.0, "p_v": 0.18, "r_v": 0.4, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 18.0, "ratio": 50.0, "p_v": 0.18, "r_v": 0.5, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 18.0, "ratio": 60.0, "p_v": 0.18, "r_v": 0.6, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 18.0, "ratio": 75.0, "p_v": 0.18, "r_v": 0.75, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"profit": 18.0, "ratio": 100.0, "p_v": 0.18, "r_v": 1.0, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}], "profits": [5.0, 6.0, 7.0, 8.0, 8.5, 9.0, 10.0, 12.0, 15.0, 18.0], "ratios": [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 40.0, 50.0, 60.0, 75.0, 100.0]}, "trailing": {"grid": [{"trig": 7.0, "drop": -1.0, "trig_v": 0.07, "drop_v": -0.01, "n": 20, "wr": 60.0, "pnl": 8.3, "avg": 0.42, "sl": 6}, {"trig": 7.0, "drop": -1.5, "trig_v": 0.07, "drop_v": -0.015, "n": 20, "wr": 60.0, "pnl": 8.14, "avg": 0.41, "sl": 6}, {"trig": 6.0, "drop": -1.5, "trig_v": 0.06, "drop_v": -0.015, "n": 20, "wr": 60.0, "pnl": 8.02, "avg": 0.4, "sl": 6}, {"trig": 6.0, "drop": -1.0, "trig_v": 0.06, "drop_v": -0.01, "n": 20, "wr": 60.0, "pnl": 7.87, "avg": 0.39, "sl": 6}, {"trig": 5.0, "drop": -1.0, "trig_v": 0.05, "drop_v": -0.01, "n": 20, "wr": 60.0, "pnl": 7.47, "avg": 0.37, "sl": 6}, {"trig": 5.0, "drop": -1.5, "trig_v": 0.05, "drop_v": -0.015, "n": 20, "wr": 60.0, "pnl": 7.47, "avg": 0.37, "sl": 6}, {"trig": 8.0, "drop": -1.0, "trig_v": 0.08, "drop_v": -0.01, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 8.0, "drop": -1.5, "trig_v": 0.08, "drop_v": -0.015, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 8.0, "drop": -2.0, "trig_v": 0.08, "drop_v": -0.02, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 8.0, "drop": -2.5, "trig_v": 0.08, "drop_v": -0.025, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 8.0, "drop": -3.0, "trig_v": 0.08, "drop_v": -0.03, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 8.0, "drop": -4.0, "trig_v": 0.08, "drop_v": -0.04, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 8.0, "drop": -5.0, "trig_v": 0.08, "drop_v": -0.05, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 10.0, "drop": -1.0, "trig_v": 0.1, "drop_v": -0.01, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 10.0, "drop": -1.5, "trig_v": 0.1, "drop_v": -0.015, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 10.0, "drop": -2.0, "trig_v": 0.1, "drop_v": -0.02, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 10.0, "drop": -2.5, "trig_v": 0.1, "drop_v": -0.025, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 10.0, "drop": -3.0, "trig_v": 0.1, "drop_v": -0.03, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 10.0, "drop": -4.0, "trig_v": 0.1, "drop_v": -0.04, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 10.0, "drop": -5.0, "trig_v": 0.1, "drop_v": -0.05, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 12.0, "drop": -1.0, "trig_v": 0.12, "drop_v": -0.01, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 12.0, "drop": -1.5, "trig_v": 0.12, "drop_v": -0.015, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 12.0, "drop": -2.0, "trig_v": 0.12, "drop_v": -0.02, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 12.0, "drop": -2.5, "trig_v": 0.12, "drop_v": -0.025, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 12.0, "drop": -3.0, "trig_v": 0.12, "drop_v": -0.03, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 12.0, "drop": -4.0, "trig_v": 0.12, "drop_v": -0.04, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 12.0, "drop": -5.0, "trig_v": 0.12, "drop_v": -0.05, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 15.0, "drop": -1.0, "trig_v": 0.15, "drop_v": -0.01, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 15.0, "drop": -1.5, "trig_v": 0.15, "drop_v": -0.015, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 15.0, "drop": -2.0, "trig_v": 0.15, "drop_v": -0.02, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 15.0, "drop": -2.5, "trig_v": 0.15, "drop_v": -0.025, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 15.0, "drop": -3.0, "trig_v": 0.15, "drop_v": -0.03, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 15.0, "drop": -4.0, "trig_v": 0.15, "drop_v": -0.04, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 15.0, "drop": -5.0, "trig_v": 0.15, "drop_v": -0.05, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 20.0, "drop": -1.0, "trig_v": 0.2, "drop_v": -0.01, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 20.0, "drop": -1.5, "trig_v": 0.2, "drop_v": -0.015, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 20.0, "drop": -2.0, "trig_v": 0.2, "drop_v": -0.02, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 20.0, "drop": -2.5, "trig_v": 0.2, "drop_v": -0.025, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 20.0, "drop": -3.0, "trig_v": 0.2, "drop_v": -0.03, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 20.0, "drop": -4.0, "trig_v": 0.2, "drop_v": -0.04, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 20.0, "drop": -5.0, "trig_v": 0.2, "drop_v": -0.05, "n": 20, "wr": 60.0, "pnl": 7.18, "avg": 0.36, "sl": 6}, {"trig": 7.0, "drop": -2.0, "trig_v": 0.07, "drop_v": -0.02, "n": 20, "wr": 60.0, "pnl": 7.07, "avg": 0.35, "sl": 6}, {"trig": 6.0, "drop": -2.5, "trig_v": 0.06, "drop_v": -0.025, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"trig": 7.0, "drop": -2.5, "trig_v": 0.07, "drop_v": -0.025, "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"trig": 6.0, "drop": -3.0, "trig_v": 0.06, "drop_v": -0.03, "n": 20, "wr": 60.0, "pnl": 6.93, "avg": 0.35, "sl": 6}, {"trig": 7.0, "drop": -3.0, "trig_v": 0.07, "drop_v": -0.03, "n": 20, "wr": 60.0, "pnl": 6.93, "avg": 0.35, "sl": 6}, {"trig": 6.0, "drop": -2.0, "trig_v": 0.06, "drop_v": -0.02, "n": 20, "wr": 60.0, "pnl": 6.9, "avg": 0.35, "sl": 6}, {"trig": 4.0, "drop": -1.0, "trig_v": 0.04, "drop_v": -0.01, "n": 20, "wr": 60.0, "pnl": 6.77, "avg": 0.34, "sl": 6}, {"trig": 6.0, "drop": -4.0, "trig_v": 0.06, "drop_v": -0.04, "n": 20, "wr": 60.0, "pnl": 6.74, "avg": 0.34, "sl": 6}, {"trig": 7.0, "drop": -4.0, "trig_v": 0.07, "drop_v": -0.04, "n": 20, "wr": 60.0, "pnl": 6.74, "avg": 0.34, "sl": 6}, {"trig": 4.0, "drop": -5.0, "trig_v": 0.04, "drop_v": -0.05, "n": 20, "wr": 60.0, "pnl": 6.69, "avg": 0.33, "sl": 6}, {"trig": 5.0, "drop": -5.0, "trig_v": 0.05, "drop_v": -0.05, "n": 20, "wr": 60.0, "pnl": 6.69, "avg": 0.33, "sl": 6}, {"trig": 6.0, "drop": -5.0, "trig_v": 0.06, "drop_v": -0.05, "n": 20, "wr": 60.0, "pnl": 6.69, "avg": 0.33, "sl": 6}, {"trig": 7.0, "drop": -5.0, "trig_v": 0.07, "drop_v": -0.05, "n": 20, "wr": 60.0, "pnl": 6.69, "avg": 0.33, "sl": 6}, {"trig": 4.0, "drop": -1.5, "trig_v": 0.04, "drop_v": -0.015, "n": 20, "wr": 60.0, "pnl": 6.27, "avg": 0.31, "sl": 6}, {"trig": 4.0, "drop": -2.0, "trig_v": 0.04, "drop_v": -0.02, "n": 20, "wr": 60.0, "pnl": 5.18, "avg": 0.26, "sl": 6}, {"trig": 5.0, "drop": -2.0, "trig_v": 0.05, "drop_v": -0.02, "n": 20, "wr": 60.0, "pnl": 5.08, "avg": 0.25, "sl": 6}, {"trig": 5.0, "drop": -4.0, "trig_v": 0.05, "drop_v": -0.04, "n": 20, "wr": 60.0, "pnl": 5.08, "avg": 0.25, "sl": 6}, {"trig": 5.0, "drop": -2.5, "trig_v": 0.05, "drop_v": -0.025, "n": 20, "wr": 60.0, "pnl": 4.88, "avg": 0.24, "sl": 6}, {"trig": 4.0, "drop": -2.5, "trig_v": 0.04, "drop_v": -0.025, "n": 20, "wr": 60.0, "pnl": 4.73, "avg": 0.24, "sl": 6}, {"trig": 5.0, "drop": -3.0, "trig_v": 0.05, "drop_v": -0.03, "n": 20, "wr": 60.0, "pnl": 4.58, "avg": 0.23, "sl": 6}, {"trig": 4.0, "drop": -4.0, "trig_v": 0.04, "drop_v": -0.04, "n": 20, "wr": 60.0, "pnl": 4.21, "avg": 0.21, "sl": 6}, {"trig": 4.0, "drop": -3.0, "trig_v": 0.04, "drop_v": -0.03, "n": 20, "wr": 60.0, "pnl": 4.12, "avg": 0.21, "sl": 6}], "trigs": [4.0, 5.0, 6.0, 7.0, 8.0, 10.0, 12.0, 15.0, 20.0], "drops": [-1.0, -1.5, -2.0, -2.5, -3.0, -4.0, -5.0]}, "time_windows": {"grid": [{"g": "09:15", "gm": "09:15", "f": "14:00", "n": 25, "wr": 64.0, "pnl": 26.34, "avg": 1.05, "sl": 8}, {"g": "09:15", "gm": "09:20", "f": "14:00", "n": 25, "wr": 64.0, "pnl": 26.34, "avg": 1.05, "sl": 8}, {"g": "09:15", "gm": "09:15", "f": "15:20", "n": 30, "wr": 63.3, "pnl": 26.25, "avg": 0.88, "sl": 9}, {"g": "09:15", "gm": "09:20", "f": "15:20", "n": 30, "wr": 63.3, "pnl": 26.25, "avg": 0.88, "sl": 9}, {"g": "09:15", "gm": "09:15", "f": "15:00", "n": 29, "wr": 62.1, "pnl": 25.9, "avg": 0.89, "sl": 9}, {"g": "09:15", "gm": "09:20", "f": "15:00", "n": 29, "wr": 62.1, "pnl": 25.9, "avg": 0.89, "sl": 9}, {"g": "09:15", "gm": "09:15", "f": "14:30", "n": 28, "wr": 60.7, "pnl": 25.84, "avg": 0.92, "sl": 9}, {"g": "09:15", "gm": "09:20", "f": "14:30", "n": 28, "wr": 60.7, "pnl": 25.84, "avg": 0.92, "sl": 9}, {"g": "09:15", "gm": "09:15", "f": "12:00", "n": 24, "wr": 62.5, "pnl": 24.77, "avg": 1.03, "sl": 8}, {"g": "09:15", "gm": "09:15", "f": "13:00", "n": 24, "wr": 62.5, "pnl": 24.77, "avg": 1.03, "sl": 8}, {"g": "09:15", "gm": "09:20", "f": "12:00", "n": 24, "wr": 62.5, "pnl": 24.77, "avg": 1.03, "sl": 8}, {"g": "09:15", "gm": "09:20", "f": "13:00", "n": 24, "wr": 62.5, "pnl": 24.77, "avg": 1.03, "sl": 8}, {"g": "09:15", "gm": "09:30", "f": "14:00", "n": 27, "wr": 59.3, "pnl": 24.22, "avg": 0.9, "sl": 9}, {"g": "09:15", "gm": "09:30", "f": "15:20", "n": 32, "wr": 59.4, "pnl": 24.13, "avg": 0.75, "sl": 10}, {"g": "09:15", "gm": "09:30", "f": "15:00", "n": 31, "wr": 58.1, "pnl": 23.78, "avg": 0.77, "sl": 10}, {"g": "09:15", "gm": "09:30", "f": "14:30", "n": 30, "wr": 56.7, "pnl": 23.72, "avg": 0.79, "sl": 10}, {"g": "09:15", "gm": "09:10", "f": "14:00", "n": 23, "wr": 60.9, "pnl": 23.24, "avg": 1.01, "sl": 8}, {"g": "09:15", "gm": "09:10", "f": "15:20", "n": 28, "wr": 60.7, "pnl": 23.15, "avg": 0.83, "sl": 9}, {"g": "09:15", "gm": "09:10", "f": "15:00", "n": 27, "wr": 59.3, "pnl": 22.8, "avg": 0.84, "sl": 9}, {"g": "09:15", "gm": "09:10", "f": "14:30", "n": 26, "wr": 57.7, "pnl": 22.74, "avg": 0.87, "sl": 9}, {"g": "09:15", "gm": "09:30", "f": "12:00", "n": 26, "wr": 57.7, "pnl": 22.65, "avg": 0.87, "sl": 9}, {"g": "09:15", "gm": "09:30", "f": "13:00", "n": 26, "wr": 57.7, "pnl": 22.65, "avg": 0.87, "sl": 9}, {"g": "09:15", "gm": "09:10", "f": "12:00", "n": 22, "wr": 59.1, "pnl": 21.67, "avg": 0.98, "sl": 8}, {"g": "09:15", "gm": "09:10", "f": "13:00", "n": 22, "wr": 59.1, "pnl": 21.67, "avg": 0.98, "sl": 8}, {"g": "09:20", "gm": "09:15", "f": "14:00", "n": 27, "wr": 59.3, "pnl": 21.1, "avg": 0.78, "sl": 10}, {"g": "09:20", "gm": "09:20", "f": "14:00", "n": 27, "wr": 59.3, "pnl": 21.1, "avg": 0.78, "sl": 10}, {"g": "09:20", "gm": "09:15", "f": "15:20", "n": 32, "wr": 59.4, "pnl": 21.01, "avg": 0.66, "sl": 11}, {"g": "09:20", "gm": "09:20", "f": "15:20", "n": 32, "wr": 59.4, "pnl": 21.01, "avg": 0.66, "sl": 11}, {"g": "09:20", "gm": "09:15", "f": "15:00", "n": 31, "wr": 58.1, "pnl": 20.66, "avg": 0.67, "sl": 11}, {"g": "09:20", "gm": "09:20", "f": "15:00", "n": 31, "wr": 58.1, "pnl": 20.66, "avg": 0.67, "sl": 11}, {"g": "09:20", "gm": "09:15", "f": "14:30", "n": 30, "wr": 56.7, "pnl": 20.6, "avg": 0.69, "sl": 11}, {"g": "09:20", "gm": "09:20", "f": "14:30", "n": 30, "wr": 56.7, "pnl": 20.6, "avg": 0.69, "sl": 11}, {"g": "09:20", "gm": "09:15", "f": "12:00", "n": 26, "wr": 57.7, "pnl": 19.53, "avg": 0.75, "sl": 10}, {"g": "09:20", "gm": "09:15", "f": "13:00", "n": 26, "wr": 57.7, "pnl": 19.53, "avg": 0.75, "sl": 10}, {"g": "09:20", "gm": "09:20", "f": "12:00", "n": 26, "wr": 57.7, "pnl": 19.53, "avg": 0.75, "sl": 10}, {"g": "09:20", "gm": "09:20", "f": "13:00", "n": 26, "wr": 57.7, "pnl": 19.53, "avg": 0.75, "sl": 10}, {"g": "09:20", "gm": "09:30", "f": "14:00", "n": 29, "wr": 55.2, "pnl": 18.98, "avg": 0.65, "sl": 11}, {"g": "09:20", "gm": "09:30", "f": "15:20", "n": 34, "wr": 55.9, "pnl": 18.89, "avg": 0.56, "sl": 12}, {"g": "09:20", "gm": "09:30", "f": "15:00", "n": 33, "wr": 54.5, "pnl": 18.54, "avg": 0.56, "sl": 12}, {"g": "09:20", "gm": "09:30", "f": "14:30", "n": 32, "wr": 53.1, "pnl": 18.48, "avg": 0.58, "sl": 12}, {"g": "09:20", "gm": "09:10", "f": "14:00", "n": 25, "wr": 56.0, "pnl": 18.0, "avg": 0.72, "sl": 10}, {"g": "09:20", "gm": "09:10", "f": "15:20", "n": 30, "wr": 56.7, "pnl": 17.91, "avg": 0.6, "sl": 11}, {"g": "09:20", "gm": "09:10", "f": "15:00", "n": 29, "wr": 55.2, "pnl": 17.56, "avg": 0.61, "sl": 11}, {"g": "09:20", "gm": "09:10", "f": "14:30", "n": 28, "wr": 53.6, "pnl": 17.5, "avg": 0.63, "sl": 11}, {"g": "09:20", "gm": "09:30", "f": "12:00", "n": 28, "wr": 53.6, "pnl": 17.41, "avg": 0.62, "sl": 11}, {"g": "09:20", "gm": "09:30", "f": "13:00", "n": 28, "wr": 53.6, "pnl": 17.41, "avg": 0.62, "sl": 11}, {"g": "09:20", "gm": "09:10", "f": "12:00", "n": 24, "wr": 54.2, "pnl": 16.43, "avg": 0.68, "sl": 10}, {"g": "09:20", "gm": "09:10", "f": "13:00", "n": 24, "wr": 54.2, "pnl": 16.43, "avg": 0.68, "sl": 10}, {"g": "09:30", "gm": "09:15", "f": "14:00", "n": 35, "wr": 51.4, "pnl": 13.61, "avg": 0.39, "sl": 16}, {"g": "09:30", "gm": "09:20", "f": "14:00", "n": 35, "wr": 51.4, "pnl": 13.61, "avg": 0.39, "sl": 16}], "g_ends": ["09:05", "09:07", "09:10", "09:12", "09:15", "09:20", "09:30"], "gm_ends": ["09:10", "09:15", "09:20", "09:30"], "f_ends": ["12:00", "13:00", "14:00", "14:30", "15:00", "15:20"]}, "second_buy": [{"name": "trig:-3.5%/qr:1.1x", "trigger": -3.5, "qr": 1.15, "n": 20, "wr": 60.0, "pnl": 8.79, "avg": 0.44, "sl": 6}, {"name": "trig:-5.0%/qr:3.0x", "trigger": -5.0, "qr": 3.0, "n": 20, "wr": 55.0, "pnl": 7.68, "avg": 0.38, "sl": 6}, {"name": "trig:-5.0%/qr:2.5x", "trigger": -5.0, "qr": 2.5, "n": 20, "wr": 55.0, "pnl": 7.56, "avg": 0.38, "sl": 6}, {"name": "trig:-5.0%/qr:2.0x", "trigger": -5.0, "qr": 2.0, "n": 20, "wr": 55.0, "pnl": 7.45, "avg": 0.37, "sl": 6}, {"name": "trig:-4.0%/qr:1.1x", "trigger": -4.0, "qr": 1.15, "n": 20, "wr": 55.0, "pnl": 7.42, "avg": 0.37, "sl": 6}, {"name": "trig:-5.0%/qr:1.1x", "trigger": -5.0, "qr": 1.15, "n": 20, "wr": 55.0, "pnl": 7.41, "avg": 0.37, "sl": 6}, {"name": "trig:-3.5%/qr:1.0x", "trigger": -3.5, "qr": 1.0, "n": 20, "wr": 60.0, "pnl": 7.02, "avg": 0.35, "sl": 7}, {"name": "trig:-5.0%/qr:0.5x", "trigger": -5.0, "qr": 0.5, "n": 20, "wr": 55.0, "pnl": 5.75, "avg": 0.29, "sl": 7}, {"name": "trig:-4.0%/qr:0.5x", "trigger": -4.0, "qr": 0.5, "n": 20, "wr": 55.0, "pnl": 5.74, "avg": 0.29, "sl": 7}, {"name": "trig:-4.0%/qr:1.0x", "trigger": -4.0, "qr": 1.0, "n": 20, "wr": 55.0, "pnl": 5.71, "avg": 0.29, "sl": 7}, {"name": "trig:-3.5%/qr:3.0x", "trigger": -3.5, "qr": 3.0, "n": 20, "wr": 55.0, "pnl": 5.7, "avg": 0.29, "sl": 7}, {"name": "trig:-5.0%/qr:1.0x", "trigger": -5.0, "qr": 1.0, "n": 20, "wr": 55.0, "pnl": 5.68, "avg": 0.28, "sl": 7}, {"name": "trig:-3.5%/qr:2.5x", "trigger": -3.5, "qr": 2.5, "n": 20, "wr": 55.0, "pnl": 5.61, "avg": 0.28, "sl": 7}, {"name": "비활성화", "trigger": "-", "qr": "-", "n": 20, "wr": 60.0, "pnl": 5.5, "avg": 0.28, "sl": 5}, {"name": "trig:-3.5%/qr:2.0x", "trigger": -3.5, "qr": 2.0, "n": 20, "wr": 55.0, "pnl": 4.63, "avg": 0.23, "sl": 7}, {"name": "trig:-4.0%/qr:3.0x", "trigger": -4.0, "qr": 3.0, "n": 20, "wr": 50.0, "pnl": 4.45, "avg": 0.22, "sl": 7}, {"name": "trig:-4.0%/qr:2.5x", "trigger": -4.0, "qr": 2.5, "n": 20, "wr": 50.0, "pnl": 4.43, "avg": 0.22, "sl": 7}, {"name": "trig:-3.5%/qr:1.5x", "trigger": -3.5, "qr": 1.5, "n": 20, "wr": 55.0, "pnl": 4.4, "avg": 0.22, "sl": 7}, {"name": "trig:-4.0%/qr:2.0x", "trigger": -4.0, "qr": 2.0, "n": 20, "wr": 50.0, "pnl": 4.37, "avg": 0.22, "sl": 7}, {"name": "trig:-5.0%/qr:1.5x", "trigger": -5.0, "qr": 1.5, "n": 20, "wr": 50.0, "pnl": 4.26, "avg": 0.21, "sl": 7}, {"name": "trig:-4.0%/qr:1.5x", "trigger": -4.0, "qr": 1.5, "n": 20, "wr": 50.0, "pnl": 4.25, "avg": 0.21, "sl": 7}, {"name": "trig:-2.9%/qr:2.5x", "trigger": -2.9, "qr": 2.5, "n": 20, "wr": 55.0, "pnl": 3.81, "avg": 0.19, "sl": 7}, {"name": "trig:-3.5%/qr:0.5x", "trigger": -3.5, "qr": 0.5, "n": 20, "wr": 55.0, "pnl": 3.76, "avg": 0.19, "sl": 8}, {"name": "trig:-3.0%/qr:2.0x", "trigger": -3.0, "qr": 2.0, "n": 20, "wr": 55.0, "pnl": 3.7, "avg": 0.19, "sl": 7}, {"name": "trig:-2.9%/qr:2.0x", "trigger": -2.9, "qr": 2.0, "n": 20, "wr": 55.0, "pnl": 3.68, "avg": 0.18, "sl": 7}, {"name": "trig:-3.0%/qr:1.5x", "trigger": -3.0, "qr": 1.5, "n": 20, "wr": 55.0, "pnl": 3.55, "avg": 0.18, "sl": 7}, {"name": "trig:-2.9%/qr:1.5x", "trigger": -2.9, "qr": 1.5, "n": 20, "wr": 55.0, "pnl": 3.53, "avg": 0.18, "sl": 7}, {"name": "trig:-3.0%/qr:3.0x", "trigger": -3.0, "qr": 3.0, "n": 20, "wr": 55.0, "pnl": 2.72, "avg": 0.14, "sl": 7}, {"name": "trig:-2.9%/qr:3.0x", "trigger": -2.9, "qr": 3.0, "n": 20, "wr": 55.0, "pnl": 2.66, "avg": 0.13, "sl": 7}, {"name": "trig:-3.0%/qr:2.5x", "trigger": -3.0, "qr": 2.5, "n": 20, "wr": 55.0, "pnl": 2.6, "avg": 0.13, "sl": 7}, {"name": "trig:-2.9%/qr:1.0x", "trigger": -2.9, "qr": 1.0, "n": 20, "wr": 55.0, "pnl": 1.63, "avg": 0.08, "sl": 8}, {"name": "trig:-3.0%/qr:1.0x", "trigger": -3.0, "qr": 1.0, "n": 20, "wr": 55.0, "pnl": 1.63, "avg": 0.08, "sl": 8}, {"name": "trig:-2.5%/qr:3.0x", "trigger": -2.5, "qr": 3.0, "n": 20, "wr": 50.0, "pnl": 1.38, "avg": 0.07, "sl": 7}, {"name": "trig:-2.9%/qr:1.1x", "trigger": -2.9, "qr": 1.15, "n": 20, "wr": 55.0, "pnl": 1.38, "avg": 0.07, "sl": 7}, {"name": "trig:-3.0%/qr:1.1x", "trigger": -3.0, "qr": 1.15, "n": 20, "wr": 55.0, "pnl": 1.38, "avg": 0.07, "sl": 7}, {"name": "trig:-2.5%/qr:2.5x", "trigger": -2.5, "qr": 2.5, "n": 20, "wr": 50.0, "pnl": 1.28, "avg": 0.06, "sl": 7}, {"name": "trig:-2.5%/qr:1.1x", "trigger": -2.5, "qr": 1.15, "n": 20, "wr": 50.0, "pnl": 0.72, "avg": 0.04, "sl": 7}, {"name": "trig:-2.0%/qr:1.1x", "trigger": -2.0, "qr": 1.15, "n": 20, "wr": 50.0, "pnl": -0.04, "avg": -0.0, "sl": 8}, {"name": "trig:-2.0%/qr:3.0x", "trigger": -2.0, "qr": 3.0, "n": 20, "wr": 45.0, "pnl": -1.03, "avg": -0.05, "sl": 8}, {"name": "trig:-2.5%/qr:1.0x", "trigger": -2.5, "qr": 1.0, "n": 20, "wr": 50.0, "pnl": -1.04, "avg": -0.05, "sl": 8}, {"name": "trig:-2.0%/qr:2.5x", "trigger": -2.0, "qr": 2.5, "n": 20, "wr": 45.0, "pnl": -1.12, "avg": -0.06, "sl": 8}, {"name": "trig:-2.0%/qr:2.0x", "trigger": -2.0, "qr": 2.0, "n": 20, "wr": 45.0, "pnl": -1.26, "avg": -0.06, "sl": 8}, {"name": "trig:-2.0%/qr:1.0x", "trigger": -2.0, "qr": 1.0, "n": 20, "wr": 50.0, "pnl": -1.77, "avg": -0.09, "sl": 9}, {"name": "trig:-2.0%/qr:0.5x", "trigger": -2.0, "qr": 0.5, "n": 20, "wr": 50.0, "pnl": -1.8, "avg": -0.09, "sl": 9}, {"name": "trig:-2.5%/qr:2.0x", "trigger": -2.5, "qr": 2.0, "n": 20, "wr": 45.0, "pnl": -2.16, "avg": -0.11, "sl": 8}, {"name": "trig:-2.5%/qr:1.5x", "trigger": -2.5, "qr": 1.5, "n": 20, "wr": 45.0, "pnl": -2.37, "avg": -0.12, "sl": 8}, {"name": "trig:-2.9%/qr:0.5x", "trigger": -2.9, "qr": 0.5, "n": 20, "wr": 50.0, "pnl": -2.73, "avg": -0.14, "sl": 9}, {"name": "trig:-3.0%/qr:0.5x", "trigger": -3.0, "qr": 0.5, "n": 20, "wr": 50.0, "pnl": -2.75, "avg": -0.14, "sl": 9}, {"name": "trig:-2.5%/qr:0.5x", "trigger": -2.5, "qr": 0.5, "n": 20, "wr": 50.0, "pnl": -2.77, "avg": -0.14, "sl": 9}, {"name": "trig:-2.0%/qr:1.5x", "trigger": -2.0, "qr": 1.5, "n": 20, "wr": 45.0, "pnl": -3.18, "avg": -0.16, "sl": 9}], "greedy_steps": [{"step": "BASELINE", "desc": "현행 전략", "n": 20, "wr": 60.0, "pnl": 6.95, "avg": 0.35, "sl": 6}, {"step": "RET: 3:avg", "desc": "되돌림 최적화", "n": 20, "wr": 60.0, "pnl": 7.55, "avg": 0.38, "sl": 6}, {"step": "SL: fo=없음 as=없음", "desc": "손절 최적화", "n": 20, "wr": 75.0, "pnl": 20.95, "avg": 1.05, "sl": 0}, {"step": "TRAIL: +7%/-1.0%", "desc": "트레일링 최적화", "n": 20, "wr": 75.0, "pnl": 22.64, "avg": 1.13, "sl": 0}, {"step": "TP1: +3.0%/100%", "desc": "익절1단계 최적화", "n": 20, "wr": 75.0, "pnl": 28.74, "avg": 1.44, "sl": 0}, {"step": "TP2: +2.0%/0%", "desc": "익절2단계 최적화", "n": 20, "wr": 75.0, "pnl": 28.74, "avg": 1.44, "sl": 0}, {"step": "TP3: +3.0%/0%", "desc": "익절3단계 최적화", "n": 20, "wr": 75.0, "pnl": 28.74, "avg": 1.44, "sl": 0}, {"step": "TP4: +5.0%/0%", "desc": "익절4단계 최적화", "n": 20, "wr": 75.0, "pnl": 28.74, "avg": 1.44, "sl": 0}, {"step": "TW: G09:15 GM09:30 F15:20", "desc": "시간대 최적화", "n": 32, "wr": 78.1, "pnl": 51.0, "avg": 1.59, "sl": 0}, {"step": "SB: -4.0%/3.0x", "desc": "2차매수 최적화", "n": 32, "wr": 84.4, "pnl": 55.37, "avg": 1.73, "sl": 0}, {"step": "AS_TP1: +2.5%/100%", "desc": "2차후 TP1 최적화", "n": 32, "wr": 87.5, "pnl": 66.7, "avg": 2.08, "sl": 0}], "verification": {"retracement": [{"name": "현행 {1:0, 3:tier2}", "n": 32, "wr": 87.5, "pnl": 66.7, "avg": 2.08, "sl": 0}, {"name": "1만제거", "n": 32, "wr": 87.5, "pnl": 66.7, "avg": 2.08, "sl": 0}, {"name": "3만제거", "n": 32, "wr": 87.5, "pnl": 66.7, "avg": 2.08, "sl": 0}, {"name": "전부제거", "n": 32, "wr": 87.5, "pnl": 66.7, "avg": 2.08, "sl": 0}, {"name": "1:+0.5%", "n": 32, "wr": 87.5, "pnl": 66.7, "avg": 2.08, "sl": 0}, {"name": "1:+1%", "n": 32, "wr": 87.5, "pnl": 66.7, "avg": 2.08, "sl": 0}, {"name": "1:-1%", "n": 32, "wr": 87.5, "pnl": 66.7, "avg": 2.08, "sl": 0}, {"name": "3:avg", "n": 32, "wr": 87.5, "pnl": 66.7, "avg": 2.08, "sl": 0}, {"name": "2+3", "n": 32, "wr": 84.4, "pnl": 63.14, "avg": 1.97, "sl": 0}, {"name": "1+2+3", "n": 32, "wr": 84.4, "pnl": 63.14, "avg": 1.97, "sl": 0}], "stop_loss": {"fo": "없음", "as": "없음", "n": 32, "wr": 87.5, "pnl": 66.7, "avg": 2.08, "sl": 0}, "trailing": {"trig": 4.0, "drop": -1.0, "n": 32, "wr": 87.5, "pnl": 66.7, "avg": 2.08, "sl": 0}}, "final": {"n": 32, "wr": 87.5, "pnl": 66.7, "avg": 2.08, "sl": 0, "bal": 1927631, "cr": 92.76}, "final_config": {"time_filters": {"골든10분": ["09:00", "09:15"], "굿모닝": ["09:00", "09:30"], "세력감지": ["09:00", "15:20"]}, "strategies": {"골든10분v1": {"stop_loss": {"first_only": null, "after_second": null}, "take_profit": {"first_only": [{"profit": 0.03, "sell_ratio": 1.0}, {"profit": 0.02, "sell_ratio": 0.0}, {"profit": 0.03, "sell_ratio": 0.0}, {"profit": 0.05, "sell_ratio": 0.0}], "after_second": [{"profit": 0.025, "sell_ratio": 1.0}, {"profit": 0.012, "sell_ratio": 0.25}, {"profit": 0.032, "sell_ratio": 0.4}, {"profit": 0.065, "sell_ratio": 0.5}], "trailing": {"trigger_profit": 0.07, "trailing_drop": -0.01}}, "retracement_rules": {"1": 0.0, "3": 0.0}, "second_buy": {"type": "zone", "zone_enter": -0.016, "bounce": 0.022, "qty_ratio": 3.0}}, "골든10분v2": {"stop_loss": {"first_only": null, "after_second": null}, "take_profit": {"first_only": [{"profit": 0.03, "sell_ratio": 1.0}, {"profit": 0.02, "sell_ratio": 0.0}, {"profit": 0.03, "sell_ratio": 0.0}, {"profit": 0.05, "sell_ratio": 0.0}], "after_second": [{"profit": 0.025, "sell_ratio": 1.0}, {"profit": 0.012, "sell_ratio": 0.25}, {"profit": 0.032, "sell_ratio": 0.4}, {"profit": 0.065, "sell_ratio": 0.5}], "trailing": {"trigger_profit": 0.07, "trailing_drop": -0.01}}, "retracement_rules": {"1": 0.0, "3": 0.0}, "second_buy": {"type": "direct", "trigger_drop": -0.04, "qty_ratio": 3.0}}, "굿모닝": {"stop_loss": {"first_only": null, "after_second": null}, "take_profit": {"first_only": [{"profit": 0.03, "sell_ratio": 1.0}, {"profit": 0.02, "sell_ratio": 0.0}, {"profit": 0.03, "sell_ratio": 0.0}, {"profit": 0.05, "sell_ratio": 0.0}], "after_second": [{"profit": 0.025, "sell_ratio": 1.0}, {"profit": 0.019, "sell_ratio": 0.25}, {"profit": 0.032, "sell_ratio": 0.4}, {"profit": 0.065, "sell_ratio": 0.5}], "trailing": {"trigger_profit": 0.07, "trailing_drop": -0.01}}, "retracement_rules": {"1": 0.0, "3": 0.0}, "second_buy": {"type": "direct", "trigger_drop": -0.04, "qty_ratio": 3.0}}, "세력감지": {"stop_loss": {"first_only": null, "after_second": null}, "take_profit": {"first_only": [{"profit": 0.03, "sell_ratio": 1.0}, {"profit": 0.02, "sell_ratio": 0.0}, {"profit": 0.03, "sell_ratio": 0.0}, {"profit": 0.05, "sell_ratio": 0.0}], "after_second": [{"profit": 0.025, "sell_ratio": 1.0}, {"profit": 0.026, "sell_ratio": 0.4}, {"profit": 0.034, "sell_ratio": 0.5}, {"profit": 0.04, "sell_ratio": 1.0}], "trailing": {"trigger_profit": 0.07, "trailing_drop": -0.01}}, "retracement_rules": {"1": 0.0, "3": 0.0}, "second_buy": {"type": "zone", "zone_enter": -0.024, "bounce": 0.008, "qty_ratio": 3.0}}}}};
+
+// ==== Utility functions ====
+function fmt(v, d=2) { return v == null ? '-' : Number(v).toFixed(d); }
+function fmtPct(v, d=1) { return v == null ? '-' : Number(v).toFixed(d) + '%'; }
+function pnlColor(v) { return v > 0 ? 'text-profit font-semibold' : v < 0 ? 'text-loss font-semibold' : 'text-gray-600'; }
+function pnlBg(v) { return v > 0 ? 'bg-green-50' : v < 0 ? 'bg-red-50' : ''; }
+
+function heatmapColor(value, min, max, median) {
+  if (value == null) return '#f3f4f6';
+  let r, g, b;
+  if (value >= median) {
+    const t = max === median ? 0 : (value - median) / (max - median);
+    r = Math.round(255 - t * (255 - 22));
+    g = Math.round(255 - t * (255 - 163));
+    b = Math.round(255 - t * (255 - 74));
+  } else {
+    const t = median === min ? 0 : (median - value) / (median - min);
+    r = Math.round(255 - t * (255 - 220));
+    g = Math.round(255 - t * (255 - 38));
+    b = Math.round(255 - t * (255 - 38));
+  }
+  return `rgb(${r},${g},${b})`;
+}
+
+function textColorForBg(value, min, max, median) {
+  const intensity = max === min ? 0.5 : Math.abs(value - median) / ((max - min) / 2);
+  return intensity > 0.6 ? '#fff' : '#1f2937';
+}
+
+// ==== Section 1: Executive Summary ====
+function renderExecSummary() {
+  const b = DATA.baseline;
+  const f = DATA.final;
+  const dPnl = f.pnl - b.pnl;
+  const dWr = f.wr - b.wr;
+  const container = document.getElementById('exec-summary');
+  container.innerHTML = `
+    <div class="card p-5">
+      <div class="text-sm font-medium text-gray-500 mb-3">현행 (Baseline)</div>
+      <div class="space-y-3">
+        <div>
+          <div class="text-2xl font-extrabold ${pnlColor(b.pnl)}">${fmtPct(b.pnl)}</div>
+          <div class="text-xs text-gray-400">합산 PNL</div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div>
+            <div class="text-lg font-bold text-gray-800">${fmtPct(b.wr)}</div>
+            <div class="text-xs text-gray-400">승률</div>
+          </div>
+          <div>
+            <div class="text-lg font-bold text-gray-800">${fmtPct(b.avg)}</div>
+            <div class="text-xs text-gray-400">평균PNL</div>
+          </div>
+          <div>
+            <div class="text-lg font-bold text-gray-800">${b.sl}</div>
+            <div class="text-xs text-gray-400">손절</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card p-5 ring-2 ring-profit/30">
+      <div class="text-sm font-medium text-profit mb-3">최적화 (Optimized)</div>
+      <div class="space-y-3">
+        <div>
+          <div class="text-2xl font-extrabold text-profit">${fmtPct(f.pnl)}</div>
+          <div class="text-xs text-gray-400">합산 PNL (${f.n}건)</div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div>
+            <div class="text-lg font-bold text-profit">${fmtPct(f.wr)}</div>
+            <div class="text-xs text-gray-400">승률</div>
+          </div>
+          <div>
+            <div class="text-lg font-bold text-profit">${fmtPct(f.avg)}</div>
+            <div class="text-xs text-gray-400">평균PNL</div>
+          </div>
+          <div>
+            <div class="text-lg font-bold text-profit">${f.sl}</div>
+            <div class="text-xs text-gray-400">손절</div>
+          </div>
+        </div>
+        ${f.bal ? `<div class="text-xs text-gray-400 pt-1 border-t border-gray-100">최종잔고: ${Number(f.bal).toLocaleString()}원 (복리 ${fmtPct(f.cr)})</div>` : ''}
+      </div>
+    </div>
+    <div class="card p-5 bg-gradient-to-br from-green-50 to-white">
+      <div class="text-sm font-medium text-gray-500 mb-3">개선폭</div>
+      <div class="space-y-3">
+        <div>
+          <div class="text-2xl font-extrabold text-profit">+${fmtPct(dPnl)}</div>
+          <div class="text-xs text-gray-400">PNL 차이</div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-center">
+          <div>
+            <div class="text-lg font-bold text-profit">+${fmtPct(dWr)}</div>
+            <div class="text-xs text-gray-400">승률 차이</div>
+          </div>
+          <div>
+            <div class="text-lg font-bold text-profit">${fmt(dPnl / b.pnl * 100, 0)}%</div>
+            <div class="text-xs text-gray-400">PNL 배수</div>
+          </div>
+        </div>
+        <div class="text-xs text-gray-400 pt-1 border-t border-gray-100">거래수 ${b.n} &rarr; ${f.n} (시간대 확장)</div>
+      </div>
+    </div>
+  `;
+}
+
+// ==== Section 2: Greedy Steps ====
+function renderGreedySteps() {
+  const steps = DATA.greedy_steps;
+  const basePnl = steps[0].pnl;
+  let tbody = document.getElementById('greedy-body');
+  let html = '';
+  steps.forEach((s, i) => {
+    const stepImprove = i === 0 ? 0 : (s.pnl - steps[i-1].pnl);
+    const cumImprove = s.pnl - basePnl;
+    const isBase = i === 0;
+    html += `<tr class="${!isBase && stepImprove > 0 ? 'step-improve' : ''}">
+      <td class="text-center font-mono text-xs text-gray-400">${i}</td>
+      <td class="font-semibold text-sm">${s.step}</td>
+      <td class="text-gray-500 text-xs">${s.desc}</td>
+      <td class="text-right font-mono">${s.n}</td>
+      <td class="text-right font-mono font-semibold ${pnlColor(s.pnl)}">${fmtPct(s.pnl)}</td>
+      <td class="text-right font-mono">${fmtPct(s.wr)}</td>
+      <td class="text-right font-mono">${fmtPct(s.avg)}</td>
+      <td class="text-right font-mono">${s.sl}</td>
+      <td class="text-right font-mono ${pnlColor(stepImprove)}">${isBase ? '-' : (stepImprove > 0 ? '+' : '') + fmtPct(stepImprove)}</td>
+      <td class="text-right font-mono ${pnlColor(cumImprove)}">${isBase ? '-' : (cumImprove > 0 ? '+' : '') + fmtPct(cumImprove)}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+// ==== Section 3: Heatmaps ====
+function buildHeatmap(containerId, grid, rowKey, colKey, rowLabels, colLabels, currentRow, currentCol) {
+  const container = document.getElementById(containerId);
+
+  // Build lookup: rowLabel -> colLabel -> pnl
+  const lookup = {};
+  let allPnl = [];
+  grid.forEach(item => {
+    const rk = String(item[rowKey]);
+    const ck = String(item[colKey]);
+    if (!lookup[rk]) lookup[rk] = {};
+    lookup[rk][ck] = item.pnl;
+    allPnl.push(item.pnl);
+  });
+
+  const minPnl = Math.min(...allPnl);
+  const maxPnl = Math.max(...allPnl);
+  const medianPnl = allPnl.sort((a,b) => a-b)[Math.floor(allPnl.length/2)];
+
+  // Find max cell
+  let maxVal = -Infinity, maxR = null, maxC = null;
+  grid.forEach(item => {
+    if (item.pnl > maxVal) {
+      maxVal = item.pnl;
+      maxR = String(item[rowKey]);
+      maxC = String(item[colKey]);
+    }
+  });
+
+  let html = '<table class="border-collapse">';
+  // Header
+  html += '<tr><th class="heatmap-cell bg-gray-50 text-xs" style="min-width:80px"></th>';
+  colLabels.forEach(c => {
+    html += `<th class="heatmap-cell bg-gray-50 text-xs font-semibold">${c}</th>`;
+  });
+  html += '</tr>';
+
+  // Rows
+  rowLabels.forEach(r => {
+    html += `<tr><td class="heatmap-cell bg-gray-50 text-xs font-semibold text-left" style="min-width:80px">${r}</td>`;
+    colLabels.forEach(c => {
+      const val = lookup[String(r)] && lookup[String(r)][String(c)];
+      const bg = val != null ? heatmapColor(val, minPnl, maxPnl, medianPnl) : '#f3f4f6';
+      const fg = val != null ? textColorForBg(val, minPnl, maxPnl, medianPnl) : '#6b7280';
+      const isMax = String(r) === maxR && String(c) === maxC;
+      const isCurrent = String(r) === String(currentRow) && String(c) === String(currentCol);
+      let cls = 'heatmap-cell';
+      if (isMax) cls += ' cell-max';
+      if (isCurrent) cls += ' cell-current';
+      html += `<td class="${cls}" style="background:${bg};color:${fg}" title="${r} x ${c}: PNL ${val != null ? fmtPct(val) : 'N/A'}">${val != null ? fmt(val, 1) : '-'}</td>`;
+    });
+    html += '</tr>';
+  });
+
+  html += '</table>';
+
+  // Legend
+  html += `<div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
+    <div class="flex items-center gap-1"><span class="inline-block w-4 h-4 rounded" style="box-shadow: inset 0 0 0 3px #f59e0b; background: #fff"></span> 최고 PNL (${fmtPct(maxVal)})</div>
+    <div class="flex items-center gap-1"><span class="inline-block w-4 h-4 rounded" style="box-shadow: inset 0 0 0 2px #2563eb; border: 1px dashed #2563eb; background: #fff"></span> 현행 설정</div>
+    <div class="flex items-center gap-1"><span class="inline-block w-4 h-4 rounded" style="background: #16a34a"></span> 높은 PNL</div>
+    <div class="flex items-center gap-1"><span class="inline-block w-4 h-4 rounded" style="background: #dc2626"></span> 낮은 PNL</div>
+  </div>`;
+
+  container.innerHTML = html;
+}
+
+function renderHeatmaps() {
+  // Stop Loss heatmap
+  const sl = DATA.stop_loss;
+  buildHeatmap('sl-heatmap', sl.grid, 'fo', 'as', sl.fo_values, sl.as_values, '-3.0%', '-2.0%');
+
+  // TP1
+  buildHeatmap('tp1-heatmap', DATA.tp1.grid, 'profit', 'ratio', DATA.tp1.profits, DATA.tp1.ratios, 2.5, 25.0);
+
+  // TP2
+  buildHeatmap('tp2-heatmap', DATA.tp2.grid, 'profit', 'ratio', DATA.tp2.profits, DATA.tp2.ratios, 4.9, 40.0);
+
+  // TP3
+  buildHeatmap('tp3-heatmap', DATA.tp3.grid, 'profit', 'ratio', DATA.tp3.profits, DATA.tp3.ratios, 6.3, 50.0);
+
+  // TP4
+  buildHeatmap('tp4-heatmap', DATA.tp4.grid, 'profit', 'ratio', DATA.tp4.profits, DATA.tp4.ratios, 8.5, 50.0);
+
+  // Trailing
+  buildHeatmap('trailing-heatmap', DATA.trailing.grid, 'trig', 'drop', DATA.trailing.trigs, DATA.trailing.drops, 7.0, -2.5);
+}
+
+// ==== Section 4: Retracement ====
+function renderRetracement() {
+  const ret = DATA.retracement;
+  const maxPnl = Math.max(...ret.map(r => r.pnl));
+  let html = '';
+  ret.forEach((r, i) => {
+    const isBest = r.pnl === maxPnl;
+    html += `<tr class="${isBest ? 'bg-green-50' : ''}">
+      <td class="text-center font-mono text-xs ${isBest ? 'text-profit font-bold' : 'text-gray-400'}">${i + 1}</td>
+      <td class="font-semibold text-sm">${isBest ? '<span class="text-profit">&#9733;</span> ' : ''}${r.name}</td>
+      <td class="text-right font-mono">${r.n}</td>
+      <td class="text-right font-mono font-semibold ${pnlColor(r.pnl)}">${fmtPct(r.pnl)}</td>
+      <td class="text-right font-mono">${fmtPct(r.wr)}</td>
+      <td class="text-right font-mono">${fmtPct(r.avg)}</td>
+      <td class="text-right font-mono">${r.sl}</td>
+    </tr>`;
+  });
+  document.getElementById('ret-body').innerHTML = html;
+}
+
+// ==== Section 5: Time Windows ====
+function renderTimeWindows() {
+  const tw = DATA.time_windows.grid.slice(0, 20);
+  let html = '';
+  tw.forEach((r, i) => {
+    html += `<tr class="${i === 0 ? 'bg-green-50' : ''}">
+      <td class="text-center font-mono text-xs ${i === 0 ? 'text-profit font-bold' : 'text-gray-400'}">${i + 1}</td>
+      <td class="font-mono text-sm">${r.g}</td>
+      <td class="font-mono text-sm">${r.gm}</td>
+      <td class="font-mono text-sm">${r.f}</td>
+      <td class="text-right font-mono">${r.n}</td>
+      <td class="text-right font-mono font-semibold ${pnlColor(r.pnl)}">${fmtPct(r.pnl)}</td>
+      <td class="text-right font-mono">${fmtPct(r.wr)}</td>
+      <td class="text-right font-mono">${fmtPct(r.avg)}</td>
+      <td class="text-right font-mono">${r.sl}</td>
+    </tr>`;
+  });
+  document.getElementById('tw-body').innerHTML = html;
+}
+
+// ==== Section 6: Second Buy ====
+function renderSecondBuy() {
+  const sb = DATA.second_buy.slice(0, 15);
+  let html = '';
+  sb.forEach((r, i) => {
+    html += `<tr class="${i === 0 ? 'bg-green-50' : ''}">
+      <td class="text-center font-mono text-xs ${i === 0 ? 'text-profit font-bold' : 'text-gray-400'}">${i + 1}</td>
+      <td class="font-semibold text-sm">${r.name}</td>
+      <td class="text-right font-mono">${r.n}</td>
+      <td class="text-right font-mono font-semibold ${pnlColor(r.pnl)}">${fmtPct(r.pnl)}</td>
+      <td class="text-right font-mono">${fmtPct(r.wr)}</td>
+      <td class="text-right font-mono">${fmtPct(r.avg)}</td>
+      <td class="text-right font-mono">${r.sl}</td>
+    </tr>`;
+  });
+  document.getElementById('sb-body').innerHTML = html;
+}
+
+// ==== Section 7: Final Config ====
+function renderFinalConfig() {
+  const cfg = DATA.final_config;
+  const container = document.getElementById('final-config');
+
+  let html = '';
+
+  // Time filters
+  html += `<div class="mb-6">
+    <h3 class="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">시간 필터 (조건별 활성 시간대)</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">`;
+  for (const [name, times] of Object.entries(cfg.time_filters)) {
+    html += `<div class="bg-gray-50 rounded-lg p-3">
+      <div class="text-sm font-semibold text-gray-800">${name}</div>
+      <div class="font-mono text-sm text-accent">${times[0]} ~ ${times[1]}</div>
+    </div>`;
+  }
+  html += `</div></div>`;
+
+  // Strategies
+  html += `<h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">전략별 파라미터</h3>`;
+
+  for (const [stratName, strat] of Object.entries(cfg.strategies)) {
+    html += `<div class="mb-6 border border-gray-100 rounded-lg overflow-hidden">
+      <div class="bg-gradient-to-r from-accent/5 to-transparent px-4 py-2 border-b border-gray-100">
+        <span class="font-bold text-accent">${stratName}</span>
+      </div>
+      <div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">`;
+
+    // Stop Loss
+    html += `<div>
+      <div class="text-xs font-semibold text-gray-500 mb-1 uppercase">손절</div>
+      <div class="font-mono">1차만: ${strat.stop_loss.first_only == null ? '<span class="text-gray-400">없음</span>' : fmtPct(strat.stop_loss.first_only * 100)}</div>
+      <div class="font-mono">2차후: ${strat.stop_loss.after_second == null ? '<span class="text-gray-400">없음</span>' : fmtPct(strat.stop_loss.after_second * 100)}</div>
+    </div>`;
+
+    // Take Profit (first only)
+    html += `<div>
+      <div class="text-xs font-semibold text-gray-500 mb-1 uppercase">익절 (1차만)</div>`;
+    strat.take_profit.first_only.forEach((tp, i) => {
+      html += `<div class="font-mono text-xs">T${i+1}: +${fmt(tp.profit * 100)}% / ${fmt(tp.sell_ratio * 100)}%</div>`;
+    });
+    html += `</div>`;
+
+    // Take Profit (after second)
+    html += `<div>
+      <div class="text-xs font-semibold text-gray-500 mb-1 uppercase">익절 (2차후)</div>`;
+    strat.take_profit.after_second.forEach((tp, i) => {
+      html += `<div class="font-mono text-xs">T${i+1}: +${fmt(tp.profit * 100)}% / ${fmt(tp.sell_ratio * 100)}%</div>`;
+    });
+    html += `</div>`;
+
+    // Trailing + Retracement + 2nd buy
+    html += `<div>
+      <div class="text-xs font-semibold text-gray-500 mb-1 uppercase">트레일링</div>
+      <div class="font-mono text-xs">트리거: +${fmt(strat.take_profit.trailing.trigger_profit * 100)}%</div>
+      <div class="font-mono text-xs">하락폭: ${fmt(strat.take_profit.trailing.trailing_drop * 100)}%</div>
+      <div class="text-xs font-semibold text-gray-500 mb-1 mt-2 uppercase">되돌림</div>
+      <div class="font-mono text-xs">${JSON.stringify(strat.retracement_rules)}</div>
+      <div class="text-xs font-semibold text-gray-500 mb-1 mt-2 uppercase">2차매수</div>
+      <div class="font-mono text-xs">유형: ${strat.second_buy.type}</div>`;
+    if (strat.second_buy.type === 'zone') {
+      html += `<div class="font-mono text-xs">진입: ${fmt(strat.second_buy.zone_enter * 100)}%</div>
+        <div class="font-mono text-xs">반등: +${fmt(strat.second_buy.bounce * 100)}%</div>`;
+    } else {
+      html += `<div class="font-mono text-xs">트리거: ${fmt(strat.second_buy.trigger_drop * 100)}%</div>`;
+    }
+    html += `<div class="font-mono text-xs">배수: ${strat.second_buy.qty_ratio}x</div>`;
+    html += `</div>`;
+
+    html += `</div></div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// ==== Init ====
+document.addEventListener('DOMContentLoaded', () => {
+  renderExecSummary();
+  renderGreedySteps();
+  renderHeatmaps();
+  renderRetracement();
+  renderTimeWindows();
+  renderSecondBuy();
+  renderFinalConfig();
+});
+</script>
+
+</body>
+</html>
