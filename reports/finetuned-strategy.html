@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>파인튜닝 매매 전략 대시보드</title>
+<title>New Test Rule — A/B 테스트 전략</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
@@ -17,8 +17,6 @@ tailwind.config = {
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
   body { font-family: 'Inter', sans-serif; }
   code, .mono { font-family: 'JetBrains Mono', monospace; }
-  .strat-card { transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-  .strat-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
   .delta { font-size: 9px; padding: 1px 4px; border-radius: 3px; vertical-align: middle; }
   .delta-up { background: #dcfce7; color: #166534; }
   .delta-dn { background: #fef2f2; color: #991b1b; }
@@ -27,325 +25,333 @@ tailwind.config = {
 </head>
 <body class="bg-bg text-gray-700 min-h-screen">
 
-<main class="max-w-6xl mx-auto px-4 py-8">
+<main class="max-w-5xl mx-auto px-4 py-8">
 
 <!-- Header -->
 <div class="mb-8">
   <a href="/" class="text-accent text-sm hover:underline mb-2 inline-block">&larr; 현행 전략 대시보드</a>
   <div class="flex items-center gap-3 mb-1">
-    <h1 class="text-2xl font-bold text-gray-900">파인튜닝 매매 전략</h1>
-    <span class="px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold">#13 Fine-tuned</span>
+    <h1 class="text-2xl font-bold text-gray-900">New Test Rule</h1>
+    <span class="px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold">A/B 테스트용</span>
   </div>
-  <p class="text-muted text-sm">480K 시뮬레이션 기반 &middot; 15개 파라미터 정밀 최적화 &middot; 2026-02-04~13 데이터</p>
+  <p class="text-muted text-sm">480K 시뮬레이션 파인튜닝 기반 &middot; base와 동시 운용 &middot; 조건당 5만원씩</p>
 </div>
 
-<!-- Performance Banner -->
+<!-- A/B Test Structure -->
+<div class="bg-gradient-to-r from-slate-50 to-indigo-50 border border-slate-200 rounded-xl p-5 mb-8">
+  <h2 class="text-sm font-semibold text-gray-900 mb-3">A/B 테스트 구조</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white border border-slate-200 rounded-lg p-4">
+      <div class="text-[10px] text-muted uppercase tracking-wider mb-2">조건 진입 시</div>
+      <div class="text-sm">같은 종목에 <span class="font-semibold">2개 포지션</span> 동시 생성</div>
+      <div class="mono text-xs text-muted mt-1">max_amount 100,000 &divide; 2 = 50,000</div>
+    </div>
+    <div class="bg-white border border-gray-300 rounded-lg p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+        <span class="text-[10px] text-muted uppercase tracking-wider">_base (5만원)</span>
+      </div>
+      <div class="text-sm">기존 전략 그대로 유지</div>
+      <div class="text-xs text-muted mt-1">4단계 TP, SL -2.1%, 트레일링 7%/-2.5%</div>
+    </div>
+    <div class="bg-white border border-indigo-300 rounded-lg p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+        <span class="text-[10px] text-indigo-600 uppercase tracking-wider font-semibold">_new (5만원)</span>
+      </div>
+      <div class="text-sm font-semibold text-indigo-700">파인튜닝 최적화 전략</div>
+      <div class="text-xs text-muted mt-1">3단계 TP, SL -4.3%, 트레일링 7.7%/-0.6%</div>
+    </div>
+  </div>
+</div>
+
+<!-- Backtest Performance -->
 <div class="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-5 mb-8">
-  <div class="grid grid-cols-2 md:grid-cols-6 gap-4 text-center">
+  <div class="flex items-center gap-2 mb-3">
+    <h2 class="text-sm font-semibold text-indigo-700">백테스트 성과 (new rule 단독)</h2>
+    <span class="text-[10px] text-muted bg-white px-2 py-0.5 rounded">2026-02-04~13 · 30건</span>
+  </div>
+  <div class="grid grid-cols-3 md:grid-cols-6 gap-4 text-center">
     <div>
-      <div class="text-2xl font-bold text-indigo-700 mono">+86.47%</div>
-      <div class="text-xs text-muted">누적 PNL</div>
-      <div class="delta delta-up mt-0.5">+10.94%p vs 현행</div>
+      <div class="text-xl font-bold text-indigo-700 mono">+86.5%</div>
+      <div class="text-[10px] text-muted">누적 PNL</div>
+      <div class="delta delta-up mt-0.5">+10.9%p</div>
     </div>
     <div>
-      <div class="text-2xl font-bold text-gray-900 mono">86.7%</div>
-      <div class="text-xs text-muted">승률 (26/30)</div>
+      <div class="text-xl font-bold text-gray-900 mono">86.7%</div>
+      <div class="text-[10px] text-muted">승률</div>
     </div>
     <div>
-      <div class="text-2xl font-bold text-profit mono">+2.88%</div>
-      <div class="text-xs text-muted">건당 평균</div>
+      <div class="text-xl font-bold text-profit mono">+2.88%</div>
+      <div class="text-[10px] text-muted">건당 평균</div>
     </div>
     <div>
-      <div class="text-2xl font-bold text-gray-900 mono">2</div>
-      <div class="text-xs text-muted">손절 횟수</div>
+      <div class="text-xl font-bold text-gray-900 mono">2</div>
+      <div class="text-[10px] text-muted">손절</div>
     </div>
     <div>
-      <div class="text-2xl font-bold text-indigo-700 mono">2,317K</div>
-      <div class="text-xs text-muted">복리 잔고</div>
-      <div class="delta delta-up mt-0.5">+226K vs 현행</div>
+      <div class="text-xl font-bold text-indigo-700 mono">+131.7%</div>
+      <div class="text-[10px] text-muted">복리 수익률</div>
+      <div class="delta delta-up mt-0.5">+22.6%p</div>
     </div>
     <div>
-      <div class="text-2xl font-bold text-profit mono">+131.7%</div>
-      <div class="text-xs text-muted">복리 수익률</div>
-      <div class="delta delta-up mt-0.5">+22.6%p vs 현행</div>
+      <div class="text-xl font-bold text-profit mono">2,317K</div>
+      <div class="text-[10px] text-muted">복리 잔고</div>
     </div>
   </div>
 </div>
 
-<!-- Common Settings -->
-<div class="bg-card border border-border rounded-xl p-5 mb-8">
-  <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">공통 설정</h2>
-  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 text-center">
-    <div>
-      <div class="text-lg font-bold text-gray-900 mono">100,000</div>
-      <div class="text-xs text-muted">최대 금액 (원)</div>
-    </div>
-    <div>
-      <div class="text-lg font-bold text-gray-900 mono">-2틱</div>
-      <div class="text-xs text-muted">주문 오프셋</div>
-    </div>
-    <div>
-      <div class="text-lg font-bold text-gray-900 mono">2,000</div>
-      <div class="text-xs text-muted">최소 가격 (원)</div>
-    </div>
-    <div>
-      <div class="text-lg font-bold text-gray-900 mono">98</div>
-      <div class="text-xs text-muted">최소 체결강도</div>
-    </div>
-    <div>
-      <div class="text-lg font-bold text-gray-900 mono">70초</div>
-      <div class="text-xs text-muted">미체결 타임아웃</div>
-    </div>
-    <div>
-      <div class="text-lg font-bold text-gray-900 mono">15:25</div>
-      <div class="text-xs text-muted">강제 청산</div>
-    </div>
-  </div>
-</div>
-
-<!-- Unified TP/SL/Trailing (applies to all strategies) -->
+<!-- NEW Rule Parameters (all unified) -->
 <div class="bg-card border border-indigo-200 rounded-xl p-5 mb-8">
   <div class="flex items-center gap-2 mb-4">
-    <h2 class="text-sm font-semibold text-indigo-700 uppercase tracking-wider">통합 매도 전략</h2>
-    <span class="text-[10px] text-muted bg-card2 px-2 py-0.5 rounded">3개 전략 공통 적용</span>
+    <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+    <h2 class="text-sm font-semibold text-indigo-700 uppercase tracking-wider">New Rule — 통합 매매 파라미터</h2>
+    <span class="text-[10px] text-muted bg-card2 px-2 py-0.5 rounded">3개 조건 공통</span>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <!-- Left: TP tiers -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Col 1: 매수 -->
     <div class="space-y-4">
-      <!-- Stop Loss -->
+      <div>
+        <div class="text-[10px] text-muted uppercase tracking-wider mb-2">2차 매수 (직행)</div>
+        <div class="space-y-2">
+          <div class="bg-card2 rounded-lg p-3 flex justify-between items-center">
+            <span class="text-xs text-muted">하락 기준</span>
+            <div class="text-right">
+              <span class="mono text-sm text-loss font-semibold">-5.3%</span>
+              <div class="delta delta-new">-2.9%&rarr;-5.3%</div>
+            </div>
+          </div>
+          <div class="bg-card2 rounded-lg p-3 flex justify-between items-center">
+            <span class="text-xs text-muted">수량 배수</span>
+            <div class="text-right">
+              <span class="mono text-sm font-semibold">1.56x</span>
+              <div class="delta delta-new">2.0x&rarr;1.56x</div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div>
         <div class="text-[10px] text-muted uppercase tracking-wider mb-2">손절</div>
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <div class="bg-card2 rounded-lg p-2 text-center">
-            <div class="mono text-muted">없음</div>
-            <div class="text-[10px] text-muted">1차 매수만</div>
+        <div class="space-y-2">
+          <div class="bg-card2 rounded-lg p-3 flex justify-between items-center">
+            <span class="text-xs text-muted">1차 매수만</span>
+            <span class="mono text-sm text-muted">없음</span>
           </div>
-          <div class="bg-red-50 border border-red-200 rounded-lg p-2 text-center">
-            <div class="mono text-loss">-4.3%</div>
-            <div class="text-[10px] text-muted">2차 매수 후</div>
-            <div class="delta delta-new">-2.1% &rarr; -4.3%</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TP First Only -->
-      <div>
-        <div class="text-[10px] text-muted uppercase tracking-wider mb-2">익절 (1차 매수만)</div>
-        <div class="space-y-1">
-          <div class="flex items-center gap-2 text-xs">
-            <span class="w-12 text-right mono text-profit">+3.1%</span>
-            <div class="flex-1 bg-gray-200 rounded-full h-4"><div class="h-full bg-green-200 rounded-full flex items-center justify-center text-[10px] text-profit font-medium" style="width:24%">24%</div></div>
-          </div>
-          <div class="flex items-center gap-2 text-xs">
-            <span class="w-12 text-right mono text-profit">+6.9%</span>
-            <div class="flex-1 bg-gray-200 rounded-full h-4"><div class="h-full bg-green-200 rounded-full flex items-center justify-center text-[10px] text-profit font-medium" style="width:41%">41%</div></div>
-          </div>
-          <div class="flex items-center gap-2 text-xs">
-            <span class="w-12 text-right mono text-profit">+10.9%</span>
-            <div class="flex-1 bg-gray-200 rounded-full h-4"><div class="h-full bg-green-300 rounded-full flex items-center justify-center text-[10px] text-profit font-medium" style="width:100%">100%</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TP After Second -->
-      <div>
-        <div class="text-[10px] text-muted uppercase tracking-wider mb-2">익절 (2차 매수 후)</div>
-        <div class="space-y-1">
-          <div class="flex items-center gap-2 text-xs">
-            <span class="w-12 text-right mono text-indigo-600">+2.7%</span>
-            <div class="flex-1 bg-gray-200 rounded-full h-4"><div class="h-full bg-indigo-200 rounded-full flex items-center justify-center text-[10px] text-indigo-700 font-medium" style="width:25%">25%</div></div>
-          </div>
-          <div class="flex items-center gap-2 text-xs">
-            <span class="w-12 text-right mono text-indigo-600">+5.0%</span>
-            <div class="flex-1 bg-gray-200 rounded-full h-4"><div class="h-full bg-indigo-200 rounded-full flex items-center justify-center text-[10px] text-indigo-700 font-medium" style="width:59%">59%</div></div>
-          </div>
-          <div class="flex items-center gap-2 text-xs">
-            <span class="w-12 text-right mono text-indigo-600">+8.0%</span>
-            <div class="flex-1 bg-gray-200 rounded-full h-4"><div class="h-full bg-indigo-300 rounded-full flex items-center justify-center text-[10px] text-indigo-700 font-medium" style="width:100%">100%</div></div>
+          <div class="bg-red-50 border border-red-100 rounded-lg p-3 flex justify-between items-center">
+            <span class="text-xs text-muted">2차 매수 후</span>
+            <div class="text-right">
+              <span class="mono text-sm text-loss font-semibold">-4.3%</span>
+              <div class="delta delta-new">-2.1%&rarr;-4.3%</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Right: Trailing + Retracement + summary -->
+    <!-- Col 2: 익절 -->
     <div class="space-y-4">
-      <!-- Trailing -->
       <div>
-        <div class="text-[10px] text-muted uppercase tracking-wider mb-2">추적 손절 (트레일링 스탑)</div>
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <div class="bg-purple-50 border border-purple-200 rounded-lg p-3 text-center">
-            <div class="mono text-purple-700 text-lg font-bold">+7.7%</div>
-            <div class="text-[10px] text-muted">트리거 이익률</div>
-            <div class="delta delta-new">7.0% &rarr; 7.7%</div>
+        <div class="text-[10px] text-muted uppercase tracking-wider mb-2">익절 — 1차 매수만 (3단계)</div>
+        <div class="space-y-1">
+          <div class="flex items-center gap-2 text-xs">
+            <span class="w-14 text-right mono text-profit font-medium">+3.1%</span>
+            <div class="flex-1 bg-gray-200 rounded-full h-5"><div class="h-full bg-green-200 rounded-full flex items-center justify-center text-[10px] text-profit font-medium" style="width:24%">24%</div></div>
           </div>
-          <div class="bg-purple-50 border border-purple-200 rounded-lg p-3 text-center">
-            <div class="mono text-purple-700 text-lg font-bold">-0.6%</div>
-            <div class="text-[10px] text-muted">고점 대비 하락</div>
-            <div class="delta delta-new">-1.0% &rarr; -0.6%</div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="w-14 text-right mono text-profit font-medium">+6.9%</span>
+            <div class="flex-1 bg-gray-200 rounded-full h-5"><div class="h-full bg-green-200 rounded-full flex items-center justify-center text-[10px] text-profit font-medium" style="width:41%">41%</div></div>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="w-14 text-right mono text-profit font-medium">+10.9%</span>
+            <div class="flex-1 bg-gray-200 rounded-full h-5"><div class="h-full bg-green-300 rounded-full flex items-center justify-center text-[10px] text-profit font-medium" style="width:100%">전량</div></div>
           </div>
         </div>
       </div>
+      <div>
+        <div class="text-[10px] text-muted uppercase tracking-wider mb-2">익절 — 2차 매수 후 (3단계)</div>
+        <div class="space-y-1">
+          <div class="flex items-center gap-2 text-xs">
+            <span class="w-14 text-right mono text-indigo-600 font-medium">+2.7%</span>
+            <div class="flex-1 bg-gray-200 rounded-full h-5"><div class="h-full bg-indigo-200 rounded-full flex items-center justify-center text-[10px] text-indigo-700 font-medium" style="width:25%">25%</div></div>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="w-14 text-right mono text-indigo-600 font-medium">+5.0%</span>
+            <div class="flex-1 bg-gray-200 rounded-full h-5"><div class="h-full bg-indigo-200 rounded-full flex items-center justify-center text-[10px] text-indigo-700 font-medium" style="width:59%">59%</div></div>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="w-14 text-right mono text-indigo-600 font-medium">+8.0%</span>
+            <div class="flex-1 bg-gray-200 rounded-full h-5"><div class="h-full bg-indigo-300 rounded-full flex items-center justify-center text-[10px] text-indigo-700 font-medium" style="width:100%">전량</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      <!-- Retracement -->
+    <!-- Col 3: 트레일링 + 되돌림 -->
+    <div class="space-y-4">
+      <div>
+        <div class="text-[10px] text-muted uppercase tracking-wider mb-2">트레일링 스탑</div>
+        <div class="space-y-2">
+          <div class="bg-purple-50 border border-purple-100 rounded-lg p-3 flex justify-between items-center">
+            <span class="text-xs text-muted">트리거</span>
+            <div class="text-right">
+              <span class="mono text-sm text-purple-700 font-semibold">+7.7%</span>
+              <div class="delta delta-new">7.0%&rarr;7.7%</div>
+            </div>
+          </div>
+          <div class="bg-purple-50 border border-purple-100 rounded-lg p-3 flex justify-between items-center">
+            <span class="text-xs text-muted">고점 대비 하락</span>
+            <div class="text-right">
+              <span class="mono text-sm text-purple-700 font-semibold">-0.6%</span>
+              <div class="delta delta-new">-2.5%&rarr;-0.6%</div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div>
         <div class="text-[10px] text-muted uppercase tracking-wider mb-2">되돌림 매도</div>
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-center">
-            <div class="mono text-warn">TP1 도달 후</div>
-            <div class="text-[10px] text-muted mt-0.5">매입가 이하 &rarr; 청산</div>
+        <div class="space-y-2">
+          <div class="bg-amber-50 border border-amber-100 rounded-lg p-3 text-center">
+            <div class="mono text-xs text-warn">TP1 후 매입가 이하 &rarr; 청산</div>
           </div>
-          <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-center">
-            <div class="mono text-warn">TP3 도달 후</div>
-            <div class="text-[10px] text-muted mt-0.5">TP2가 이하 &rarr; 청산</div>
+          <div class="bg-amber-50 border border-amber-100 rounded-lg p-3 text-center">
+            <div class="mono text-xs text-warn">TP3 후 TP2가 이하 &rarr; 청산</div>
           </div>
-        </div>
-      </div>
-
-      <!-- Key changes summary -->
-      <div>
-        <div class="text-[10px] text-muted uppercase tracking-wider mb-2">주요 변경 요약</div>
-        <div class="bg-card2 rounded-lg p-3 space-y-1.5 text-xs">
-          <div class="flex justify-between"><span class="text-muted">TP1 비율 (FO)</span><span class="mono">33% <span class="text-accent">&rarr; 24%</span></span></div>
-          <div class="flex justify-between"><span class="text-muted">TP2 이익률 (FO)</span><span class="mono">6.0% <span class="text-accent">&rarr; 6.9%</span></span></div>
-          <div class="flex justify-between"><span class="text-muted">TP3 이익률 (FO)</span><span class="mono">10.0% <span class="text-accent">&rarr; 10.9%</span></span></div>
-          <div class="flex justify-between"><span class="text-muted">TP2 비율 (AS)</span><span class="mono">50% <span class="text-accent">&rarr; 59%</span></span></div>
-          <div class="flex justify-between"><span class="text-muted">트레일링 진입</span><span class="mono">7.0% <span class="text-accent">&rarr; 7.7%</span></span></div>
-          <div class="flex justify-between"><span class="text-muted">트레일링 하락</span><span class="mono">-1.0% <span class="text-accent">&rarr; -0.6%</span></span></div>
-          <div class="flex justify-between"><span class="text-muted">손절 (2차후)</span><span class="mono">-2.1% <span class="text-accent">&rarr; -4.3%</span></span></div>
-          <div class="flex justify-between"><span class="text-muted">2차매수 배수</span><span class="mono">2.0x <span class="text-accent">&rarr; 1.56x</span></span></div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Strategy Cards (per-strategy unique: SB, time window) -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-
-  <!-- 골든10분 -->
-  <div class="strat-card bg-card border border-purple-200 rounded-xl overflow-hidden">
-    <div class="bg-purple-50 border-b border-purple-200 px-5 py-3 flex items-center justify-between">
-      <div>
-        <h2 class="text-lg font-bold text-purple-600">골든10분</h2>
-        <div class="text-xs text-muted">조건: 골든10분 &rarr; 09:00~09:15 <span class="delta delta-new">10분 &rarr; 15분</span></div>
-      </div>
-      <div class="flex flex-col items-end gap-1">
-        <span class="px-2 py-0.5 bg-orange-100 text-orange-700 rounded text-[10px] font-medium">직행 추매</span>
-        <span class="px-2 py-0.5 bg-purple-50 text-purple-500 rounded text-[10px]">고가대비 -8.4%</span>
-      </div>
-    </div>
-    <div class="p-5 space-y-4">
-      <div>
-        <div class="text-[10px] text-muted uppercase tracking-wider mb-2">2차 매수 (직행)</div>
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <div class="bg-card2 rounded-lg p-2 text-center">
-            <div class="mono text-loss">-5.3%</div>
-            <div class="text-[10px] text-muted">하락 기준</div>
-            <div class="delta delta-new">-2.9% &rarr; -5.3%</div>
-          </div>
-          <div class="bg-card2 rounded-lg p-2 text-center">
-            <div class="mono text-gray-900">1.56x</div>
-            <div class="text-[10px] text-muted">수량 배수</div>
-            <div class="delta delta-new">2.0x &rarr; 1.56x</div>
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- Condition-specific Differences -->
+<div class="bg-card border border-border rounded-xl p-5 mb-8">
+  <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">조건별 차이점</h2>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-[10px] text-muted uppercase tracking-wider border-b border-border">
+          <th class="text-left py-2 px-3">조건식</th>
+          <th class="text-center py-2 px-3">포지션 키</th>
+          <th class="text-center py-2 px-3">시간대</th>
+          <th class="text-center py-2 px-3">고가대비 제한</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-border/50">
+          <td class="py-3 px-3 font-semibold text-purple-600">골든10분</td>
+          <td class="py-3 px-3 text-center">
+            <span class="mono text-[10px] px-2 py-0.5 bg-gray-100 rounded">_base</span>
+            <span class="mono text-[10px] px-2 py-0.5 bg-indigo-100 text-indigo-600 rounded">_new</span>
+          </td>
+          <td class="py-3 px-3 text-center mono">09:00~09:15</td>
+          <td class="py-3 px-3 text-center mono">-8.4%</td>
+        </tr>
+        <tr class="border-b border-border/50">
+          <td class="py-3 px-3 font-semibold text-green-600">굿모닝</td>
+          <td class="py-3 px-3 text-center">
+            <span class="mono text-[10px] px-2 py-0.5 bg-gray-100 rounded">_base</span>
+            <span class="mono text-[10px] px-2 py-0.5 bg-indigo-100 text-indigo-600 rounded">_new</span>
+          </td>
+          <td class="py-3 px-3 text-center mono">09:00~09:15</td>
+          <td class="py-3 px-3 text-center mono">-8.4%</td>
+        </tr>
+        <tr>
+          <td class="py-3 px-3 font-semibold text-orange-600">세력감지</td>
+          <td class="py-3 px-3 text-center">
+            <span class="mono text-[10px] px-2 py-0.5 bg-gray-100 rounded">_base</span>
+            <span class="mono text-[10px] px-2 py-0.5 bg-indigo-100 text-indigo-600 rounded">_new</span>
+          </td>
+          <td class="py-3 px-3 text-center mono">09:00~15:20</td>
+          <td class="py-3 px-3 text-center mono text-muted">없음</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-
-  <!-- 굿모닝 -->
-  <div class="strat-card bg-card border border-green-200 rounded-xl overflow-hidden">
-    <div class="bg-green-50 border-b border-green-200 px-5 py-3 flex items-center justify-between">
-      <div>
-        <h2 class="text-lg font-bold text-green-600">굿모닝</h2>
-        <div class="text-xs text-muted">조건: 굿모닝 &rarr; 09:00~09:15</div>
-      </div>
-      <div class="flex flex-col items-end gap-1">
-        <span class="px-2 py-0.5 bg-orange-100 text-orange-700 rounded text-[10px] font-medium">직행 추매</span>
-        <span class="px-2 py-0.5 bg-green-50 text-green-500 rounded text-[10px]">고가대비 -8.4%</span>
-      </div>
-    </div>
-    <div class="p-5 space-y-4">
-      <div>
-        <div class="text-[10px] text-muted uppercase tracking-wider mb-2">2차 매수 (직행)</div>
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <div class="bg-card2 rounded-lg p-2 text-center">
-            <div class="mono text-loss">-5.3%</div>
-            <div class="text-[10px] text-muted">하락 기준</div>
-            <div class="delta delta-new">-2.9% &rarr; -5.3%</div>
-          </div>
-          <div class="bg-card2 rounded-lg p-2 text-center">
-            <div class="mono text-gray-900">1.56x</div>
-            <div class="text-[10px] text-muted">수량 배수</div>
-            <div class="delta delta-new">2.0x &rarr; 1.56x</div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="mt-3 p-3 bg-amber-50 border border-amber-100 rounded-lg text-xs text-warn">
+    <strong>세력감지 관찰 포인트:</strong> base는 반등 추매(zone -2.4%/+0.8%), new는 직행 추매(direct -5.3%). 추매 방식 변경이 세력감지 특성과 맞는지 실전 확인 필요.
   </div>
-
-  <!-- 세력감지 -->
-  <div class="strat-card bg-card border border-orange-200 rounded-xl overflow-hidden">
-    <div class="bg-orange-50 border-b border-orange-200 px-5 py-3 flex items-center justify-between">
-      <div>
-        <h2 class="text-lg font-bold text-orange-600">세력감지</h2>
-        <div class="text-xs text-muted">조건: 세력감지 &rarr; 09:00~15:20 <span class="delta delta-new">14:30 &rarr; 15:20</span></div>
-      </div>
-      <div class="flex flex-col items-end gap-1">
-        <span class="px-2 py-0.5 bg-orange-100 text-orange-700 rounded text-[10px] font-medium">직행 추매</span>
-        <span class="delta delta-new">반등 &rarr; 직행</span>
-        <span class="px-2 py-0.5 bg-gray-100 text-muted rounded text-[10px]">고가대비 제한 없음</span>
-      </div>
-    </div>
-    <div class="p-5 space-y-4">
-      <div>
-        <div class="text-[10px] text-muted uppercase tracking-wider mb-2">2차 매수 (직행)</div>
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <div class="bg-card2 rounded-lg p-2 text-center">
-            <div class="mono text-loss">-5.3%</div>
-            <div class="text-[10px] text-muted">하락 기준</div>
-            <div class="delta delta-new">zone &rarr; direct</div>
-          </div>
-          <div class="bg-card2 rounded-lg p-2 text-center">
-            <div class="mono text-gray-900">1.56x</div>
-            <div class="text-[10px] text-muted">수량 배수</div>
-            <div class="delta delta-new">2.0x &rarr; 1.56x</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
 </div>
 
-<!-- Condition Map -->
-<div class="bg-card border border-border rounded-xl p-5 mt-8">
-  <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">조건식 &rarr; 전략 매핑</h2>
-  <div class="space-y-3">
-    <div class="flex items-center gap-3 bg-card2 rounded-lg p-3">
-      <span class="text-gray-900 font-semibold w-20">골든10분</span>
-      <svg class="w-4 h-4 text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-      <span class="mono text-xs px-2.5 py-1 bg-purple-100 text-purple-600 rounded-md">골든10분</span>
-      <span class="text-muted text-xs ml-auto">09:00~09:15</span>
-    </div>
-    <div class="flex items-center gap-3 bg-card2 rounded-lg p-3">
-      <span class="text-gray-900 font-semibold w-20">굿모닝</span>
-      <svg class="w-4 h-4 text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-      <span class="mono text-xs px-2.5 py-1 bg-green-100 text-green-600 rounded-md">굿모닝</span>
-      <span class="text-muted text-xs ml-auto">09:00~09:15</span>
-    </div>
-    <div class="flex items-center gap-3 bg-card2 rounded-lg p-3">
-      <span class="text-gray-900 font-semibold w-20">세력감지</span>
-      <svg class="w-4 h-4 text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-      <span class="mono text-xs px-2.5 py-1 bg-orange-100 text-orange-600 rounded-md">세력감지</span>
-      <span class="text-muted text-xs ml-auto">09:00~15:20</span>
-    </div>
+<!-- Base vs New Comparison -->
+<div class="bg-card border border-border rounded-xl p-5 mb-8">
+  <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">base vs new 비교</h2>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-[10px] text-muted uppercase tracking-wider border-b border-border">
+          <th class="text-left py-2 px-3">항목</th>
+          <th class="text-center py-2 px-3 bg-gray-50">base</th>
+          <th class="text-center py-2 px-3 bg-indigo-50">new</th>
+        </tr>
+      </thead>
+      <tbody class="text-xs">
+        <tr class="border-b border-border/50">
+          <td class="py-2 px-3 text-muted">2차매수 하락기준</td>
+          <td class="py-2 px-3 text-center mono bg-gray-50">-2.9%</td>
+          <td class="py-2 px-3 text-center mono bg-indigo-50 font-semibold text-indigo-700">-5.3%</td>
+        </tr>
+        <tr class="border-b border-border/50">
+          <td class="py-2 px-3 text-muted">2차매수 배수</td>
+          <td class="py-2 px-3 text-center mono bg-gray-50">2.0x</td>
+          <td class="py-2 px-3 text-center mono bg-indigo-50 font-semibold text-indigo-700">1.56x</td>
+        </tr>
+        <tr class="border-b border-border/50">
+          <td class="py-2 px-3 text-muted">손절 (2차후)</td>
+          <td class="py-2 px-3 text-center mono bg-gray-50">-2.1%</td>
+          <td class="py-2 px-3 text-center mono bg-indigo-50 font-semibold text-indigo-700">-4.3%</td>
+        </tr>
+        <tr class="border-b border-border/50">
+          <td class="py-2 px-3 text-muted">TP 단계</td>
+          <td class="py-2 px-3 text-center mono bg-gray-50">4단계</td>
+          <td class="py-2 px-3 text-center mono bg-indigo-50 font-semibold text-indigo-700">3단계</td>
+        </tr>
+        <tr class="border-b border-border/50">
+          <td class="py-2 px-3 text-muted">TP1 FO</td>
+          <td class="py-2 px-3 text-center mono bg-gray-50">2.5% / 25%</td>
+          <td class="py-2 px-3 text-center mono bg-indigo-50">3.1% / 24%</td>
+        </tr>
+        <tr class="border-b border-border/50">
+          <td class="py-2 px-3 text-muted">TP2 FO</td>
+          <td class="py-2 px-3 text-center mono bg-gray-50">4.9% / 40%</td>
+          <td class="py-2 px-3 text-center mono bg-indigo-50">6.9% / 41%</td>
+        </tr>
+        <tr class="border-b border-border/50">
+          <td class="py-2 px-3 text-muted">TP3 FO</td>
+          <td class="py-2 px-3 text-center mono bg-gray-50">6.3% / 50%</td>
+          <td class="py-2 px-3 text-center mono bg-indigo-50">10.9% / 전량</td>
+        </tr>
+        <tr class="border-b border-border/50">
+          <td class="py-2 px-3 text-muted">TP1 AS</td>
+          <td class="py-2 px-3 text-center mono bg-gray-50">0.8% / 50%</td>
+          <td class="py-2 px-3 text-center mono bg-indigo-50">2.7% / 25%</td>
+        </tr>
+        <tr class="border-b border-border/50">
+          <td class="py-2 px-3 text-muted">TP2 AS</td>
+          <td class="py-2 px-3 text-center mono bg-gray-50">1.2% / 25%</td>
+          <td class="py-2 px-3 text-center mono bg-indigo-50">5.0% / 59%</td>
+        </tr>
+        <tr class="border-b border-border/50">
+          <td class="py-2 px-3 text-muted">TP3 AS</td>
+          <td class="py-2 px-3 text-center mono bg-gray-50">3.2% / 40%</td>
+          <td class="py-2 px-3 text-center mono bg-indigo-50">8.0% / 전량</td>
+        </tr>
+        <tr class="border-b border-border/50">
+          <td class="py-2 px-3 text-muted">트레일링 트리거</td>
+          <td class="py-2 px-3 text-center mono bg-gray-50">+7.0%</td>
+          <td class="py-2 px-3 text-center mono bg-indigo-50 font-semibold text-indigo-700">+7.7%</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-3 text-muted">트레일링 하락</td>
+          <td class="py-2 px-3 text-center mono bg-gray-50">-2.5%</td>
+          <td class="py-2 px-3 text-center mono bg-indigo-50 font-semibold text-indigo-700">-0.6%</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
 <footer class="text-center text-muted text-xs mt-8 pt-4 border-t border-border">
-  출처: #13 Fine-tuned (finetune_optimization.py) &middot; 480K sims &middot;
+  출처: #13 Fine-tuned (480K sims, 2026-02-04~13) &middot;
   <a href="/reports/finetune-report" class="text-accent hover:underline">상세 최적화 보고서</a>
 </footer>
 
