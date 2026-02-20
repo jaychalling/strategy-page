@@ -293,6 +293,120 @@ tailwind.config = {
   </div>
 </div>
 
+<!-- Strategy Improvement Analysis -->
+<div class="bg-card border border-border rounded-xl p-5 mb-6">
+  <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">전략 개선점 분석</h2>
+  <p class="text-xs text-muted mb-4">오늘 매매 데이터 기반 구조적 문제 5가지와 개선 제안</p>
+  <div class="space-y-4" id="strategy-problems"></div>
+</div>
+
+<!-- Base vs New 전략 특성 비교 -->
+<div class="bg-card border border-border rounded-xl p-5 mb-6">
+  <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">Base vs New 전략 특성 총평</h2>
+  <div class="overflow-x-auto">
+    <table class="w-full text-xs">
+      <thead>
+        <tr class="text-left text-muted border-b border-border">
+          <th class="py-2 px-3">항목</th>
+          <th class="py-2 px-3"><span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">Base</span></th>
+          <th class="py-2 px-3"><span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">New</span></th>
+        </tr>
+      </thead>
+      <tbody class="mono">
+        <tr class="border-b border-gray-100">
+          <td class="py-2 px-3 font-medium text-gray-900">1차 손절</td>
+          <td class="py-2 px-3"><span class="text-loss font-bold">-3.1%</span> <span class="text-[10px] text-muted">(빠른 탈출)</span></td>
+          <td class="py-2 px-3"><span class="text-loss font-bold">없음</span> <span class="text-[10px] text-muted">(방치)</span></td>
+        </tr>
+        <tr class="border-b border-gray-100">
+          <td class="py-2 px-3 font-medium text-gray-900">2차 매수</td>
+          <td class="py-2 px-3">zone <span class="text-muted">-2.4% + 바운스</span></td>
+          <td class="py-2 px-3">direct <span class="text-muted">-5.3%</span></td>
+        </tr>
+        <tr class="border-b border-gray-100">
+          <td class="py-2 px-3 font-medium text-gray-900">TP 구간</td>
+          <td class="py-2 px-3">1.4% ~ 7.1% <span class="text-muted">(4단계)</span></td>
+          <td class="py-2 px-3">3.1% ~ 10.9% <span class="text-muted">(3단계)</span></td>
+        </tr>
+        <tr class="border-b border-gray-100">
+          <td class="py-2 px-3 font-medium text-gray-900">오늘 P&L</td>
+          <td class="py-2 px-3 text-profit font-bold">+1,075원</td>
+          <td class="py-2 px-3 text-profit font-bold">+893원</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-3 font-medium text-gray-900">특징</td>
+          <td class="py-2 px-3"><span class="text-[10px] px-2 py-0.5 rounded bg-green-100 text-profit font-semibold">보수적, 안정적</span></td>
+          <td class="py-2 px-3"><span class="text-[10px] px-2 py-0.5 rounded bg-orange-100 text-warn font-semibold">고수익, 고위험</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-4 bg-blue-50 rounded-lg p-3 text-xs text-gray-600">
+    <span class="font-semibold text-accent">핵심 결론:</span> base의 zone 2차매수가 오늘 동양생명에서 성공적으로 작동 (반등 확인 후 매수 &rarr; 분할 익절). new의 direct -5.3%는 금양그린파워에서 참사. <strong>가장 시급한 개선은 new의 first_only 손절 도입과 2차매수/손절 간격 확대.</strong>
+  </div>
+</div>
+
+<!-- 되돌림 수익 반납 상세 -->
+<div class="bg-card border border-border rounded-xl p-5 mb-6">
+  <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">되돌림 수익 반납 상세</h2>
+  <div class="overflow-x-auto">
+    <table class="w-full text-xs">
+      <thead>
+        <tr class="text-left text-muted border-b border-border">
+          <th class="py-2 px-3">종목</th>
+          <th class="py-2 px-3">전략</th>
+          <th class="py-2 px-3 text-right">TP 시점</th>
+          <th class="py-2 px-3 text-right">되돌림 청산</th>
+          <th class="py-2 px-3 text-right">반납분</th>
+        </tr>
+      </thead>
+      <tbody class="mono">
+        <tr class="border-b border-gray-100">
+          <td class="py-2 px-3 font-medium text-gray-900">한일단조</td>
+          <td class="py-2 px-3"><span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">base</span></td>
+          <td class="py-2 px-3 text-right text-profit">+2.8%</td>
+          <td class="py-2 px-3 text-right text-warn">+1.8%</td>
+          <td class="py-2 px-3 text-right text-loss font-bold">-1.0%p</td>
+        </tr>
+        <tr class="border-b border-gray-100">
+          <td class="py-2 px-3 font-medium text-gray-900">한일단조</td>
+          <td class="py-2 px-3"><span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">new</span></td>
+          <td class="py-2 px-3 text-right text-profit">+3.6%</td>
+          <td class="py-2 px-3 text-right text-warn">+3.0%</td>
+          <td class="py-2 px-3 text-right text-loss font-bold">-0.6%p</td>
+        </tr>
+        <tr class="border-b border-gray-100">
+          <td class="py-2 px-3 font-medium text-gray-900">아모텍</td>
+          <td class="py-2 px-3"><span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">new</span></td>
+          <td class="py-2 px-3 text-right text-profit">+3.3%</td>
+          <td class="py-2 px-3 text-right text-warn">+2.6%</td>
+          <td class="py-2 px-3 text-right text-loss font-bold">-0.7%p</td>
+        </tr>
+        <tr class="border-b border-gray-100">
+          <td class="py-2 px-3 font-medium text-gray-900">동양생명</td>
+          <td class="py-2 px-3"><span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">new</span></td>
+          <td class="py-2 px-3 text-right text-profit">+3.2%</td>
+          <td class="py-2 px-3 text-right text-warn">+0.7%</td>
+          <td class="py-2 px-3 text-right text-loss font-bold">-2.5%p</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-3 font-medium text-gray-900">동양생명</td>
+          <td class="py-2 px-3"><span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">base</span></td>
+          <td class="py-2 px-3 text-right text-profit">+1.5%</td>
+          <td class="py-2 px-3 text-right text-warn">-0.8%</td>
+          <td class="py-2 px-3 text-right text-loss font-bold">-2.3%p</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="border-t-2 border-border">
+          <td colspan="4" class="py-2 px-3 font-semibold text-gray-900 text-right">평균 반납</td>
+          <td class="py-2 px-3 text-right text-loss font-bold">-1.4%p</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
 <footer class="text-center text-muted text-xs mt-8 pt-4 border-t border-border">
   분석 기준: 2026-02-20 실거래 10개 포지션 &middot; Supabase position_results / trades 테이블 &middot; 생성일: 2026-02-20
 </footer>
@@ -533,6 +647,67 @@ signals.forEach(s => {
     <td class="py-1.5 px-2 text-[10px] text-muted">${s.reason}</td>
   `;
   sigBody.appendChild(tr);
+});
+
+// Strategy Improvement Problems
+const problems = [
+  {
+    title: 'new 전략의 first_only 손절 부재',
+    severity: 'HIGH', sevColor: 'bg-red-100 text-loss',
+    desc: '금양그린파워가 대표 사례. base는 <code class="bg-gray-100 px-1 rounded">first_only: -3.1%</code>로 5분 만에 -3.3% 손절 탈출. new는 <code class="bg-gray-100 px-1 rounded">first_only: null</code>이라 4시간 45분 방치 후 -5.3%에서 2차매수 트리거 &rarr; 6초 후 즉시 손절.',
+    example: 'base: 13,860 → 13,400 (5분, -3.3%) 탈출\nnew:  13,860 → ... 4h45m 방치 ... → 13,120 (2차매수) → 13,100 (6초 후 손절, -5.5%)',
+    fix: 'new에 <code class="bg-green-100 px-1 rounded">first_only: -0.045</code> 도입. 2차매수 트리거(-5.3%)보다 위에서 컷하면 애매한 하락에서 조기 탈출 가능.'
+  },
+  {
+    title: '2차매수 트리거(-5.3%)와 after_second 손절(-4.3%) 간격이 너무 좁음',
+    severity: 'HIGH', sevColor: 'bg-red-100 text-loss',
+    desc: '2차매수가 발동할 정도로 약한 종목은 추가 하락 확률이 높은데, 매수 직후 반등 여유가 거의 없음. 금양그린파워: 2차매수 체결 13,120 &rarr; 6초 후 13,100에서 손절.',
+    example: '매수가 13,860\n2차매수 @ 13,120 (-5.3%)\n예상 평단가 ~13,570\npending_sl_price = 13,570 × 0.957 = 12,987\n실제: 6초 후 13,100 → 아직 안 터짐 (Method B)\n하지만 20원만 더 빠지면 즉시 손절',
+    fix: '<code class="bg-green-100 px-1 rounded">trigger_drop</code>을 -4.0%로 상향 (반등 여력 남을 때 매수) 또는 <code class="bg-green-100 px-1 rounded">after_second</code>를 -5.5%로 확대 (숨쉴 공간 확보).'
+  },
+  {
+    title: '골든10분_base time_window(09:00~09:10)가 너무 좁음',
+    severity: 'MID', sevColor: 'bg-orange-100 text-warn',
+    desc: '아모텍이 09:10:16에 조건 진입 &mdash; <strong>16초 차이</strong>로 base 매수 실패. new(~09:15)만 매수해서 +2.6% 수익. base가 일관되게 기회를 놓치는 패턴.',
+    example: '아모텍  09:10:16 진입 → base(~09:10) MISS, new(~09:15) HIT\nLG디스플 09:13:18 진입 → base(~09:10) MISS, new(~09:15) HIT',
+    fix: 'base도 <code class="bg-green-100 px-1 rounded">09:15</code>로 확장 검토. A/B 테스트 목적이면 현행 유지하되 결과 해석 시 time_window 차이 감안.'
+  },
+  {
+    title: '되돌림(retracement)이 수익을 과도하게 반납',
+    severity: 'MID', sevColor: 'bg-orange-100 text-warn',
+    desc: '오늘 되돌림 5건, 평균 -1.4%p 수익 반납. 동양생명 new는 TP1(+3.2%) 달성 후 되돌림으로 +0.7%까지 반납(-2.5%p). <code class="bg-gray-100 px-1 rounded">retracement_rules: {"1": 0.0}</code> &mdash; TP1 찍고 매수가까지 돌아오면 청산.',
+    example: '한일단조 base: TP1 +2.8% → 되돌림 +1.8% (-1.0%p)\n동양생명 new:  TP1 +3.2% → 되돌림 +0.7% (-2.5%p)\n동양생명 base: TP3 +1.5% → 되돌림 -0.8% (-2.3%p)',
+    fix: '되돌림 기준을 TP1 profit의 50% 수준으로 설정. 예: TP1이 +3.1%면 +1.5% 이하로 돌아올 때 청산. 소폭 눌림에서의 조기 청산 방지.'
+  },
+  {
+    title: '시간 기반 탈출 전략 부재',
+    severity: 'LOW', sevColor: 'bg-blue-100 text-accent',
+    desc: 'LG디스플레이: 09:13 매수 &rarr; 15:25 강제청산까지 <strong>6시간 12분</strong> 보유, -2.2% 손실. 장 초반 모멘텀 전략에서 1~2시간 내 TP1 미도달이면 모멘텀 소진 가능성 높음.',
+    example: 'LG디스플레이: 09:13 매수 → 6h12m 횡보 → 15:25 강제청산 -2.2%\n(만약 2시간 타임아웃이 있었다면 11:13에 ~-1% 수준에서 탈출)',
+    fix: '골든10분 전략에 <code class="bg-green-100 px-1 rounded">time_limit: 7200</code> (2시간) 타임아웃 도입 검토. 장 초반 모멘텀 소진 시 조기 탈출.'
+  }
+];
+
+const problemsDiv = document.getElementById('strategy-problems');
+problems.forEach((p, i) => {
+  problemsDiv.innerHTML += `
+    <div class="bg-card2 rounded-lg p-4">
+      <div class="flex items-start gap-3">
+        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-gray-200 text-gray-700 text-[11px] font-bold flex items-center justify-center mt-0.5">${i+1}</span>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span class="text-xs font-bold px-1.5 py-0.5 rounded ${p.sevColor}">${p.severity}</span>
+            <h3 class="text-xs font-semibold text-gray-900">${p.title}</h3>
+          </div>
+          <p class="text-xs text-gray-600 leading-relaxed mb-2">${p.desc}</p>
+          <div class="bg-white border border-gray-200 rounded-lg p-3 mono text-[11px] text-muted leading-relaxed mb-2">${p.example.replace(/\n/g, '<br>')}</div>
+          <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-xs">
+            <span class="font-semibold text-profit">개선안:</span> ${p.fix}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 });
 
 // Insights
