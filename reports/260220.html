@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>일일 매매 분석 보고서 | 2026-02-20</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { colors: {
+    bg: '#f8f9fb', card: '#ffffff', card2: '#f1f3f7', border: '#e2e5ed',
+    accent: '#2563eb', profit: '#16a34a', loss: '#dc2626', warn: '#d97706', muted: '#6b7280',
+  }}}
+}
+</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+  body { font-family: 'Inter', sans-serif; }
+  code, .mono { font-family: 'JetBrains Mono', monospace; }
+  .report-card { transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .report-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+  .section-toggle { cursor: pointer; user-select: none; }
+  .section-toggle .chevron { transition: transform 0.2s; }
+  .section-toggle.open .chevron { transform: rotate(90deg); }
+  .collapsible { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
+  .collapsible.open { max-height: 8000px; }
+  table { border-collapse: collapse; }
+  th { position: sticky; top: 0; background: #f1f3f7; z-index: 1; }
+  .event-buy      { background: #dbeafe; border-left: 3px solid #2563eb; }
+  .event-profit   { background: #dcfce7; border-left: 3px solid #16a34a; }
+  .event-stop     { background: #fee2e2; border-left: 3px solid #dc2626; }
+  .event-ret      { background: #fef3c7; border-left: 3px solid #d97706; }
+  .event-force    { background: #f3e8ff; border-left: 3px solid #9333ea; }
+</style>
+</head>
+<body class="bg-bg text-gray-700 min-h-screen">
+
+<main class="max-w-6xl mx-auto px-4 py-8">
+
+<!-- Header -->
+<div class="mb-8">
+  <a href="/" class="text-accent text-sm hover:underline">&larr; 매매 전략 대시보드</a>
+  <h1 class="text-2xl font-bold text-gray-900 mt-2">일일 매매 분석 보고서</h1>
+  <p class="text-muted text-sm mt-1">2026-02-20 &middot; 10개 포지션 &middot; 6개 종목 &middot; base/new A/B 전략 비교</p>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+  <div class="bg-card border border-border rounded-xl p-4 text-center report-card">
+    <div class="text-2xl font-bold text-gray-900 mono">10</div>
+    <div class="text-xs text-muted mt-1">총 포지션</div>
+    <div class="text-[10px] text-muted">7W / 3L</div>
+  </div>
+  <div class="bg-card border border-border rounded-xl p-4 text-center report-card">
+    <div class="text-2xl font-bold text-accent mono">70%</div>
+    <div class="text-xs text-muted mt-1">승률</div>
+    <div class="text-[10px] text-muted">7승 3패</div>
+  </div>
+  <div class="bg-card border border-border rounded-xl p-4 text-center report-card">
+    <div class="text-2xl font-bold text-profit mono">+1,968원</div>
+    <div class="text-xs text-muted mt-1">순손익</div>
+    <div class="text-[10px] text-muted">+6,528 / -4,560</div>
+  </div>
+  <div class="bg-card border border-border rounded-xl p-4 text-center report-card">
+    <div class="text-2xl font-bold text-warn mono">32%</div>
+    <div class="text-xs text-muted mt-1">신호 실행률</div>
+    <div class="text-[10px] text-muted">19개 중 6개 실행</div>
+  </div>
+</div>
+
+<!-- Position Results Table -->
+<div class="bg-card border border-border rounded-xl p-5 mb-6">
+  <div class="section-toggle open flex items-center gap-2 mb-4" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+    <svg class="chevron w-4 h-4 text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <h2 class="text-sm font-semibold text-muted uppercase tracking-wider">포지션 결과</h2>
+    <span class="text-[10px] text-muted ml-auto">10개 포지션</span>
+  </div>
+  <div class="collapsible open overflow-x-auto">
+    <table class="w-full text-xs">
+      <thead>
+        <tr class="text-left text-muted border-b border-border">
+          <th class="py-2 px-2">#</th>
+          <th class="py-2 px-2">종목</th>
+          <th class="py-2 px-2">전략</th>
+          <th class="py-2 px-2 text-right">매수금액</th>
+          <th class="py-2 px-2 text-right">매도금액</th>
+          <th class="py-2 px-2 text-right">손익</th>
+          <th class="py-2 px-2 text-right">수익률</th>
+          <th class="py-2 px-2">청산유형</th>
+          <th class="py-2 px-2">매매 흐름</th>
+        </tr>
+      </thead>
+      <tbody class="mono" id="position-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Trade Timeline -->
+<div class="bg-card border border-border rounded-xl p-5 mb-6">
+  <div class="section-toggle open flex items-center gap-2 mb-4" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+    <svg class="chevron w-4 h-4 text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <h2 class="text-sm font-semibold text-muted uppercase tracking-wider">매매 타임라인</h2>
+    <span class="text-[10px] text-muted ml-auto">29건 체결</span>
+  </div>
+  <div class="collapsible open overflow-x-auto">
+    <table class="w-full text-xs">
+      <thead>
+        <tr class="text-left text-muted border-b border-border">
+          <th class="py-2 px-2">시간</th>
+          <th class="py-2 px-2">종목</th>
+          <th class="py-2 px-2">유형</th>
+          <th class="py-2 px-2 text-right">가격</th>
+          <th class="py-2 px-2 text-right">수량</th>
+          <th class="py-2 px-2 text-right">금액</th>
+        </tr>
+      </thead>
+      <tbody class="mono" id="timeline-table"></tbody>
+    </table>
+    <div class="mt-3 flex flex-wrap gap-2 text-[10px]">
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm event-buy inline-block"></span> 매수</span>
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm event-profit inline-block"></span> 익절</span>
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm event-stop inline-block"></span> 손절</span>
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm event-ret inline-block"></span> 되돌림</span>
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm event-force inline-block"></span> 강제청산</span>
+    </div>
+  </div>
+</div>
+
+<!-- Strategy Comparison + base vs new -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+  <!-- 전략 비교: 골든10분 vs 세력감지 -->
+  <div class="bg-card border border-border rounded-xl p-5 report-card">
+    <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">전략 비교</h2>
+    <div class="space-y-4">
+      <div class="bg-blue-50 rounded-lg p-4">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-sm font-semibold text-accent">골든10분</span>
+          <span class="mono text-sm font-bold text-profit">+2,868원</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-[10px] text-center">
+          <div class="bg-white rounded p-2">
+            <div class="font-bold text-gray-900">4</div>
+            <div class="text-muted">포지션</div>
+          </div>
+          <div class="bg-white rounded p-2">
+            <div class="font-bold text-profit">75%</div>
+            <div class="text-muted">승률 3W/1L</div>
+          </div>
+          <div class="bg-white rounded p-2">
+            <div class="font-bold text-profit">+717원</div>
+            <div class="text-muted">평균 P&L</div>
+          </div>
+        </div>
+        <p class="text-[10px] text-muted mt-2">한일단조×2, 아모텍 수익 / LG디스플레이 강제청산 손실. _base는 09:10까지, _new는 09:15까지 진입 가능.</p>
+      </div>
+      <div class="bg-orange-50 rounded-lg p-4">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-sm font-semibold text-warn">세력감지</span>
+          <span class="mono text-sm font-bold text-loss">-900원</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-[10px] text-center">
+          <div class="bg-white rounded p-2">
+            <div class="font-bold text-gray-900">6</div>
+            <div class="text-muted">포지션</div>
+          </div>
+          <div class="bg-white rounded p-2">
+            <div class="font-bold text-warn">67%</div>
+            <div class="text-muted">승률 4W/2L</div>
+          </div>
+          <div class="bg-white rounded p-2">
+            <div class="font-bold text-loss">-150원</div>
+            <div class="text-muted">평균 P&L</div>
+          </div>
+        </div>
+        <p class="text-[10px] text-muted mt-2">태웅×2, 동양생명×2 수익. 금양그린파워×2 손절이 전략 수익을 잠식. 09:00-15:20 장중 계속 유효.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- base vs new A/B 비교 -->
+  <div class="bg-card border border-border rounded-xl p-5 report-card">
+    <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">Base vs New A/B 비교</h2>
+    <div class="space-y-3" id="ab-comparison"></div>
+  </div>
+
+</div>
+
+<!-- Signal Funnel -->
+<div class="bg-card border border-border rounded-xl p-5 mb-6">
+  <div class="section-toggle open flex items-center gap-2 mb-4" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+    <svg class="chevron w-4 h-4 text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <h2 class="text-sm font-semibold text-muted uppercase tracking-wider">신호 분석</h2>
+    <span class="text-[10px] text-muted ml-auto">19개 신호</span>
+  </div>
+  <div class="collapsible open">
+    <!-- Funnel Visual -->
+    <div class="flex items-start gap-4 mb-5 text-center">
+      <div class="flex-1 bg-gray-100 rounded-lg p-3">
+        <div class="text-2xl font-bold text-gray-900 mono">19</div>
+        <div class="text-xs text-muted">감지된 신호</div>
+      </div>
+      <div class="flex items-center pt-4 text-muted">&rarr;</div>
+      <div class="flex-1 bg-red-50 rounded-lg p-3">
+        <div class="text-2xl font-bold text-loss mono">13</div>
+        <div class="text-xs text-muted">필터 제거</div>
+      </div>
+      <div class="flex items-center pt-4 text-muted">&rarr;</div>
+      <div class="flex-1 bg-blue-50 rounded-lg p-3">
+        <div class="text-2xl font-bold text-accent mono">6</div>
+        <div class="text-xs text-muted">실제 매수</div>
+      </div>
+      <div class="flex items-center pt-4 text-muted">&rarr;</div>
+      <div class="flex-1 bg-green-50 rounded-lg p-3">
+        <div class="text-2xl font-bold text-profit mono">7W</div>
+        <div class="text-xs text-muted">수익 포지션</div>
+      </div>
+    </div>
+    <!-- Filter Reasons -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+      <div class="bg-gray-50 rounded-lg p-3 text-center">
+        <div class="text-lg font-bold text-gray-900 mono">8</div>
+        <div class="text-xs text-muted">시간 범위 밖</div>
+        <div class="text-[10px] text-muted">(굿모닝/골든10분 시간 초과)</div>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-3 text-center">
+        <div class="text-lg font-bold text-gray-900 mono">3</div>
+        <div class="text-xs text-muted">알림 전용 조건</div>
+        <div class="text-[10px] text-muted">(산일전기 스윙검토)</div>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-3 text-center">
+        <div class="text-lg font-bold text-gray-900 mono">2</div>
+        <div class="text-xs text-muted">기타</div>
+        <div class="text-[10px] text-muted">(지에스이, 한국석유)</div>
+      </div>
+    </div>
+    <!-- Signal Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs">
+        <thead>
+          <tr class="text-left text-muted border-b border-border">
+            <th class="py-2 px-2">시간</th>
+            <th class="py-2 px-2">종목</th>
+            <th class="py-2 px-2">조건</th>
+            <th class="py-2 px-2">결과</th>
+            <th class="py-2 px-2">필터 사유</th>
+          </tr>
+        </thead>
+        <tbody class="mono" id="signal-table"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Key Insights -->
+<div class="bg-card border border-border rounded-xl p-5 mb-6">
+  <h2 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">주요 인사이트</h2>
+  <div class="space-y-3" id="insights"></div>
+</div>
+
+<!-- Bug Report -->
+<div class="bg-card border border-border rounded-xl p-5 mb-6">
+  <div class="flex items-center gap-2 mb-4">
+    <span class="text-xs font-bold bg-red-100 text-loss px-2 py-0.5 rounded">BUG</span>
+    <h2 class="text-sm font-semibold text-gray-900">데이터 이상 노트</h2>
+  </div>
+  <div class="bg-red-50 rounded-lg p-4 text-xs">
+    <h3 class="font-semibold text-loss mb-2">금양그린파워 282720 세력감지_new P&amp;L 기록 오류</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+      <div class="bg-white rounded p-3">
+        <div class="text-[10px] text-muted mb-1">시스템 기록 (오류)</div>
+        <div class="space-y-1 mono">
+          <div>매수: <span class="text-gray-900">94,060원</span></div>
+          <div>매도: <span class="text-gray-900">39,300원</span></div>
+          <div>손익: <span class="text-loss font-bold">-54,760원 (-58.22%)</span></div>
+        </div>
+      </div>
+      <div class="bg-white rounded p-3">
+        <div class="text-[10px] text-muted mb-1">실제 추정 (수정값)</div>
+        <div class="space-y-1 mono">
+          <div>매수: <span class="text-gray-900">41,580원</span></div>
+          <div>매도: <span class="text-gray-900">39,300원</span></div>
+          <div>손익: <span class="text-loss font-bold">-2,280원 (-5.48%)</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="space-y-1 text-gray-600">
+      <p><span class="font-semibold text-gray-900">타임라인:</span> 10:10:37 buy_1 체결 → 14:55:44 buy_2 주문 → 14:55:50 stop_loss 발동 (6초 후)</p>
+      <p><span class="font-semibold text-gray-900">원인 추정:</span> <code class="bg-red-100 px-1 rounded">_handle_position_close()</code>에서 미체결 2차 매수를 취소했지만, <code class="bg-red-100 px-1 rounded">buy_amount</code> 복원이 누락된 것으로 추정</p>
+      <p><span class="font-semibold text-gray-900">영향:</span> position_results 테이블의 수익률 통계 왜곡. 이 보고서의 모든 수치는 수정값 기준으로 계산됨.</p>
+      <p class="mt-2"><span class="text-xs font-bold bg-orange-100 text-warn px-2 py-0.5 rounded">수정 필요</span> <code class="bg-gray-100 px-1 rounded">_handle_position_close()</code>에서 취소된 미체결 주문의 금액을 buy_amount에서 복원하는 로직 추가</p>
+    </div>
+  </div>
+</div>
+
+<footer class="text-center text-muted text-xs mt-8 pt-4 border-t border-border">
+  분석 기준: 2026-02-20 실거래 10개 포지션 &middot; Supabase position_results / trades 테이블 &middot; 생성일: 2026-02-20
+</footer>
+
+</main>
+
+<script>
+// ===== DATA =====
+
+const positions = [
+  { n:1,  name:'태웅',       code:'044490', strat:'세력감지_base', buy:36200,  sell:36800,  profit:600,   pct:1.66,  closeType:'익절1',   trades:'buy_1→TP1',             win:true },
+  { n:2,  name:'태웅',       code:'044490', strat:'세력감지_new',  buy:36200,  sell:37400,  profit:1200,  pct:3.31,  closeType:'익절1',   trades:'buy_1→TP1',             win:true },
+  { n:3,  name:'아모텍',     code:'052710', strat:'골든10분_new',  buy:47712,  sell:49040,  profit:1328,  pct:2.78,  closeType:'되돌림1', trades:'buy_1→TP1→Ret1',        win:true },
+  { n:4,  name:'금양그린파워',code:'282720', strat:'세력감지_base', buy:41580,  sell:40200,  profit:-1380, pct:-3.32, closeType:'손절',    trades:'buy_1→SL',              win:false },
+  { n:5,  name:'금양그린파워',code:'282720', strat:'세력감지_new',  buy:41580,  sell:39300,  profit:-2280, pct:-5.48, closeType:'손절',    trades:'buy_1→(buy_2미체결)→SL', win:false },
+  { n:6,  name:'동양생명',   code:'082640', strat:'세력감지_base', buy:83600,  sell:84500,  profit:900,   pct:1.08,  closeType:'되돌림1', trades:'buy_1→buy_2→TP1,2,3→Ret1', win:true },
+  { n:7,  name:'동양생명',   code:'082640', strat:'세력감지_new',  buy:8520,   sell:8580,   profit:60,    pct:0.70,  closeType:'되돌림1', trades:'buy_1→TP1→Ret1',        win:true },
+  { n:8,  name:'한일단조',   code:'024740', strat:'골든10분_base', buy:47595,  sell:48550,  profit:955,   pct:2.01,  closeType:'되돌림1', trades:'buy_1→TP1→Ret1',        win:true },
+  { n:9,  name:'한일단조',   code:'024740', strat:'골든10분_new',  buy:47595,  sell:49080,  profit:1485,  pct:3.12,  closeType:'되돌림1', trades:'buy_1→TP1→Ret1',        win:true },
+  { n:10, name:'LG디스플레이',code:'034220',strat:'골든10분_new',  buy:40770,  sell:39870,  profit:-900,  pct:-2.21, closeType:'강제청산', trades:'buy_1→force_close',     win:false },
+];
+
+const timeline = [
+  { time:'09:04:43', name:'한일단조',    type:'buy_1',          typeLabel:'buy',      price:2505, qty:19, amount:47595 },
+  { time:'09:04:43', name:'한일단조',    type:'buy_1',          typeLabel:'buy',      price:2505, qty:19, amount:47595, note:'_new' },
+  { time:'09:10:16', name:'아모텍',      type:'buy_1',          typeLabel:'buy',      price:11930, qty:4, amount:47720 },
+  { time:'09:13:18', name:'LG디스플레이',type:'buy_1',          typeLabel:'buy',      price:13590, qty:3, amount:40770 },
+  { time:'09:40:45', name:'태웅',        type:'buy_1',          typeLabel:'buy',      price:36200, qty:1, amount:36200 },
+  { time:'09:40:45', name:'태웅',        type:'buy_1',          typeLabel:'buy',      price:36200, qty:1, amount:36200, note:'_new' },
+  { time:'09:42:00', name:'태웅',        type:'take_profit_1',  typeLabel:'profit',   price:36800, qty:1, amount:36800, note:'_base' },
+  { time:'09:46:54', name:'태웅',        type:'take_profit_1',  typeLabel:'profit',   price:37400, qty:1, amount:37400, note:'_new' },
+  { time:'10:01:44', name:'아모텍',      type:'take_profit_1',  typeLabel:'profit',   price:12320, qty:1, amount:12320 },
+  { time:'10:02:22', name:'아모텍',      type:'retracement_1',  typeLabel:'ret',      price:12240, qty:3, amount:36720 },
+  { time:'10:10:37', name:'금양그린파워',type:'buy_1',          typeLabel:'buy',      price:13860, qty:3, amount:41580 },
+  { time:'10:10:37', name:'금양그린파워',type:'buy_1',          typeLabel:'buy',      price:13860, qty:3, amount:41580, note:'_new' },
+  { time:'10:15:47', name:'금양그린파워',type:'stop_loss',      typeLabel:'stop',     price:13400, qty:3, amount:40200, note:'_base' },
+  { time:'10:35:25', name:'동양생명',    type:'buy_1',          typeLabel:'buy',      price:8520,  qty:5, amount:42600 },
+  { time:'10:35:25', name:'동양생명',    type:'buy_1',          typeLabel:'buy',      price:8520,  qty:5, amount:42600, note:'_new' },
+  { time:'10:38:53', name:'동양생명',    type:'buy_2',          typeLabel:'buy',      price:8360,  qty:10, amount:83600, note:'_base' },
+  { time:'10:39:21', name:'동양생명',    type:'take_profit_1',  typeLabel:'profit',   price:8490,  qty:3, amount:25470, note:'_base' },
+  { time:'10:39:50', name:'동양생명',    type:'take_profit_2',  typeLabel:'profit',   price:8590,  qty:4, amount:34360, note:'_base' },
+  { time:'10:44:02', name:'동양생명',    type:'take_profit_1',  typeLabel:'profit',   price:8790,  qty:1, amount:8790, note:'_new' },
+  { time:'10:46:52', name:'동양생명',    type:'take_profit_3',  typeLabel:'profit',   price:8650,  qty:1, amount:8650, note:'_base' },
+  { time:'10:55:32', name:'동양생명',    type:'retracement_1',  typeLabel:'ret',      price:8580,  qty:1, amount:8580, note:'_new' },
+  { time:'11:53:27', name:'한일단조',    type:'take_profit_1',  typeLabel:'profit',   price:2575,  qty:4, amount:10300, note:'_base' },
+  { time:'11:54:05', name:'한일단조',    type:'retracement_1',  typeLabel:'ret',      price:2550,  qty:15, amount:38250, note:'_base' },
+  { time:'11:54:17', name:'한일단조',    type:'take_profit_1',  typeLabel:'profit',   price:2595,  qty:4, amount:10380, note:'_new' },
+  { time:'11:54:23', name:'한일단조',    type:'retracement_1',  typeLabel:'ret',      price:2580,  qty:15, amount:38700, note:'_new' },
+  { time:'14:42:04', name:'동양생명',    type:'retracement_1',  typeLabel:'ret',      price:8450,  qty:10, amount:84500, note:'_base' },
+  { time:'14:55:44', name:'금양그린파워',type:'buy_2',          typeLabel:'buy',      price:13120, qty:4, amount:52480, note:'_new (미체결 추정)' },
+  { time:'14:55:50', name:'금양그린파워',type:'stop_loss',      typeLabel:'stop',     price:13100, qty:3, amount:39300, note:'_new' },
+  { time:'15:25:20', name:'LG디스플레이',type:'force_close',    typeLabel:'force',    price:13290, qty:3, amount:39870 },
+];
+
+const signals = [
+  { time:'09:04', name:'한일단조',    cond:'골든10분', action:'buy',    reason:'' },
+  { time:'09:10', name:'아모텍',      cond:'골든10분', action:'buy',    reason:'' },
+  { time:'09:13', name:'LG디스플레이',cond:'골든10분', action:'buy',    reason:'' },
+  { time:'09:22', name:'태웅',        cond:'세력감지', action:'buy',    reason:'' },
+  { time:'09:25', name:'산일전기',    cond:'스윙검토', action:'filter', reason:'알림 전용 조건' },
+  { time:'09:40', name:'태웅',        cond:'세력감지', action:'buy',    reason:'재진입' },
+  { time:'09:50', name:'대창솔루션',  cond:'골든10분', action:'filter', reason:'시간 범위 밖' },
+  { time:'10:10', name:'금양그린파워',cond:'세력감지', action:'buy',    reason:'' },
+  { time:'10:35', name:'동양생명',    cond:'세력감지', action:'buy',    reason:'' },
+  { time:'11:10', name:'대한광통신',  cond:'굿모닝',   action:'filter', reason:'시간 범위 밖' },
+  { time:'11:51', name:'빅텍',        cond:'굿모닝',   action:'filter', reason:'시간 범위 밖' },
+  { time:'11:54', name:'한일단조',    cond:'굿모닝',   action:'filter', reason:'시간 범위 밖' },
+  { time:'12:36', name:'산일전기',    cond:'스윙검토', action:'filter', reason:'알림 전용 조건' },
+  { time:'12:52', name:'빅텍',        cond:'굿모닝',   action:'filter', reason:'시간 범위 밖' },
+  { time:'12:59', name:'대한광통신',  cond:'굿모닝',   action:'filter', reason:'시간 범위 밖' },
+  { time:'13:04', name:'산일전기',    cond:'스윙검토', action:'filter', reason:'알림 전용 조건' },
+  { time:'13:27', name:'지에스이',    cond:'골든10분', action:'filter', reason:'시간 범위 밖' },
+  { time:'13:52', name:'한국석유',    cond:'굿모닝',   action:'filter', reason:'시간 범위 밖' },
+  { time:'14:12', name:'흥아해운',    cond:'굿모닝',   action:'filter', reason:'시간 범위 밖' },
+];
+
+const insights = [
+  {
+    title: '되돌림(Retracement) 매도가 주요 청산 패턴',
+    body: '10개 포지션 중 6개가 익절1 후 되돌림1로 청산. 익절 1단계 후 가격이 다시 내려와서 전량 매도하는 패턴이 가장 흔함.',
+    badge: '관찰', badgeColor: 'bg-blue-100 text-accent'
+  },
+  {
+    title: '동양생명 2차 매수 성공 사례',
+    body: '세력감지_base에서 buy_1 후 급락 시 buy_2 진입 → TP1→TP2→TP3까지 전부 달성, 총 +1.08%. 2차 매수가 평단가를 낮추고 TP 달성을 도운 케이스.',
+    badge: '긍정', badgeColor: 'bg-green-100 text-profit'
+  },
+  {
+    title: '금양그린파워 데이터 이상',
+    body: '2차 매수 주문 후 6초 만에 손절 발동. 2차 매수 미체결 상태에서 buy_amount에 포함되어 -58.22%로 기록됨. 실제 손실은 -5.48%. 버그 수정 필요.',
+    badge: '버그', badgeColor: 'bg-red-100 text-loss'
+  },
+  {
+    title: 'LG디스플레이 강제청산',
+    body: '15:25 장마감 전 강제청산으로 -2.21% 손실. 09:13 매수 후 장 내내 회복 없이 하락 지속. 골든10분 신호였으나 장중 반등 모멘텀 부재.',
+    badge: '주의', badgeColor: 'bg-orange-100 text-warn'
+  },
+  {
+    title: '골든10분_new vs _base 시간 범위 차이',
+    body: '_base는 09:00-09:10, _new는 09:00-09:15까지 진입 가능. 아모텍(09:10:16), LG디스플레이(09:13:18)는 _new만 매수. _base는 09:10 마감이라 이 종목들 진입 불가.',
+    badge: '전략', badgeColor: 'bg-purple-100 text-purple-600'
+  },
+  {
+    title: '세력감지 신호는 장중 계속 유효',
+    body: '09:00-15:20 시간대에 계속 신호 발생. 금양그린파워(10:10), 동양생명(10:35) 모두 10시 이후 진입. 골든10분이 오전 집중인 것과 대조적.',
+    badge: '관찰', badgeColor: 'bg-blue-100 text-accent'
+  },
+];
+
+// ===== HELPERS =====
+
+function fmt(n) { return n.toLocaleString(); }
+function fmtPct(v) { return (v >= 0 ? '+' : '') + v.toFixed(2) + '%'; }
+function profitColor(v) { return v >= 0 ? 'text-profit' : 'text-loss'; }
+
+function stratBadge(s) {
+  const base = s.includes('base') ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700';
+  const cond = s.startsWith('골든') ? 'bg-teal-100 text-teal-700' : s.startsWith('세력') ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-muted';
+  const condName = s.split('_')[0];
+  const varName = s.includes('base') ? 'base' : 'new';
+  return `<span class="text-[10px] px-1.5 py-0.5 rounded ${cond}">${condName}</span> <span class="text-[10px] px-1.5 py-0.5 rounded ${base}">${varName}</span>`;
+}
+
+function closeBadge(t) {
+  const map = {
+    '익절1':   'bg-green-100 text-profit',
+    '손절':    'bg-red-100 text-loss',
+    '되돌림1': 'bg-yellow-100 text-warn',
+    '강제청산':'bg-purple-100 text-purple-600',
+  };
+  const cls = map[t] || 'bg-gray-100 text-muted';
+  return `<span class="text-[10px] px-1.5 py-0.5 rounded ${cls}">${t}</span>`;
+}
+
+function timelineRowClass(typeLabel) {
+  const map = { buy:'event-buy', profit:'event-profit', stop:'event-stop', ret:'event-ret', force:'event-force' };
+  return map[typeLabel] || '';
+}
+
+function typeDisplayLabel(t) {
+  const map = {
+    buy_1: '매수1', buy_2: '매수2(추매)',
+    take_profit_1: '익절1', take_profit_2: '익절2', take_profit_3: '익절3',
+    stop_loss: '손절', retracement_1: '되돌림1', force_close: '강제청산',
+  };
+  return map[t] || t;
+}
+
+// ===== RENDER =====
+
+// Position table
+const ptBody = document.getElementById('position-table');
+positions.forEach(p => {
+  const tr = document.createElement('tr');
+  tr.className = 'border-b border-gray-100 hover:bg-gray-50';
+  const profitNote = p.n === 5 ? ' <span class="text-[9px] text-warn" title="데이터 이상 수정값">*수정</span>' : '';
+  tr.innerHTML = `
+    <td class="py-2 px-2 text-muted">${p.n}</td>
+    <td class="py-2 px-2 font-medium text-gray-900">${p.name} <span class="text-[10px] text-muted">${p.code}</span></td>
+    <td class="py-2 px-2">${stratBadge(p.strat)}</td>
+    <td class="py-2 px-2 text-right">${fmt(p.buy)}</td>
+    <td class="py-2 px-2 text-right">${fmt(p.sell)}</td>
+    <td class="py-2 px-2 text-right font-semibold ${profitColor(p.profit)}">${p.profit >= 0 ? '+' : ''}${fmt(p.profit)}${profitNote}</td>
+    <td class="py-2 px-2 text-right font-semibold ${profitColor(p.pct)}">${fmtPct(p.pct)}</td>
+    <td class="py-2 px-2">${closeBadge(p.closeType)}</td>
+    <td class="py-2 px-2 text-muted text-[10px]">${p.trades}</td>
+  `;
+  ptBody.appendChild(tr);
+});
+
+// Timeline table
+const tlBody = document.getElementById('timeline-table');
+timeline.forEach(t => {
+  const tr = document.createElement('tr');
+  tr.className = timelineRowClass(t.typeLabel) + ' border-b border-gray-100 text-[11px]';
+  const noteHtml = t.note ? `<span class="text-[9px] text-muted ml-1">${t.note}</span>` : '';
+  tr.innerHTML = `
+    <td class="py-1.5 px-2 mono">${t.time}</td>
+    <td class="py-1.5 px-2 font-medium text-gray-900">${t.name}</td>
+    <td class="py-1.5 px-2">${typeDisplayLabel(t.type)}${noteHtml}</td>
+    <td class="py-1.5 px-2 text-right mono">${fmt(t.price)}</td>
+    <td class="py-1.5 px-2 text-right mono">${t.qty}</td>
+    <td class="py-1.5 px-2 text-right mono">${fmt(t.amount)}</td>
+  `;
+  tlBody.appendChild(tr);
+});
+
+// A/B comparison
+const abStocks = [
+  { name:'태웅',        base:{ pct:1.66,  result:600,  close:'익절1' },  nw:{ pct:3.31,  result:1200, close:'익절1' },   diff:1.65 },
+  { name:'금양그린파워', base:{ pct:-3.32, result:-1380,close:'손절' },   nw:{ pct:-5.48, result:-2280,close:'손절' },    diff:-2.16 },
+  { name:'동양생명',    base:{ pct:1.08,  result:900,  close:'되돌림1' }, nw:{ pct:0.70,  result:60,   close:'되돌림1' },  diff:-0.38 },
+  { name:'한일단조',    base:{ pct:2.01,  result:955,  close:'되돌림1' }, nw:{ pct:3.12,  result:1485, close:'되돌림1' },  diff:1.11 },
+];
+
+const abDiv = document.getElementById('ab-comparison');
+abStocks.forEach(s => {
+  const diffColor = s.diff >= 0 ? 'text-profit' : 'text-loss';
+  const diffSign = s.diff >= 0 ? '+' : '';
+  abDiv.innerHTML += `
+    <div class="bg-card2 rounded-lg p-3">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-xs font-semibold text-gray-900">${s.name}</span>
+        <span class="text-[10px] mono font-bold ${diffColor}">new ${diffSign}${s.diff.toFixed(2)}%p</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-[10px]">
+        <div class="bg-blue-50 rounded p-2">
+          <div class="text-muted mb-1">Base</div>
+          <div class="font-bold mono ${profitColor(s.base.pct)}">${fmtPct(s.base.pct)}</div>
+          <div class="text-muted">${s.base.close}</div>
+        </div>
+        <div class="bg-purple-50 rounded p-2">
+          <div class="text-muted mb-1">New</div>
+          <div class="font-bold mono ${profitColor(s.nw.pct)}">${fmtPct(s.nw.pct)}</div>
+          <div class="text-muted">${s.nw.close}</div>
+        </div>
+      </div>
+    </div>
+  `;
+});
+
+// Signal table
+const sigBody = document.getElementById('signal-table');
+signals.forEach(s => {
+  const tr = document.createElement('tr');
+  tr.className = 'border-b border-gray-100 hover:bg-gray-50';
+  const isBuy = s.action === 'buy';
+  const actionHtml = isBuy
+    ? `<span class="text-[10px] bg-blue-100 text-accent px-1.5 py-0.5 rounded">✅ 매수${s.reason ? ' ('+s.reason+')' : ''}</span>`
+    : `<span class="text-[10px] bg-gray-100 text-muted px-1.5 py-0.5 rounded">❌ 필터</span>`;
+  const condColor = { '골든10분':'bg-teal-100 text-teal-700', '세력감지':'bg-orange-100 text-orange-700', '굿모닝':'bg-green-100 text-green-700', '스윙검토':'bg-gray-100 text-muted' };
+  const condCls = condColor[s.cond] || 'bg-gray-100 text-muted';
+  tr.innerHTML = `
+    <td class="py-1.5 px-2 mono text-muted">${s.time}</td>
+    <td class="py-1.5 px-2 font-medium text-gray-900">${s.name}</td>
+    <td class="py-1.5 px-2"><span class="text-[10px] px-1.5 py-0.5 rounded ${condCls}">${s.cond}</span></td>
+    <td class="py-1.5 px-2">${actionHtml}</td>
+    <td class="py-1.5 px-2 text-[10px] text-muted">${s.reason}</td>
+  `;
+  sigBody.appendChild(tr);
+});
+
+// Insights
+const insightsDiv = document.getElementById('insights');
+insights.forEach((ins, i) => {
+  insightsDiv.innerHTML += `
+    <div class="bg-card2 rounded-lg p-4">
+      <div class="flex items-start gap-3">
+        <span class="flex-shrink-0 w-5 h-5 rounded-full bg-accent text-white text-[10px] font-bold flex items-center justify-center mt-0.5">${i+1}</span>
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-xs font-bold px-1.5 py-0.5 rounded ${ins.badgeColor}">${ins.badge}</span>
+            <h3 class="text-xs font-semibold text-gray-900">${ins.title}</h3>
+          </div>
+          <p class="text-xs text-gray-600 leading-relaxed">${ins.body}</p>
+        </div>
+      </div>
+    </div>
+  `;
+});
+</script>
+
+</body>
+</html>
