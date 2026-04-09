@@ -215,6 +215,13 @@ function switchTab(name) {
   });
   event.target.classList.add('active');
   event.target.classList.remove('text-muted');
+  // 포트폴리오 탭 전환 시 차트 다시 그리기 (hidden→visible 크기 문제)
+  if (name === 'portfolio' && portfolioData) {
+    document.getElementById('pnlChart').innerHTML = '';
+    document.getElementById('cumulativeChart').innerHTML = '';
+    renderPnlChart(portfolioData.daily || []);
+    renderCumulativeChart(portfolioData.daily || []);
+  }
 }
 
 // ── 날짜별 신호 로드 ──
@@ -318,16 +325,18 @@ function renderChart(signal) {
   const isDaily = signal.candle_type === 'daily';
 
   // 캔들 데이터 변환
+  // Lightweight Charts v4: 분봉 = UTC timestamp (초), 일봉 = "YYYY-MM-DD" 문자열
   const candleData = candles.map(c => {
     let time;
     if (isDaily) {
-      // 일봉: dt="YYYYMMDD" → "YYYY-MM-DD"
       const dt = c.dt;
       time = `${dt.substring(0, 4)}-${dt.substring(4, 6)}-${dt.substring(6, 8)}`;
     } else {
-      // 분봉: t="HH:MM" → 가상 날짜+시간
       const date = document.getElementById('dateSelect').value;
-      time = `${date} ${c.t}:00`;
+      const [h, m] = c.t.split(':');
+      // KST 시간을 UTC인 것처럼 속여서 저장 → 차트에서 KST로 표시됨
+      const d = new Date(`${date}T${h.padStart(2,'0')}:${m.padStart(2,'0')}:00Z`);
+      time = Math.floor(d.getTime() / 1000);
     }
     return { time, open: c.o, high: c.h, low: c.l, close: c.c };
   });
@@ -366,7 +375,16 @@ function renderChart(signal) {
   for (const t of stockTrades) {
     if (!t.trade_time) continue;
     const hm = t.trade_time.substring(0, 5);
-    const matchCandle = candleData.find(c => c.time?.includes(hm));
+    let matchCandle;
+    if (isDaily) {
+      matchCandle = candleData.find(c => c.time?.includes(hm));
+    } else {
+      // 분봉: timestamp 매칭
+      const date = document.getElementById('dateSelect').value;
+      const [h, m] = hm.split(':');
+      const ts = Math.floor(new Date(`${date}T${h}:${m}:00Z`).getTime() / 1000);
+      matchCandle = candleData.find(c => c.time === ts);
+    }
     if (!matchCandle) continue;
 
     const isBuy = t.trade_type?.startsWith('buy');
