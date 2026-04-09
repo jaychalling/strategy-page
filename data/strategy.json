@@ -1,0 +1,130 @@
+{
+  "first_buy": {
+    "min_trading_intensity": 98
+  },
+  "condition_map": {
+    "골든10분": ["골든10분"],
+    "굿모닝": ["굿모닝"],
+    "세력감지": ["세력감지"]
+  },
+  "strategies": {
+    "굿모닝": {
+      "time_window": { "start": "09:00", "end": "09:15" },
+      "price_range": { "min": 1400, "max": 135000 },
+      "buy_amount_1": 700000,
+      "buy_amount_2": 1400000,
+      "buy_timeout": 180,
+      "sell_timeout": 30,
+      "below_price_rule": "prev_close",
+      "second_buy": {
+        "type": "direct",
+        "trigger_drop": -0.029,
+        "amount": 1400000
+      },
+      "stop_loss": {
+        "first_only": { "after_tp": true, "value": -0.01 },
+        "after_second": -0.02
+      },
+      "take_profit": {
+        "first_only": [
+          { "profit": 0.034, "sell_ratio": 0.25 },
+          { "profit": 0.049, "sell_ratio": 0.40 },
+          { "profit": 0.063, "sell_ratio": 0.50 },
+          { "profit": 0.085, "sell_ratio": 0.50 }
+        ],
+        "after_second": [
+          { "profit": 0.008, "sell_ratio": 0.50 },
+          { "profit": 0.019, "sell_ratio": 0.25 },
+          { "profit": 0.032, "sell_ratio": 0.40 },
+          { "profit": 0.065, "sell_ratio": 0.50 }
+        ],
+        "trailing": { "trigger_profit": 0.035, "trailing_drop": 0.031 }
+      },
+      "profit_floor": { "trigger": 0.035, "floor": 0.008 },
+      "retracement_rules": {
+        "first_only": { "3": "all" },
+        "after_second": { "1": "all" }
+      },
+      "intensity_floor": { "threshold": 97, "duration_seconds": 15 }
+    },
+    "골든10분": {
+      "time_window": { "start": "09:00", "end": "09:10" },
+      "price_range": { "min": 1400, "max": 135000 },
+      "buy_amount_1": 600000,
+      "buy_amount_2": 1200000,
+      "buy_timeout": 70,
+      "sell_timeout": 10,
+      "below_price_rule": "prev_close",
+      "second_buy": {
+        "type": "direct",
+        "trigger_drop": -0.028,
+        "amount": 1200000
+      },
+      "stop_loss": {
+        "first_only": { "after_tp": true, "value": -0.017 },
+        "after_second": -0.022
+      },
+      "take_profit": {
+        "first_only": [
+          { "profit": 0.025, "sell_ratio": 0.25 },
+          { "profit": 0.049, "sell_ratio": 0.40 },
+          { "profit": 0.063, "sell_ratio": 0.50 },
+          { "profit": 0.085, "sell_ratio": 0.50 }
+        ],
+        "after_second": [
+          { "profit": 0.008, "sell_ratio": 0.50 },
+          { "profit": 0.014, "sell_ratio": 0.25 },
+          { "profit": 0.032, "sell_ratio": 0.40 },
+          { "profit": 0.065, "sell_ratio": 0.50 }
+        ],
+        "trailing": { "trigger_profit": 0.035, "trailing_drop": 0.031 }
+      },
+      "profit_floor": { "trigger": 0.035, "floor": 0.008 },
+      "retracement_rules": {
+        "first_only": { "3": "all" },
+        "after_second": { "1": "all", "2": "all" }
+      },
+      "intensity_floor": { "threshold": 92, "duration_seconds": 15 }
+    },
+    "세력감지": {
+      "time_window": { "start": "09:14", "end": "14:20" },
+      "price_range": { "min": 1800, "max": 135000 },
+      "buy_amount_1": 500000,
+      "buy_amount_2": 1000000,
+      "buy_timeout": 190,
+      "sell_timeout": 210,
+      "below_price_rule": "open_after_0930",
+      "second_buy": {
+        "type": "zone",
+        "zone_enter": -0.024,
+        "bounce": 0.008,
+        "amount": 1000000
+      },
+      "stop_loss": {
+        "first_only": -0.029,
+        "after_second": -0.029
+      },
+      "take_profit": {
+        "first_only": [
+          { "profit": 0.014, "sell_ratio": 0.25 },
+          { "profit": 0.034, "sell_ratio": 0.40 },
+          { "profit": 0.055, "sell_ratio": 0.50 },
+          { "profit": 0.074, "sell_ratio": 1.00 }
+        ],
+        "after_second": [
+          { "profit": 0.013, "sell_ratio": 0.25 },
+          { "profit": 0.027, "sell_ratio": 0.40 },
+          { "profit": 0.068, "sell_ratio": 0.50 },
+          { "profit": 0.088, "sell_ratio": 1.00 }
+        ],
+        "trailing": { "trigger_profit": 0.031, "trailing_drop": 0.030 }
+      },
+      "profit_floor": { "trigger": 0.07, "floor": 0.04 },
+      "retracement_rules": {
+        "first_only": { "1": "all", "2": "all", "3": "all", "4": "all" },
+        "after_second": { "1": "all", "2": "all", "3": "all", "4": "all" }
+      },
+      "intensity_floor": { "threshold": 92, "duration_seconds": 62 }
+    }
+  }
+}
