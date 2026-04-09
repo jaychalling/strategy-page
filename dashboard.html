@@ -421,6 +421,29 @@ function renderChart(signal) {
     });
   }
 
+  // 포착시점 세로줄
+  if (signal.time && !isDaily) {
+    const date = document.getElementById('dateSelect').value;
+    const [sh, sm] = signal.time.substring(0, 5).split(':');
+    const sigTs = Math.floor(new Date(`${date}T${sh}:${sm}:00Z`).getTime() / 1000);
+    const sigMarker = candleData.find(c => c.time >= sigTs);
+    if (sigMarker) {
+      // 세로줄 표시용 별도 시리즈 (투명 라인 + marker)
+      const vertSeries = mainChart.addLineSeries({
+        color: 'rgba(0,0,0,0)', lineWidth: 0,
+        lastValueVisible: false, priceLineVisible: false,
+      });
+      vertSeries.setData([{ time: sigMarker.time, value: candleData[0].low }]);
+      vertSeries.setMarkers([{
+        time: sigMarker.time,
+        position: 'aboveBar',
+        color: '#f59e0b',
+        shape: 'square',
+        text: `▼ 포착 ${signal.time.substring(0, 5)}`,
+      }]);
+    }
+  }
+
   // 전략별 가격선 (목표가, 손절가, 추매가)
   drawStrategyLines(candleSeries, signal);
 
@@ -469,16 +492,19 @@ function drawStrategyLines(series, signal) {
 
   const bp = signal.buy_price;
 
-  // ── 손절가 (빨강 점선) ──
+  // ── 손절가 (빨강 점선) — after_tp 조건부 손절은 표시 안 함 ──
   const sl = strat.stop_loss?.first_only;
   if (sl != null) {
-    const slVal = typeof sl === 'object' ? sl.value : sl;
-    if (slVal) {
-      const slPrice = Math.round(bp * (1 + slVal));
-      series.createPriceLine({
-        price: slPrice, color: '#dc2626', lineWidth: 1, lineStyle: 1,
-        axisLabelVisible: true, title: `손절 ${(slVal * 100).toFixed(1)}%`,
-      });
+    const isConditional = typeof sl === 'object' && sl.after_tp;
+    if (!isConditional) {
+      const slVal = typeof sl === 'object' ? sl.value : sl;
+      if (slVal) {
+        const slPrice = Math.round(bp * (1 + slVal));
+        series.createPriceLine({
+          price: slPrice, color: '#dc2626', lineWidth: 1, lineStyle: 1,
+          axisLabelVisible: true, title: `손절 ${(slVal * 100).toFixed(1)}%`,
+        });
+      }
     }
   }
 
@@ -509,16 +535,7 @@ function drawStrategyLines(series, signal) {
     });
   });
 
-  // ── 트레일링 시작 (파랑 점선) ──
-  const tr = strat.take_profit?.trailing;
-  if (tr?.trigger_profit) {
-    const trPrice = Math.round(bp * (1 + tr.trigger_profit));
-    series.createPriceLine({
-      price: trPrice, color: '#2563eb', lineWidth: 1, lineStyle: 3,
-      axisLabelVisible: true,
-      title: `트레일링 +${(tr.trigger_profit * 100).toFixed(1)}%`,
-    });
-  }
+  // 트레일링은 특이 케이스 — 차트 표기 생략
 }
 
 // ── 신호 리스트 (전체) ──
