@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-04-09 22:36:41",
+  "generated_at": "2026-04-09 23:30:43",
   "summary": {
     "total": 268,
-    "hit": 178,
-    "miss": 90,
-    "hit_rate": 66.4,
+    "hit": 176,
+    "miss": 92,
+    "hit_rate": 65.7,
     "date_range": {
       "start": "2026-02-10",
       "end": "2026-04-09"
@@ -42,12 +42,12 @@
       "condition": "세력감지",
       "tp1_threshold": 1.4,
       "total": 74,
-      "hit": 54,
-      "miss": 20,
-      "hit_rate": 73.0,
+      "hit": 52,
+      "miss": 22,
+      "hit_rate": 70.3,
       "real_trade_count": 40,
-      "real_hit": 34,
-      "real_hit_rate": 85.0
+      "real_hit": 33,
+      "real_hit_rate": 82.5
     }
   ],
   "by_time": [
@@ -74,10 +74,10 @@
     },
     {
       "range": "10:00-11:00",
-      "hit": 39,
-      "miss": 10,
+      "hit": 37,
+      "miss": 12,
       "total": 49,
-      "hit_rate": 79.6
+      "hit_rate": 75.5
     },
     {
       "range": "11:00-12:00",
@@ -221,10 +221,10 @@
       },
       {
         "range": "10:00-11:00",
-        "hit": 15,
-        "miss": 2,
+        "hit": 13,
+        "miss": 4,
         "total": 17,
-        "hit_rate": 88.2
+        "hit_rate": 76.5
       },
       {
         "range": "11:00-12:00",
@@ -273,10 +273,10 @@
     },
     {
       "range": "10~15%",
-      "hit": 59,
-      "miss": 24,
+      "hit": 57,
+      "miss": 26,
       "total": 83,
-      "hit_rate": 71.1
+      "hit_rate": 68.7
     },
     {
       "range": "15%+",
@@ -303,10 +303,10 @@
     },
     {
       "range": "-1~0%",
-      "hit": 30,
-      "miss": 26,
+      "hit": 29,
+      "miss": 27,
       "total": 56,
-      "hit_rate": 53.6
+      "hit_rate": 51.8
     },
     {
       "range": "0~0.5%",
@@ -324,10 +324,10 @@
     },
     {
       "range": "1%+",
-      "hit": 57,
-      "miss": 5,
+      "hit": 56,
+      "miss": 6,
       "total": 62,
-      "hit_rate": 91.9
+      "hit_rate": 90.3
     }
   ],
   "by_vol_ratio": [
@@ -340,10 +340,10 @@
     },
     {
       "range": "20~40%",
-      "hit": 61,
-      "miss": 10,
+      "hit": 60,
+      "miss": 11,
       "total": 71,
-      "hit_rate": 85.9
+      "hit_rate": 84.5
     },
     {
       "range": "40~60%",
@@ -354,10 +354,10 @@
     },
     {
       "range": "60~80%",
-      "hit": 27,
-      "miss": 26,
+      "hit": 26,
+      "miss": 27,
       "total": 53,
-      "hit_rate": 50.9
+      "hit_rate": 49.1
     },
     {
       "range": "80~100%",
@@ -372,290 +372,290 @@
       "feature": "시가대비 상승률 (%)",
       "key": "rise_from_open",
       "hit": {
-        "count": 178,
-        "mean": 9.6437,
-        "median": 9.34,
-        "stdev": 4.7763
+        "count": 176,
+        "mean": 9.6047,
+        "median": 9.335,
+        "stdev": 4.7859
       },
       "miss": {
-        "count": 90,
-        "mean": 8.4184,
-        "median": 8.11,
-        "stdev": 4.5456
+        "count": 92,
+        "mean": 8.5197,
+        "median": 8.295,
+        "stdev": 4.5539
       },
-      "diff_mean": 1.2253
+      "diff_mean": 1.085
     },
     {
       "feature": "포착전 5분 상승률 (%)",
       "key": "pre_5m_rise",
       "hit": {
-        "count": 178,
-        "mean": 1.2071,
-        "median": 0.45,
-        "stdev": 3.2589
+        "count": 176,
+        "mean": 1.2382,
+        "median": 0.515,
+        "stdev": 3.2641
       },
       "miss": {
-        "count": 90,
-        "mean": 1.0392,
-        "median": 0.27,
-        "stdev": 2.9887
+        "count": 92,
+        "mean": 0.9834,
+        "median": 0.245,
+        "stdev": 2.98
       },
-      "diff_mean": 0.1679
+      "diff_mean": 0.2548
     },
     {
       "feature": "포착 캔들 몸통 (%)",
       "key": "sig_body",
       "hit": {
-        "count": 178,
-        "mean": 0.2789,
-        "median": 0.03,
-        "stdev": 1.6803
+        "count": 176,
+        "mean": 0.2835,
+        "median": 0.075,
+        "stdev": 1.6893
       },
       "miss": {
-        "count": 90,
-        "mean": -0.0023,
-        "median": 0.095,
-        "stdev": 1.1904
+        "count": 92,
+        "mean": -0.005,
+        "median": 0.035,
+        "stdev": 1.1776
       },
-      "diff_mean": 0.2812
+      "diff_mean": 0.2885
     },
     {
       "feature": "포착 캔들 변동폭 (%)",
       "key": "sig_range",
       "hit": {
-        "count": 178,
-        "mean": 2.2758,
+        "count": 176,
+        "mean": 2.2638,
         "median": 1.735,
-        "stdev": 1.8874
+        "stdev": 1.8832
       },
       "miss": {
-        "count": 90,
-        "mean": 1.3064,
-        "median": 0.885,
-        "stdev": 1.3676
+        "count": 92,
+        "mean": 1.3504,
+        "median": 0.9,
+        "stdev": 1.4148
       },
-      "diff_mean": 0.9694
+      "diff_mean": 0.9134
     },
     {
       "feature": "포착시 거래량비율 (%)",
       "key": "vol_ratio_at_sig",
       "hit": {
-        "count": 178,
-        "mean": 40.3567,
+        "count": 176,
+        "mean": 40.2756,
         "median": 38.35,
-        "stdev": 21.707
+        "stdev": 21.7636
       },
       "miss": {
-        "count": 90,
-        "mean": 69.1422,
-        "median": 73.25,
-        "stdev": 21.211
+        "count": 92,
+        "mean": 68.6717,
+        "median": 72.35,
+        "stdev": 21.3209
       },
-      "diff_mean": -28.7855
+      "diff_mean": -28.3961
     },
     {
       "feature": "고점 근접도 (%)",
       "key": "near_high",
       "hit": {
-        "count": 178,
-        "mean": -2.8579,
-        "median": -2.245,
-        "stdev": 2.0105
+        "count": 176,
+        "mean": -2.8122,
+        "median": -2.22,
+        "stdev": 1.9737
       },
       "miss": {
-        "count": 90,
-        "mean": -2.8738,
-        "median": -2.39,
-        "stdev": 1.9644
+        "count": 92,
+        "mean": -2.9609,
+        "median": -2.435,
+        "stdev": 2.0324
       },
-      "diff_mean": 0.0159
+      "diff_mean": 0.1487
     },
     {
       "feature": "포착전10분 거래량배율",
       "key": "pre10_vol_ratio",
       "hit": {
-        "count": 178,
-        "mean": 4.1443,
-        "median": 2.715,
-        "stdev": 4.6458
+        "count": 176,
+        "mean": 4.0882,
+        "median": 2.68,
+        "stdev": 4.6419
       },
       "miss": {
-        "count": 90,
-        "mean": 5.0203,
-        "median": 1.635,
-        "stdev": 11.1948
+        "count": 92,
+        "mean": 5.1086,
+        "median": 1.67,
+        "stdev": 11.0872
       },
-      "diff_mean": -0.876
+      "diff_mean": -1.0204
     },
     {
       "feature": "양봉비율 (전5분, %)",
       "key": "bullish_pct",
       "hit": {
-        "count": 178,
-        "mean": 59.8691,
+        "count": 176,
+        "mean": 60.0949,
         "median": 60.0,
-        "stdev": 22.6857
+        "stdev": 22.7148
       },
       "miss": {
-        "count": 90,
-        "mean": 57.8889,
+        "count": 92,
+        "mean": 57.5,
         "median": 60.0,
-        "stdev": 24.7456
+        "stdev": 24.6124
       },
-      "diff_mean": 1.9802
+      "diff_mean": 2.5949
     },
     {
       "feature": "거래량 스파이크 (배)",
       "key": "vol_spike",
       "hit": {
-        "count": 178,
-        "mean": 16.0794,
+        "count": 176,
+        "mean": 16.2435,
         "median": 1.195,
-        "stdev": 182.6029
+        "stdev": 183.6368
       },
       "miss": {
-        "count": 90,
-        "mean": 3.2167,
+        "count": 92,
+        "mean": 3.1824,
         "median": 1.29,
-        "stdev": 5.6435
+        "stdev": 5.5878
       },
-      "diff_mean": 12.8627
+      "diff_mean": 13.0611
     },
     {
       "feature": "포착후 1분 수익률 (%)",
       "key": "after_1m",
       "hit": {
-        "count": 178,
-        "mean": 0.5993,
+        "count": 176,
+        "mean": 0.5968,
         "median": 0.51,
-        "stdev": 1.4961
+        "stdev": 1.5001
       },
       "miss": {
-        "count": 90,
-        "mean": -0.0616,
+        "count": 92,
+        "mean": -0.0424,
         "median": 0.145,
-        "stdev": 1.0609
+        "stdev": 1.0689
       },
-      "diff_mean": 0.6609
+      "diff_mean": 0.6392
     },
     {
       "feature": "포착후 3분 수익률 (%)",
       "key": "after_3m",
       "hit": {
-        "count": 178,
-        "mean": 0.6131,
-        "median": 0.6,
-        "stdev": 2.196
+        "count": 176,
+        "mean": 0.6065,
+        "median": 0.575,
+        "stdev": 2.2068
       },
       "miss": {
-        "count": 89,
-        "mean": -0.4849,
-        "median": -0.07,
-        "stdev": 1.681
+        "count": 91,
+        "mean": -0.4479,
+        "median": -0.06,
+        "stdev": 1.6829
       },
-      "diff_mean": 1.098
+      "diff_mean": 1.0544
     },
     {
       "feature": "포착후 5분 수익률 (%)",
       "key": "after_5m",
       "hit": {
-        "count": 178,
-        "mean": 0.6682,
+        "count": 176,
+        "mean": 0.6792,
         "median": 0.74,
-        "stdev": 2.5373
+        "stdev": 2.5459
       },
       "miss": {
-        "count": 88,
-        "mean": -0.7142,
+        "count": 90,
+        "mean": -0.705,
         "median": -0.055,
-        "stdev": 1.9513
+        "stdev": 1.94
       },
-      "diff_mean": 1.3824
+      "diff_mean": 1.3842
     },
     {
       "feature": "포착후 10분 수익률 (%)",
       "key": "after_10m",
       "hit": {
-        "count": 178,
-        "mean": 1.0176,
-        "median": 0.765,
-        "stdev": 3.1066
+        "count": 176,
+        "mean": 1.0474,
+        "median": 0.8,
+        "stdev": 3.111
       },
       "miss": {
-        "count": 87,
-        "mean": -1.0615,
+        "count": 89,
+        "mean": -1.0738,
         "median": -0.5,
-        "stdev": 2.326
+        "stdev": 2.3021
       },
-      "diff_mean": 2.0791
+      "diff_mean": 2.1212
     },
     {
       "feature": "포착후 5분내 최고 (%)",
       "key": "peak_5m",
       "hit": {
-        "count": 178,
-        "mean": 2.603,
+        "count": 176,
+        "mean": 2.6009,
         "median": 1.955,
-        "stdev": 2.1513
+        "stdev": 2.1571
       },
       "miss": {
-        "count": 90,
-        "mean": 1.0044,
-        "median": 0.915,
-        "stdev": 0.6098
+        "count": 92,
+        "mean": 1.0432,
+        "median": 0.925,
+        "stdev": 0.6964
       },
-      "diff_mean": 1.5986
+      "diff_mean": 1.5577
     },
     {
       "feature": "장중 최대수익 (%)",
       "key": "max_profit",
       "hit": {
-        "count": 178,
-        "mean": 7.0017,
+        "count": 176,
+        "mean": 6.988,
         "median": 6.125,
-        "stdev": 4.1041
+        "stdev": 4.1047
       },
       "miss": {
-        "count": 90,
-        "mean": 1.2962,
-        "median": 1.08,
-        "stdev": 0.7438
+        "count": 92,
+        "mean": 1.4465,
+        "median": 1.095,
+        "stdev": 1.3776
       },
-      "diff_mean": 5.7055
+      "diff_mean": 5.5415
     },
     {
       "feature": "장중 최대낙폭 (%)",
       "key": "max_drawdown",
       "hit": {
-        "count": 178,
-        "mean": -3.5275,
-        "median": -2.685,
-        "stdev": 3.3822
+        "count": 176,
+        "mean": -3.4922,
+        "median": -2.575,
+        "stdev": 3.3716
       },
       "miss": {
-        "count": 90,
-        "mean": -4.2578,
-        "median": -2.875,
-        "stdev": 3.9243
+        "count": 92,
+        "mean": -4.3095,
+        "median": -3.045,
+        "stdev": 3.9188
       },
-      "diff_mean": 0.7303
+      "diff_mean": 0.8173
     },
     {
       "feature": "포착시점 (개장후 분)",
       "key": "mins_from_open",
       "hit": {
-        "count": 178,
-        "mean": 118.3427,
-        "median": 88.5,
-        "stdev": 103.4498
+        "count": 176,
+        "mean": 118.9489,
+        "median": 89.5,
+        "stdev": 103.8806
       },
       "miss": {
-        "count": 90,
-        "mean": 192.0222,
-        "median": 190.0,
-        "stdev": 122.4428
+        "count": 92,
+        "mean": 189.2609,
+        "median": 183.5,
+        "stdev": 122.5147
       },
-      "diff_mean": -73.6795
+      "diff_mean": -70.312
     }
   ],
   "condition_feature_comparison": {
@@ -1250,297 +1250,297 @@
       ]
     },
     "세력감지": {
-      "hit_count": 54,
-      "miss_count": 20,
+      "hit_count": 52,
+      "miss_count": 22,
       "features": [
         {
           "feature": "시가대비 상승률 (%)",
           "key": "rise_from_open",
           "hit": {
-            "count": 54,
-            "mean": 10.7746,
-            "median": 10.835,
-            "stdev": 4.3309
+            "count": 52,
+            "mean": 10.6862,
+            "median": 10.655,
+            "stdev": 4.3776
           },
           "miss": {
-            "count": 20,
-            "mean": 9.028,
-            "median": 8.04,
-            "stdev": 2.9195
+            "count": 22,
+            "mean": 9.3959,
+            "median": 8.685,
+            "stdev": 3.067
           },
-          "diff_mean": 1.7466
+          "diff_mean": 1.2903
         },
         {
           "feature": "포착전 5분 상승률 (%)",
           "key": "pre_5m_rise",
           "hit": {
-            "count": 54,
-            "mean": -0.2315,
-            "median": -0.06,
-            "stdev": 1.8606
+            "count": 52,
+            "mean": -0.1815,
+            "median": 0.07,
+            "stdev": 1.8776
           },
           "miss": {
-            "count": 20,
-            "mean": 0.0185,
-            "median": 0.14,
-            "stdev": 0.7011
+            "count": 22,
+            "mean": -0.1223,
+            "median": 0.0,
+            "stdev": 0.8133
           },
-          "diff_mean": -0.25
+          "diff_mean": -0.0592
         },
         {
           "feature": "포착 캔들 몸통 (%)",
           "key": "sig_body",
           "hit": {
-            "count": 54,
-            "mean": -0.6437,
-            "median": -0.395,
-            "stdev": 1.1051
+            "count": 52,
+            "mean": -0.6637,
+            "median": -0.445,
+            "stdev": 1.1214
           },
           "miss": {
-            "count": 20,
-            "mean": -0.295,
+            "count": 22,
+            "mean": -0.2795,
             "median": -0.125,
-            "stdev": 0.455
+            "stdev": 0.4374
           },
-          "diff_mean": -0.3487
+          "diff_mean": -0.3842
         },
         {
           "feature": "포착 캔들 변동폭 (%)",
           "key": "sig_range",
           "hit": {
-            "count": 54,
-            "mean": 1.802,
-            "median": 1.31,
-            "stdev": 1.7641
+            "count": 52,
+            "mean": 1.7433,
+            "median": 1.26,
+            "stdev": 1.7287
           },
           "miss": {
-            "count": 20,
-            "mean": 0.628,
-            "median": 0.535,
-            "stdev": 0.3442
+            "count": 22,
+            "mean": 0.8736,
+            "median": 0.6,
+            "stdev": 1.0513
           },
-          "diff_mean": 1.174
+          "diff_mean": 0.8697
         },
         {
           "feature": "포착시 거래량비율 (%)",
           "key": "vol_ratio_at_sig",
           "hit": {
-            "count": 54,
-            "mean": 47.5833,
+            "count": 52,
+            "mean": 47.5865,
             "median": 47.75,
-            "stdev": 19.2393
+            "stdev": 19.4074
           },
           "miss": {
-            "count": 20,
-            "mean": 70.49,
-            "median": 77.65,
-            "stdev": 20.1243
+            "count": 22,
+            "mean": 68.4,
+            "median": 71.9,
+            "stdev": 20.7763
           },
-          "diff_mean": -22.9067
+          "diff_mean": -20.8135
         },
         {
           "feature": "고점 근접도 (%)",
           "key": "near_high",
           "hit": {
-            "count": 54,
-            "mean": -3.2376,
-            "median": -2.22,
-            "stdev": 2.3767
+            "count": 52,
+            "mean": -3.0975,
+            "median": -2.18,
+            "stdev": 2.3041
           },
           "miss": {
-            "count": 20,
-            "mean": -2.3305,
-            "median": -2.065,
-            "stdev": 1.3025
+            "count": 22,
+            "mean": -2.7441,
+            "median": -2.195,
+            "stdev": 1.8379
           },
-          "diff_mean": -0.9071
+          "diff_mean": -0.3534
         },
         {
           "feature": "포착전10분 거래량배율",
           "key": "pre10_vol_ratio",
           "hit": {
-            "count": 54,
-            "mean": 4.3437,
-            "median": 3.42,
-            "stdev": 2.6987
+            "count": 52,
+            "mean": 4.1615,
+            "median": 3.345,
+            "stdev": 2.5788
           },
           "miss": {
-            "count": 20,
-            "mean": 3.188,
-            "median": 2.8,
-            "stdev": 2.3263
+            "count": 22,
+            "mean": 3.7236,
+            "median": 3.0,
+            "stdev": 2.8131
           },
-          "diff_mean": 1.1557
+          "diff_mean": 0.4379
         },
         {
           "feature": "양봉비율 (전5분, %)",
           "key": "bullish_pct",
           "hit": {
-            "count": 54,
-            "mean": 54.8148,
-            "median": 50.0,
-            "stdev": 21.3454
+            "count": 52,
+            "mean": 55.3846,
+            "median": 60.0,
+            "stdev": 21.5535
           },
           "miss": {
-            "count": 20,
-            "mean": 50.0,
-            "median": 50.0,
-            "stdev": 18.9181
+            "count": 22,
+            "mean": 49.0909,
+            "median": 40.0,
+            "stdev": 18.2337
           },
-          "diff_mean": 4.8148
+          "diff_mean": 6.2937
         },
         {
           "feature": "거래량 스파이크 (배)",
           "key": "vol_spike",
           "hit": {
-            "count": 54,
-            "mean": 1.1961,
+            "count": 52,
+            "mean": 1.179,
             "median": 0.93,
-            "stdev": 1.0212
+            "stdev": 1.0185
           },
           "miss": {
-            "count": 20,
-            "mean": 1.542,
+            "count": 22,
+            "mean": 1.5509,
             "median": 1.065,
-            "stdev": 1.3478
+            "stdev": 1.3182
           },
-          "diff_mean": -0.3459
+          "diff_mean": -0.3719
         },
         {
           "feature": "포착후 1분 수익률 (%)",
           "key": "after_1m",
           "hit": {
-            "count": 54,
-            "mean": 0.543,
+            "count": 52,
+            "mean": 0.5323,
             "median": 0.46,
-            "stdev": 0.8256
+            "stdev": 0.8126
           },
           "miss": {
-            "count": 20,
-            "mean": 0.0135,
+            "count": 22,
+            "mean": 0.0868,
             "median": 0.185,
-            "stdev": 0.6614
+            "stdev": 0.7491
           },
-          "diff_mean": 0.5295
+          "diff_mean": 0.4455
         },
         {
           "feature": "포착후 3분 수익률 (%)",
           "key": "after_3m",
           "hit": {
-            "count": 54,
-            "mean": 0.7161,
-            "median": 0.615,
-            "stdev": 1.4849
+            "count": 52,
+            "mean": 0.6975,
+            "median": 0.605,
+            "stdev": 1.5062
           },
           "miss": {
-            "count": 20,
-            "mean": -0.071,
-            "median": -0.065,
-            "stdev": 0.557
+            "count": 22,
+            "mean": 0.0445,
+            "median": -0.03,
+            "stdev": 0.6728
           },
-          "diff_mean": 0.7871
+          "diff_mean": 0.653
         },
         {
           "feature": "포착후 5분 수익률 (%)",
           "key": "after_5m",
           "hit": {
-            "count": 54,
-            "mean": 0.8331,
+            "count": 52,
+            "mean": 0.8767,
             "median": 0.74,
-            "stdev": 1.9915
+            "stdev": 2.0008
           },
           "miss": {
-            "count": 19,
-            "mean": -0.2437,
+            "count": 21,
+            "mean": -0.249,
             "median": -0.13,
-            "stdev": 0.7658
+            "stdev": 0.8349
           },
-          "diff_mean": 1.0768
+          "diff_mean": 1.1257
         },
         {
           "feature": "포착후 10분 수익률 (%)",
           "key": "after_10m",
           "hit": {
-            "count": 54,
-            "mean": 0.8781,
-            "median": 0.505,
-            "stdev": 2.8492
+            "count": 52,
+            "mean": 0.9738,
+            "median": 0.515,
+            "stdev": 2.8591
           },
           "miss": {
-            "count": 19,
-            "mean": -0.4895,
-            "median": -0.43,
-            "stdev": 1.2557
+            "count": 21,
+            "mean": -0.5962,
+            "median": -0.6,
+            "stdev": 1.248
           },
-          "diff_mean": 1.3676
+          "diff_mean": 1.57
         },
         {
           "feature": "포착후 5분내 최고 (%)",
           "key": "peak_5m",
           "hit": {
-            "count": 54,
-            "mean": 2.3578,
+            "count": 52,
+            "mean": 2.3413,
             "median": 2.13,
-            "stdev": 1.7157
+            "stdev": 1.7196
           },
           "miss": {
-            "count": 20,
-            "mean": 0.743,
-            "median": 0.635,
-            "stdev": 0.3165
+            "count": 22,
+            "mean": 0.9286,
+            "median": 0.7,
+            "stdev": 0.8258
           },
-          "diff_mean": 1.6148
+          "diff_mean": 1.4127
         },
         {
           "feature": "장중 최대수익 (%)",
           "key": "max_profit",
           "hit": {
-            "count": 54,
-            "mean": 5.6891,
-            "median": 3.925,
-            "stdev": 3.9966
+            "count": 52,
+            "mean": 5.5921,
+            "median": 3.78,
+            "stdev": 3.969
           },
           "miss": {
-            "count": 20,
-            "mean": 0.9205,
-            "median": 0.965,
-            "stdev": 0.274
+            "count": 22,
+            "mean": 1.5832,
+            "median": 0.975,
+            "stdev": 2.4688
           },
-          "diff_mean": 4.7686
+          "diff_mean": 4.0089
         },
         {
           "feature": "장중 최대낙폭 (%)",
           "key": "max_drawdown",
           "hit": {
-            "count": 54,
-            "mean": -3.012,
-            "median": -2.185,
-            "stdev": 3.0093
+            "count": 52,
+            "mean": -2.8727,
+            "median": -2.11,
+            "stdev": 2.9267
           },
           "miss": {
-            "count": 20,
-            "mean": -3.0105,
-            "median": -2.235,
-            "stdev": 2.5873
+            "count": 22,
+            "mean": -3.34,
+            "median": -2.68,
+            "stdev": 2.8194
           },
-          "diff_mean": -0.0015
+          "diff_mean": 0.4673
         },
         {
           "feature": "포착시점 (개장후 분)",
           "key": "mins_from_open",
           "hit": {
-            "count": 54,
-            "mean": 151.7222,
-            "median": 122.0,
-            "stdev": 103.0192
+            "count": 52,
+            "mean": 155.0577,
+            "median": 126.0,
+            "stdev": 103.5496
           },
           "miss": {
-            "count": 20,
-            "mean": 212.55,
-            "median": 252.5,
-            "stdev": 119.2346
+            "count": 22,
+            "mean": 199.1364,
+            "median": 235.0,
+            "stdev": 121.4442
           },
-          "diff_mean": -60.8278
+          "diff_mean": -44.0787
         }
       ]
     }
@@ -1562,7 +1562,7 @@
         },
         {
           "range": "-1~0%",
-          "count": 30
+          "count": 29
         },
         {
           "range": "0~1%",
@@ -1570,7 +1570,7 @@
         },
         {
           "range": "1~2%",
-          "count": 36
+          "count": 35
         },
         {
           "range": "2~3%",
@@ -1600,7 +1600,7 @@
         },
         {
           "range": "-1~0%",
-          "count": 26
+          "count": 27
         },
         {
           "range": "0~1%",
@@ -1608,7 +1608,7 @@
         },
         {
           "range": "1~2%",
-          "count": 4
+          "count": 5
         },
         {
           "range": "2~3%",
@@ -1644,11 +1644,11 @@
         },
         {
           "range": "0~1%",
-          "count": 51
+          "count": 50
         },
         {
           "range": "1~2%",
-          "count": 38
+          "count": 37
         },
         {
           "range": "2~3%",
@@ -1682,11 +1682,11 @@
         },
         {
           "range": "0~1%",
-          "count": 38
+          "count": 39
         },
         {
           "range": "1~2%",
-          "count": 5
+          "count": 6
         },
         {
           "range": "2~3%",
@@ -1714,7 +1714,7 @@
         },
         {
           "range": "-2~-1%",
-          "count": 15
+          "count": 14
         },
         {
           "range": "-1~0%",
@@ -1726,7 +1726,7 @@
         },
         {
           "range": "1~2%",
-          "count": 39
+          "count": 38
         },
         {
           "range": "2~3%",
@@ -1752,7 +1752,7 @@
         },
         {
           "range": "-2~-1%",
-          "count": 8
+          "count": 9
         },
         {
           "range": "-1~0%",
@@ -1764,7 +1764,7 @@
         },
         {
           "range": "1~2%",
-          "count": 4
+          "count": 5
         },
         {
           "range": "2~3%",
@@ -1788,11 +1788,11 @@
         },
         {
           "range": "-3~-2%",
-          "count": 15
+          "count": 14
         },
         {
           "range": "-2~-1%",
-          "count": 13
+          "count": 12
         },
         {
           "range": "-1~0%",
@@ -1826,11 +1826,11 @@
         },
         {
           "range": "-3~-2%",
-          "count": 8
+          "count": 9
         },
         {
           "range": "-2~-1%",
-          "count": 9
+          "count": 10
         },
         {
           "range": "-1~0%",
