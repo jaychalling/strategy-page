@@ -438,25 +438,33 @@ function renderChart(signal) {
   }
 
   // 포착시점 세로줄 (캔버스 오버레이, 신호가와 같은 노란색)
-  if (signal.time && !isDaily) {
-    const date = document.getElementById('dateSelect').value;
-    const [sh, sm] = signal.time.substring(0, 5).split(':');
-    const sigTs = Math.floor(new Date(`${date}T${sh}:${sm}:00Z`).getTime() / 1000);
-
-    const drawVertLine = () => {
-      const tc = mainChart.timeScale().timeToCoordinate(sigTs);
-      if (tc === null) return;
-      // 기존 오버레이 제거
-      const old = container.querySelector('.signal-vert-line');
-      if (old) old.remove();
-      const line = document.createElement('div');
-      line.className = 'signal-vert-line';
-      line.style.cssText = `position:absolute;left:${tc}px;top:0;width:0;height:100%;border-left:1px dashed #f59e0b;pointer-events:none;z-index:2;`;
-      container.style.position = 'relative';
-      container.appendChild(line);
-    };
-    drawVertLine();
-    mainChart.timeScale().subscribeVisibleTimeRangeChange(drawVertLine);
+  {
+    let sigTimeValue;
+    if (isDaily) {
+      // 일봉: signal_date를 "YYYY-MM-DD" 문자열로
+      const d = document.getElementById('dateSelect').value;
+      sigTimeValue = d;
+    } else if (signal.time) {
+      // 분봉: timestamp
+      const date = document.getElementById('dateSelect').value;
+      const [sh, sm] = signal.time.substring(0, 5).split(':');
+      sigTimeValue = Math.floor(new Date(`${date}T${sh}:${sm}:00Z`).getTime() / 1000);
+    }
+    if (sigTimeValue != null) {
+      const drawVertLine = () => {
+        const tc = mainChart.timeScale().timeToCoordinate(sigTimeValue);
+        if (tc === null) return;
+        const old = container.querySelector('.signal-vert-line');
+        if (old) old.remove();
+        const line = document.createElement('div');
+        line.className = 'signal-vert-line';
+        line.style.cssText = `position:absolute;left:${tc}px;top:0;width:0;height:100%;border-left:1px dashed #f59e0b;pointer-events:none;z-index:2;`;
+        container.style.position = 'relative';
+        container.appendChild(line);
+      };
+      drawVertLine();
+      mainChart.timeScale().subscribeVisibleTimeRangeChange(drawVertLine);
+    }
   }
 
   // 전략별 가격선 (목표가, 손절가, 추매가)
@@ -483,8 +491,16 @@ function renderChart(signal) {
   // 지표 오버레이
   drawIndicators(mainChart, candleSeries, signal, candleData, candles);
 
-  mainChart.timeScale().fitContent();
-  volumeChart.timeScale().fitContent();
+  if (isDaily && candleData.length > 200) {
+    // 스윙: 포착일 기준 전 200일 ~ 후 전체 표시
+    const sigIdx = candleData.findIndex(c => c.time >= document.getElementById('dateSelect').value);
+    const from = Math.max(0, sigIdx - 200);
+    mainChart.timeScale().setVisibleLogicalRange({ from, to: candleData.length - 1 });
+    volumeChart.timeScale().setVisibleLogicalRange({ from, to: candleData.length - 1 });
+  } else {
+    mainChart.timeScale().fitContent();
+    volumeChart.timeScale().fitContent();
+  }
 }
 
 function formatTradeType(type) {
