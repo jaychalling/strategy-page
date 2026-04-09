@@ -329,13 +329,23 @@ function renderChart(signal) {
   if (signal.filter_reason) badges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-700">${signal.filter_reason}</span>`);
   document.getElementById('chartBadges').innerHTML = badges.join('');
 
-  const candles = signal.candles || [];
+  let candles = signal.candles || [];
   if (candles.length === 0) {
     container.innerHTML = '<div class="flex items-center justify-center h-full text-muted text-sm">캔들 데이터 없음</div>';
     return;
   }
 
   const isDaily = signal.candle_type === 'daily';
+
+  // 중복 제거 (일봉 페이징 경계에서 발생 가능)
+  if (isDaily) {
+    const seen = new Set();
+    candles = candles.filter(c => {
+      if (seen.has(c.dt)) return false;
+      seen.add(c.dt);
+      return true;
+    });
+  }
 
   // 캔들 데이터 변환
   // Lightweight Charts v4: 분봉 = UTC timestamp (초), 일봉 = "YYYY-MM-DD" 문자열
