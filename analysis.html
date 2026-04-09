@@ -128,26 +128,192 @@ tailwind.config = {
 <!-- 조건별 상세 -->
 <div id="condDetails" class="space-y-6 mb-8"></div>
 
-<!-- 실전 시사점 -->
+<!-- ══════════════════════════════════════════ -->
+<!-- 포착 시점 기준 상세 해설 (정적 콘텐츠) -->
+<!-- ══════════════════════════════════════════ -->
+
+<div class="bg-card border border-border rounded-xl p-5 mb-8">
+  <h2 class="text-lg font-bold text-gray-900 mb-1">포착 시점에 알 수 있는 핵심 지표 해설</h2>
+  <p class="text-xs text-muted mb-6">포착 후 데이터(1분후 수익률 등)는 실전에서 알 수 없으므로 제외. 아래는 포착 순간에 바로 판단 가능한 지표만.</p>
+
+  <div class="space-y-8">
+
+    <!-- 1. 포착 시점 -->
+    <div>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-2 py-0.5 bg-red-100 text-red-700 rounded text-[10px] font-bold">***</span>
+        <h3 class="text-sm font-bold text-gray-900">1. 포착 시점 (개장 후 경과 분)</h3>
+      </div>
+      <p class="text-xs text-muted mb-2">09:00 장 시작 후 몇 분 뒤에 조건식에 포착됐는지. 달성 평균 122분 vs 미달 199분.</p>
+      <div class="overflow-x-auto mb-2">
+        <table class="text-xs w-full">
+          <tr class="bg-gray-50"><th class="px-3 py-1.5 text-left">시간대</th><th class="px-3 py-1.5 text-right">달성률</th><th class="px-3 py-1.5 text-right">건수</th></tr>
+          <tr class="border-t"><td class="px-3 py-1.5 font-medium text-profit">09:00~09:10</td><td class="px-3 py-1.5 text-right mono font-bold text-profit">93%</td><td class="px-3 py-1.5 text-right">14건</td></tr>
+          <tr class="border-t"><td class="px-3 py-1.5">09:10~09:30</td><td class="px-3 py-1.5 text-right mono">78%</td><td class="px-3 py-1.5 text-right">36건</td></tr>
+          <tr class="border-t"><td class="px-3 py-1.5">09:30~10:00</td><td class="px-3 py-1.5 text-right mono">72%</td><td class="px-3 py-1.5 text-right">29건</td></tr>
+          <tr class="border-t"><td class="px-3 py-1.5">10:00~11:00</td><td class="px-3 py-1.5 text-right mono">80%</td><td class="px-3 py-1.5 text-right">49건</td></tr>
+          <tr class="border-t"><td class="px-3 py-1.5">11:00~13:00</td><td class="px-3 py-1.5 text-right mono text-warn">66%</td><td class="px-3 py-1.5 text-right">58건</td></tr>
+          <tr class="border-t"><td class="px-3 py-1.5 font-medium text-loss">13:00 이후</td><td class="px-3 py-1.5 text-right mono font-bold text-loss">45%</td><td class="px-3 py-1.5 text-right">73건</td></tr>
+        </table>
+      </div>
+      <p class="text-xs text-gray-600">장 초반에 포착된 종목은 그날 강한 종목일 확률이 높음. 오후에 걸리는 건 이미 한 번 올라갔다 빠진 뒤 다시 걸리는 경우가 많아서 추가 상승 여력이 적음. <strong class="text-loss">13시 이후 포착은 동전 던지기(45%)보다 낮음.</strong></p>
+    </div>
+
+    <!-- 2. 상승 속도 -->
+    <div>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-2 py-0.5 bg-red-100 text-red-700 rounded text-[10px] font-bold">***</span>
+        <h3 class="text-sm font-bold text-gray-900">2. 상승 속도 (%/분)</h3>
+      </div>
+      <p class="text-xs text-muted mb-2"><code class="bg-gray-100 px-1 rounded">시가대비 상승률 / 개장 후 경과 분</code> &mdash; 1분당 평균 몇 % 올랐는가</p>
+      <div class="flex gap-4 mb-2">
+        <div class="bg-green-50 border border-green-200 rounded-lg px-3 py-2 text-center flex-1">
+          <div class="mono text-lg font-bold text-profit">0.24%/분</div><div class="text-[10px] text-muted">달성 평균</div>
+        </div>
+        <div class="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-center flex-1">
+          <div class="mono text-lg font-bold text-loss">0.11%/분</div><div class="text-[10px] text-muted">미달 평균</div>
+        </div>
+      </div>
+      <p class="text-xs text-gray-600">같은 10% 상승이라도 30분 만에 오른 종목(0.33%/분)과 3시간에 걸쳐 오른 종목(0.06%/분)은 다름. <strong>빠르게 올라온 종목이 추가 상승할 힘이 있음.</strong> 0.2%/분 이상이면 양호.</p>
+    </div>
+
+    <!-- 3. 포착봉 변동폭 -->
+    <div>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-2 py-0.5 bg-red-100 text-red-700 rounded text-[10px] font-bold">***</span>
+        <h3 class="text-sm font-bold text-gray-900">3. 포착봉 변동폭 (%)</h3>
+      </div>
+      <p class="text-xs text-muted mb-2"><code class="bg-gray-100 px-1 rounded">(포착 1분봉 고가 - 저가) / 저가 &times; 100</code> &mdash; 포착된 그 1분 동안 가격 변동 크기</p>
+      <div class="flex gap-4 mb-2">
+        <div class="bg-green-50 border border-green-200 rounded-lg px-3 py-2 text-center flex-1">
+          <div class="mono text-lg font-bold text-profit">2.15%</div><div class="text-[10px] text-muted">달성 평균</div>
+        </div>
+        <div class="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-center flex-1">
+          <div class="mono text-lg font-bold text-loss">1.18%</div><div class="text-[10px] text-muted">미달 평균</div>
+        </div>
+      </div>
+      <p class="text-xs text-gray-600">포착 캔들의 변동폭이 크다 = 그 순간 거래가 활발하고 매수세가 강하게 들어오고 있다는 의미. <strong>1% 미만이면 주의, 2% 이상이면 양호.</strong></p>
+    </div>
+
+    <!-- 4. 직전 10분 상승률 -->
+    <div>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-2 py-0.5 bg-red-100 text-red-700 rounded text-[10px] font-bold">***</span>
+        <h3 class="text-sm font-bold text-gray-900">4. 직전 10분 상승률 (%)</h3>
+      </div>
+      <p class="text-xs text-muted mb-2">포착 시점 기준 10분 전 시가 &rarr; 포착 직전 종가의 변화율. 포착 전 모멘텀.</p>
+      <div class="flex gap-4 mb-2">
+        <div class="bg-green-50 border border-green-200 rounded-lg px-3 py-2 text-center flex-1">
+          <div class="mono text-lg font-bold text-profit">+2.34%</div><div class="text-[10px] text-muted">달성 평균</div>
+        </div>
+        <div class="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-center flex-1">
+          <div class="mono text-lg font-bold text-loss">+1.59%</div><div class="text-[10px] text-muted">미달 평균</div>
+        </div>
+      </div>
+      <p class="text-xs text-gray-600">포착 직전에 강하게 올라오고 있었느냐의 차이. <strong>10분간 2% 이상 상승하면서 포착된 건 모멘텀이 살아있는 것.</strong></p>
+    </div>
+
+    <!-- 5. 직전 5분 평균 변동폭 -->
+    <div>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-2 py-0.5 bg-red-100 text-red-700 rounded text-[10px] font-bold">***</span>
+        <h3 class="text-sm font-bold text-gray-900">5. 직전 5분 평균 변동폭 (%)</h3>
+      </div>
+      <p class="text-xs text-muted mb-2">포착 전 5개 1분봉 각각의 <code class="bg-gray-100 px-1 rounded">(고가-저가)/저가</code>를 평균. 직전 5분간 시장의 "활력".</p>
+      <div class="flex gap-4 mb-2">
+        <div class="bg-green-50 border border-green-200 rounded-lg px-3 py-2 text-center flex-1">
+          <div class="mono text-lg font-bold text-profit">1.52%</div><div class="text-[10px] text-muted">달성 평균</div>
+        </div>
+        <div class="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-center flex-1">
+          <div class="mono text-lg font-bold text-loss">1.03%</div><div class="text-[10px] text-muted">미달 평균</div>
+        </div>
+      </div>
+      <p class="text-xs text-gray-600">직전 5분간 캔들이 크게 움직이고 있었다 = 매매가 활발하고 수급이 들어오는 중. <strong>캔들이 작고 조용하면 조건식에 걸려도 추가 상승 동력이 약함.</strong></p>
+    </div>
+
+    <!-- 6. 거래량 스파이크 -->
+    <div>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-2 py-0.5 bg-orange-100 text-orange-700 rounded text-[10px] font-bold">**</span>
+        <h3 class="text-sm font-bold text-gray-900">6. 거래량 스파이크 (배)</h3>
+      </div>
+      <p class="text-xs text-muted mb-2"><code class="bg-gray-100 px-1 rounded">포착 캔들 거래량 / 직전 5분 평균 거래량</code> &mdash; 포착된 그 1분의 거래량이 직전 5분 평균 대비 몇 배인지</p>
+      <div class="overflow-x-auto mb-2">
+        <table class="text-xs w-full">
+          <tr class="bg-gray-50"><th class="px-3 py-1.5 text-left">스파이크</th><th class="px-3 py-1.5 text-right">달성률</th><th class="px-3 py-1.5 text-right">건수</th><th class="px-3 py-1.5">해석</th></tr>
+          <tr class="border-t"><td class="px-3 py-1.5">0~0.5배 (줄어듦)</td><td class="px-3 py-1.5 text-right mono">69%</td><td class="px-3 py-1.5 text-right">49건</td><td class="px-3 py-1.5 text-muted">가격만 올라가고 거래는 줄어듦</td></tr>
+          <tr class="border-t"><td class="px-3 py-1.5">0.5~1배 (평균)</td><td class="px-3 py-1.5 text-right mono text-warn">62%</td><td class="px-3 py-1.5 text-right">69건</td><td class="px-3 py-1.5 text-muted">평범한 거래량</td></tr>
+          <tr class="border-t"><td class="px-3 py-1.5">1~2배</td><td class="px-3 py-1.5 text-right mono">69%</td><td class="px-3 py-1.5 text-right">65건</td><td class="px-3 py-1.5 text-muted">약간 증가</td></tr>
+          <tr class="border-t"><td class="px-3 py-1.5">2~5배</td><td class="px-3 py-1.5 text-right mono text-warn">58%</td><td class="px-3 py-1.5 text-right">48건</td><td class="px-3 py-1.5 text-muted">애매한 증가 (고점 개인 매수?)</td></tr>
+          <tr class="border-t bg-green-50"><td class="px-3 py-1.5 font-bold text-profit">5배 이상 (폭발)</td><td class="px-3 py-1.5 text-right mono font-bold text-profit">79%</td><td class="px-3 py-1.5 text-right">28건</td><td class="px-3 py-1.5 font-medium text-profit">큰 손 매수 진입 가능성</td></tr>
+        </table>
+      </div>
+      <p class="text-xs text-gray-600">거래량이 직전 5분 평균의 <strong>5배 이상</strong> 터지면서 포착된 종목은 79% 달성. 반면 2~5배는 오히려 58%로 낮음 &mdash; 애매한 거래량 증가는 고점 부근 개인 매수일 수 있음.</p>
+    </div>
+
+    <!-- 7. 직전 3분 상승률 극단값 -->
+    <div>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-2 py-0.5 bg-orange-100 text-orange-700 rounded text-[10px] font-bold">**</span>
+        <h3 class="text-sm font-bold text-gray-900">7. 직전 3분 상승률 &mdash; 극단값이 좋다</h3>
+      </div>
+      <p class="text-xs text-muted mb-2">포착 시점 기준 3분 전 시가 &rarr; 포착 직전 종가의 변화율</p>
+      <div class="overflow-x-auto mb-2">
+        <table class="text-xs w-full">
+          <tr class="bg-gray-50"><th class="px-3 py-1.5 text-left">직전 3분</th><th class="px-3 py-1.5 text-right">달성률</th><th class="px-3 py-1.5 text-right">건수</th><th class="px-3 py-1.5">패턴</th></tr>
+          <tr class="border-t bg-green-50"><td class="px-3 py-1.5 font-bold text-profit">-0.5% 이하 (하락 후)</td><td class="px-3 py-1.5 text-right mono font-bold text-profit">73%</td><td class="px-3 py-1.5 text-right">66건</td><td class="px-3 py-1.5 text-profit">눌림목 반등 포착</td></tr>
+          <tr class="border-t"><td class="px-3 py-1.5 text-warn">-0.5~0%</td><td class="px-3 py-1.5 text-right mono text-warn">56%</td><td class="px-3 py-1.5 text-right">41건</td><td class="px-3 py-1.5 text-muted">애매한 하락</td></tr>
+          <tr class="border-t"><td class="px-3 py-1.5 text-warn">0~0.5%</td><td class="px-3 py-1.5 text-right mono text-warn">62%</td><td class="px-3 py-1.5 text-right">47건</td><td class="px-3 py-1.5 text-muted">횡보</td></tr>
+          <tr class="border-t"><td class="px-3 py-1.5 text-warn">0.5~1.5%</td><td class="px-3 py-1.5 text-right mono text-warn">57%</td><td class="px-3 py-1.5 text-right">47건</td><td class="px-3 py-1.5 text-muted">완만한 상승</td></tr>
+          <tr class="border-t bg-green-50"><td class="px-3 py-1.5 font-bold text-profit">+1.5% 이상 (급등 중)</td><td class="px-3 py-1.5 text-right mono font-bold text-profit">78%</td><td class="px-3 py-1.5 text-right">58건</td><td class="px-3 py-1.5 text-profit">강한 모멘텀 진행 중</td></tr>
+        </table>
+      </div>
+      <p class="text-xs text-gray-600"><strong>급등 중(+1.5%)</strong>이면 모멘텀이 살아있어서 78%. <strong>눌림 후 포착(-0.5%)</strong>이면 한 번 올라갔다 살짝 빠진 건데 다시 걸린 거라 반등 기대. <strong class="text-loss">애매한 중간(0~1.5%)이 56~62%로 가장 낮음.</strong></p>
+    </div>
+
+    <!-- 8. 세력감지 특이 패턴 -->
+    <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-2 py-0.5 bg-emerald-200 text-emerald-800 rounded text-[10px] font-bold">세력감지 전용</span>
+        <h3 class="text-sm font-bold text-emerald-900">8. 세력감지는 음봉이 오히려 좋다</h3>
+      </div>
+      <p class="text-xs text-emerald-700 mb-3">세력감지는 다른 조건과 반대되는 특성을 보임:</p>
+      <div class="overflow-x-auto mb-2">
+        <table class="text-xs w-full">
+          <tr class="bg-white/50"><th class="px-3 py-1.5 text-left">지표</th><th class="px-3 py-1.5 text-right">달성</th><th class="px-3 py-1.5 text-right">미달</th><th class="px-3 py-1.5">해석</th></tr>
+          <tr class="border-t border-emerald-100"><td class="px-3 py-1.5">포착봉 몸통</td><td class="px-3 py-1.5 text-right mono font-bold text-profit">-0.64% (음봉)</td><td class="px-3 py-1.5 text-right mono">-0.29%</td><td class="px-3 py-1.5">음봉에서 포착된 게 더 좋음</td></tr>
+          <tr class="border-t border-emerald-100"><td class="px-3 py-1.5">직전 3분</td><td class="px-3 py-1.5 text-right mono font-bold text-profit">-0.46% (하락)</td><td class="px-3 py-1.5 text-right mono">-0.17%</td><td class="px-3 py-1.5">하락 중 포착이 더 좋음</td></tr>
+          <tr class="border-t border-emerald-100"><td class="px-3 py-1.5">아랫꼬리 비율</td><td class="px-3 py-1.5 text-right mono font-bold text-profit">32%</td><td class="px-3 py-1.5 text-right mono">25%</td><td class="px-3 py-1.5">아래에서 받쳐주는 매수세</td></tr>
+        </table>
+      </div>
+      <p class="text-xs text-emerald-800">세력감지는 <strong>세력이 물량을 모으는 과정</strong>에서 포착됨. 포착 시점에 살짝 눌리면서 아랫꼬리가 긴 캔들(= 매도 나오면 바로 받는 매수세)이 있으면 세력이 아직 포기 안 한 것. 양봉으로 올라가는 중에 포착되면 이미 물량 정리 단계일 수 있음.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- 실전 체크리스트 -->
 <div class="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-5 mb-8">
-  <h2 class="text-sm font-semibold text-emerald-800 mb-3">실전 시사점</h2>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-emerald-900">
-    <div class="bg-white/60 rounded-lg p-3 border border-emerald-100">
-      <div class="font-semibold text-emerald-700 mb-1">11시 이후 포착 필터 강화</div>
-      <div class="text-xs">달성률 54%로 급락. 오전 장(09:00~11:00)이 80% 수준으로 월등히 높음</div>
-    </div>
-    <div class="bg-white/60 rounded-lg p-3 border border-emerald-100">
-      <div class="font-semibold text-emerald-700 mb-1">포착 후 1분 +1% = 확정 시그널</div>
-      <div class="text-xs">92% 확률로 TP1 달성. 초기 모멘텀이 가장 강한 예측 변수</div>
-    </div>
-    <div class="bg-white/60 rounded-lg p-3 border border-emerald-100">
-      <div class="font-semibold text-emerald-700 mb-1">거래량 70% 소진 후 포착 주의</div>
-      <div class="text-xs">미달성 종목의 거래량 비율이 69%로 높음. 이미 에너지 소진된 상태</div>
-    </div>
-    <div class="bg-white/60 rounded-lg p-3 border border-emerald-100">
-      <div class="font-semibold text-emerald-700 mb-1">갭률 10% 이상이면 유리</div>
-      <div class="text-xs">시가대비 상승률 10% 이상에서 달성률 71~72%. 강한 갭 = 강한 모멘텀</div>
-    </div>
+  <h2 class="text-sm font-semibold text-emerald-800 mb-4">포착 시점 체크리스트</h2>
+  <div class="overflow-x-auto">
+    <table class="text-sm w-full">
+      <thead>
+        <tr class="text-left text-xs text-emerald-700 uppercase">
+          <th class="px-3 py-2">체크 항목</th>
+          <th class="px-3 py-2 text-center">좋은 신호</th>
+          <th class="px-3 py-2 text-center">나쁜 신호</th>
+        </tr>
+      </thead>
+      <tbody class="text-xs">
+        <tr class="border-t border-emerald-100"><td class="px-3 py-2 font-medium">포착 시점</td><td class="px-3 py-2 text-center text-profit font-semibold">09:00~11:00</td><td class="px-3 py-2 text-center text-loss font-semibold">13:00 이후</td></tr>
+        <tr class="border-t border-emerald-100"><td class="px-3 py-2 font-medium">상승 속도</td><td class="px-3 py-2 text-center text-profit font-semibold">0.2%/분 이상</td><td class="px-3 py-2 text-center text-loss font-semibold">0.1%/분 이하</td></tr>
+        <tr class="border-t border-emerald-100"><td class="px-3 py-2 font-medium">포착봉 변동폭</td><td class="px-3 py-2 text-center text-profit font-semibold">2% 이상</td><td class="px-3 py-2 text-center text-loss font-semibold">1% 미만</td></tr>
+        <tr class="border-t border-emerald-100"><td class="px-3 py-2 font-medium">직전 10분 상승률</td><td class="px-3 py-2 text-center text-profit font-semibold">2% 이상</td><td class="px-3 py-2 text-center text-loss font-semibold">1% 미만</td></tr>
+        <tr class="border-t border-emerald-100"><td class="px-3 py-2 font-medium">거래량 스파이크</td><td class="px-3 py-2 text-center text-profit font-semibold">5배 이상</td><td class="px-3 py-2 text-center text-loss font-semibold">0.5~1배 평범</td></tr>
+        <tr class="border-t border-emerald-100"><td class="px-3 py-2 font-medium">직전 3분</td><td class="px-3 py-2 text-center text-profit font-semibold">급등(+1.5%) 또는 눌림(-0.5%)</td><td class="px-3 py-2 text-center text-loss font-semibold">애매한 0~1%</td></tr>
+        <tr class="border-t border-emerald-100 bg-emerald-50"><td class="px-3 py-2 font-medium">세력감지 한정</td><td class="px-3 py-2 text-center text-profit font-semibold">음봉 + 아랫꼬리 긴 캔들</td><td class="px-3 py-2 text-center text-loss font-semibold">양봉으로 올라가는 중</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
