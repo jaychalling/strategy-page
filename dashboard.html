@@ -421,27 +421,26 @@ function renderChart(signal) {
     });
   }
 
-  // 포착시점 세로줄
+  // 포착시점 세로줄 (캔버스 오버레이, 신호가와 같은 노란색)
   if (signal.time && !isDaily) {
     const date = document.getElementById('dateSelect').value;
     const [sh, sm] = signal.time.substring(0, 5).split(':');
     const sigTs = Math.floor(new Date(`${date}T${sh}:${sm}:00Z`).getTime() / 1000);
-    const sigMarker = candleData.find(c => c.time >= sigTs);
-    if (sigMarker) {
-      // 세로줄 표시용 별도 시리즈 (투명 라인 + marker)
-      const vertSeries = mainChart.addLineSeries({
-        color: 'rgba(0,0,0,0)', lineWidth: 0,
-        lastValueVisible: false, priceLineVisible: false,
-      });
-      vertSeries.setData([{ time: sigMarker.time, value: candleData[0].low }]);
-      vertSeries.setMarkers([{
-        time: sigMarker.time,
-        position: 'aboveBar',
-        color: '#f59e0b',
-        shape: 'square',
-        text: `▼ 포착 ${signal.time.substring(0, 5)}`,
-      }]);
-    }
+
+    const drawVertLine = () => {
+      const tc = mainChart.timeScale().timeToCoordinate(sigTs);
+      if (tc === null) return;
+      // 기존 오버레이 제거
+      const old = container.querySelector('.signal-vert-line');
+      if (old) old.remove();
+      const line = document.createElement('div');
+      line.className = 'signal-vert-line';
+      line.style.cssText = `position:absolute;left:${tc}px;top:0;width:0;height:100%;border-left:1px dashed #f59e0b;pointer-events:none;z-index:2;`;
+      container.style.position = 'relative';
+      container.appendChild(line);
+    };
+    drawVertLine();
+    mainChart.timeScale().subscribeVisibleTimeRangeChange(drawVertLine);
   }
 
   // 전략별 가격선 (목표가, 손절가, 추매가)
