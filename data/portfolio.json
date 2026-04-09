@@ -1,0 +1,228 @@
+{
+  "updated": "2026-04-09T21:53:37.498182+09:00",
+  "daily": [
+    {
+      "date": "2026-02-10",
+      "profit": 3403,
+      "count": 2,
+      "wins": 2,
+      "cumulative": 3403
+    },
+    {
+      "date": "2026-02-11",
+      "profit": -3255,
+      "count": 3,
+      "wins": 1,
+      "cumulative": 148
+    },
+    {
+      "date": "2026-02-12",
+      "profit": 3020,
+      "count": 3,
+      "wins": 2,
+      "cumulative": 3168
+    },
+    {
+      "date": "2026-02-13",
+      "profit": 1930,
+      "count": 2,
+      "wins": 1,
+      "cumulative": 5098
+    },
+    {
+      "date": "2026-02-19",
+      "profit": -3500,
+      "count": 10,
+      "wins": 3,
+      "cumulative": 1598
+    },
+    {
+      "date": "2026-02-20",
+      "profit": -50382,
+      "count": 11,
+      "wins": 8,
+      "cumulative": -48784
+    },
+    {
+      "date": "2026-02-23",
+      "profit": 80547,
+      "count": 3,
+      "wins": 1,
+      "cumulative": 31763
+    },
+    {
+      "date": "2026-02-25",
+      "profit": -4700,
+      "count": 4,
+      "wins": 0,
+      "cumulative": 27063
+    },
+    {
+      "date": "2026-03-03",
+      "profit": -3305,
+      "count": 7,
+      "wins": 3,
+      "cumulative": 23758
+    },
+    {
+      "date": "2026-03-04",
+      "profit": 1950,
+      "count": 1,
+      "wins": 1,
+      "cumulative": 25708
+    },
+    {
+      "date": "2026-03-05",
+      "profit": -3360,
+      "count": 2,
+      "wins": 0,
+      "cumulative": 22348
+    },
+    {
+      "date": "2026-03-06",
+      "profit": -400,
+      "count": 2,
+      "wins": 0,
+      "cumulative": 21948
+    },
+    {
+      "date": "2026-03-09",
+      "profit": 3110,
+      "count": 1,
+      "wins": 1,
+      "cumulative": 25058
+    },
+    {
+      "date": "2026-03-10",
+      "profit": 650,
+      "count": 1,
+      "wins": 1,
+      "cumulative": 25708
+    },
+    {
+      "date": "2026-03-11",
+      "profit": 4155,
+      "count": 4,
+      "wins": 4,
+      "cumulative": 29863
+    },
+    {
+      "date": "2026-03-12",
+      "profit": 520,
+      "count": 4,
+      "wins": 2,
+      "cumulative": 30383
+    },
+    {
+      "date": "2026-03-16",
+      "profit": -3250,
+      "count": 1,
+      "wins": 0,
+      "cumulative": 27133
+    },
+    {
+      "date": "2026-03-17",
+      "profit": 520,
+      "count": 1,
+      "wins": 1,
+      "cumulative": 27653
+    },
+    {
+      "date": "2026-03-18",
+      "profit": -2480,
+      "count": 1,
+      "wins": 0,
+      "cumulative": 25173
+    },
+    {
+      "date": "2026-03-19",
+      "profit": -14680,
+      "count": 1,
+      "wins": 0,
+      "cumulative": 10493
+    },
+    {
+      "date": "2026-03-20",
+      "profit": 8134,
+      "count": 6,
+      "wins": 5,
+      "cumulative": 18627
+    },
+    {
+      "date": "2026-03-25",
+      "profit": 79590,
+      "count": 5,
+      "wins": 4,
+      "cumulative": 98217
+    },
+    {
+      "date": "2026-03-26",
+      "profit": 24630,
+      "count": 1,
+      "wins": 1,
+      "cumulative": 122847
+    },
+    {
+      "date": "2026-04-06",
+      "profit": 42370,
+      "count": 1,
+      "wins": 1,
+      "cumulative": 165217
+    },
+    {
+      "date": "2026-04-08",
+      "profit": -339180,
+      "count": 3,
+      "wins": 1,
+      "cumulative": -173963
+    },
+    {
+      "date": "2026-04-09",
+      "profit": -13936,
+      "count": 1,
+      "wins": 0,
+      "cumulative": -187899
+    }
+  ],
+  "strategies": [
+    {
+      "condition": "",
+      "count": 3,
+      "wins": 1,
+      "win_rate": 33.3,
+      "total_profit": -1158,
+      "avg_pct": -0.13
+    },
+    {
+      "condition": "골든10분",
+      "count": 13,
+      "wins": 6,
+      "win_rate": 46.2,
+      "total_profit": -4137,
+      "avg_pct": 0.3
+    },
+    {
+      "condition": "굿모닝",
+      "count": 13,
+      "wins": 8,
+      "win_rate": 61.5,
+      "total_profit": 154679,
+      "avg_pct": 2.26
+    },
+    {
+      "condition": "세력감지",
+      "count": 52,
+      "wins": 28,
+      "win_rate": 53.8,
+      "total_profit": -337283,
+      "avg_pct": -1.46
+    }
+  ],
+  "signal_summary": {
+    "total": 317,
+    "real_trade": 59,
+    "virtual": 258,
+    "close_profit": 0,
+    "close_profit_rate": 0.0
+  }
+}

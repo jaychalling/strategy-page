@@ -1,0 +1,1 @@
+[{"stock_code": "095270", "trade_type": "buy_1", "price": 5650, "quantity": 10, "trade_time": "09:08:15"}, {"stock_code": "095270", "trade_type": "buy_2", "price": 5480, "quantity": 21, "trade_time": "09:10:42"}, {"stock_code": "095270", "trade_type": "stop_loss", "price": 5430, "quantity": 31, "trade_time": "09:11:29"}]

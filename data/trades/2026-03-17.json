@@ -1,0 +1,1 @@
+[{"stock_code": "321550", "trade_type": "buy_1", "price": 8100, "quantity": 6, "trade_time": "09:27:21"}, {"stock_code": "321550", "trade_type": "take_profit_1", "price": 8220, "quantity": 1, "trade_time": "09:38:31"}, {"stock_code": "321550", "trade_type": "retracement_1", "price": 8180, "quantity": 5, "trade_time": "09:47:59"}]
