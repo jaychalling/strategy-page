@@ -23,6 +23,11 @@ tailwind.config = {
   .signal-row { transition: background 0.1s; cursor: pointer; }
   .signal-row:hover { background: #f1f5f9; }
   .signal-row.selected { background: #eff6ff; border-left: 3px solid #2563eb; }
+  .signal-card { scroll-snap-align: start; }
+  @media (min-width: 1024px) {
+    #chartContainer { height: 420px !important; }
+    #volumeContainer { height: 100px !important; }
+  }
 </style>
 </head>
 <body class="bg-bg text-gray-700 min-h-screen">
@@ -53,11 +58,11 @@ tailwind.config = {
 
 <!-- ========== TAB 1: 신호 차트 ========== -->
 <div id="tab-chart">
-  <div class="flex gap-4 mb-4">
-    <select id="dateSelect" class="border border-border rounded-lg px-3 py-2 text-sm bg-white" onchange="loadDateSignals()">
+  <div class="flex gap-2 mb-4 flex-wrap">
+    <select id="dateSelect" class="border border-border rounded-lg px-2 py-1.5 text-sm bg-white flex-1 min-w-[160px]" onchange="loadDateSignals()">
       <option value="">날짜 선택...</option>
     </select>
-    <select id="condFilter" class="border border-border rounded-lg px-3 py-2 text-sm bg-white" onchange="filterSignals()">
+    <select id="condFilter" class="border border-border rounded-lg px-2 py-1.5 text-sm bg-white" onchange="filterSignals()">
       <option value="">전체 조건</option>
       <option value="골든10분">골든10분</option>
       <option value="굿모닝">굿모닝</option>
@@ -66,9 +71,21 @@ tailwind.config = {
     </select>
   </div>
 
-  <div class="grid grid-cols-12 gap-4">
-    <!-- 신호 리스트 (좌측) -->
-    <div class="col-span-4 bg-card border border-border rounded-xl overflow-hidden">
+  <!-- 모바일: 가로 스크롤 신호 → 차트 풀폭 / 데스크톱: 좌측 사이드바 -->
+  <!-- 모바일 신호 (가로 스크롤) -->
+  <div class="lg:hidden mb-3">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="text-xs font-semibold text-muted uppercase">포착 신호</span>
+      <span class="text-xs text-muted" id="signalCountMobile"></span>
+    </div>
+    <div id="signalListMobile" class="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 snap-x">
+      <div class="text-sm text-muted whitespace-nowrap px-3 py-2">날짜를 선택하세요</div>
+    </div>
+  </div>
+
+  <div class="flex gap-4">
+    <!-- 데스크톱 신호 리스트 (좌측 사이드바) -->
+    <div class="hidden lg:block w-80 flex-shrink-0 bg-card border border-border rounded-xl overflow-hidden">
       <div class="px-4 py-3 bg-gray-50 border-b border-border">
         <span class="text-xs font-semibold text-muted uppercase">포착 신호</span>
         <span class="ml-2 text-xs text-muted" id="signalCount"></span>
@@ -78,15 +95,15 @@ tailwind.config = {
       </div>
     </div>
 
-    <!-- 차트 (우측) -->
-    <div class="col-span-8">
-      <div class="bg-card border border-border rounded-xl p-4">
+    <!-- 차트 (우측, 모바일은 풀폭) -->
+    <div class="flex-1 min-w-0">
+      <div class="bg-card border border-border rounded-xl p-3 lg:p-4">
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-semibold text-gray-900" id="chartTitle">차트</h3>
-          <div class="flex gap-2" id="chartBadges"></div>
+          <h3 class="text-sm font-semibold text-gray-900 truncate" id="chartTitle">차트</h3>
+          <div class="flex gap-1 flex-wrap" id="chartBadges"></div>
         </div>
-        <div id="chartContainer" style="height: 420px; width: 100%;"></div>
-        <div id="volumeContainer" style="height: 100px; width: 100%; margin-top: -1px;"></div>
+        <div id="chartContainer" style="height: 350px; width: 100%;"></div>
+        <div id="volumeContainer" style="height: 80px; width: 100%; margin-top: -1px;"></div>
         <!-- 지표 토글 -->
         <div id="indicatorToggles" class="flex flex-wrap gap-2 mt-3 hidden">
           <span class="text-[10px] text-muted font-semibold mr-1 self-center">지표:</span>
@@ -274,13 +291,18 @@ function filterSignals() {
 
 function renderSignalList(signals) {
   const container = document.getElementById('signalList');
+  const mobileContainer = document.getElementById('signalListMobile');
   document.getElementById('signalCount').textContent = `${signals.length}건`;
+  const mobileCount = document.getElementById('signalCountMobile');
+  if (mobileCount) mobileCount.textContent = `${signals.length}건`;
 
   if (signals.length === 0) {
     container.innerHTML = '<div class="p-4 text-sm text-muted text-center">신호 없음</div>';
+    if (mobileContainer) mobileContainer.innerHTML = '<div class="text-sm text-muted px-3 py-2">신호 없음</div>';
     return;
   }
 
+  // 데스크톱 사이드바
   container.innerHTML = signals.map((s, i) => {
     const pct = s.close_pct != null ? s.close_pct : 0;
     const pctColor = pct > 0 ? 'text-profit' : pct < 0 ? 'text-loss' : 'text-muted';
@@ -301,12 +323,39 @@ function renderSignalList(signals) {
       </div>
     `;
   }).join('');
+
+  // 모바일 가로 스크롤 카드
+  if (mobileContainer) {
+    mobileContainer.innerHTML = signals.map((s, i) => {
+      const pct = s.close_pct != null ? s.close_pct : 0;
+      const pctColor = pct > 0 ? 'text-profit' : pct < 0 ? 'text-loss' : 'text-muted';
+      const borderColor = s.is_real_trade ? 'border-blue-300 bg-blue-50/50' : 'border-border';
+      return `
+        <div class="signal-card snap-start flex-shrink-0 w-36 border ${borderColor} rounded-lg px-3 py-2 cursor-pointer hover:shadow-sm transition"
+             onclick="selectSignal(${i}, this)" data-idx="${i}">
+          <div class="font-semibold text-xs text-gray-900 truncate">${s.name}</div>
+          <div class="text-[10px] text-muted">${s.time?.substring(0, 5) || ''} · ${s.condition}</div>
+          <div class="mono text-xs font-bold ${pctColor} mt-0.5">${pct > 0 ? '+' : ''}${pct?.toFixed(2) || '0'}%</div>
+        </div>
+      `;
+    }).join('');
+  }
 }
 
 // ── 신호 선택 → 차트 렌더 ──
 function selectSignal(idx, el) {
-  document.querySelectorAll('.signal-row').forEach(r => r.classList.remove('selected'));
-  if (el) el.classList.add('selected');
+  document.querySelectorAll('.signal-row, .signal-card').forEach(r => {
+    r.classList.remove('selected', 'ring-2', 'ring-accent');
+  });
+  if (el) {
+    el.classList.add('selected');
+    if (el.classList.contains('signal-card')) el.classList.add('ring-2', 'ring-accent');
+  }
+  // 같은 idx의 반대쪽도 선택
+  document.querySelectorAll(`[data-idx="${idx}"]`).forEach(r => {
+    r.classList.add('selected');
+    if (r.classList.contains('signal-card')) r.classList.add('ring-2', 'ring-accent');
+  });
 
   const s = (document.getElementById('condFilter').value
     ? currentSignals.filter(x => x.condition === document.getElementById('condFilter').value)
