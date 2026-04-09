@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TP1 달성 분석</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { colors: {
+    bg: '#f8f9fb', card: '#ffffff', card2: '#f1f3f7', border: '#e2e5ed',
+    accent: '#2563eb', profit: '#16a34a', loss: '#dc2626', warn: '#d97706', muted: '#6b7280',
+  }}}
+}
+</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+  body { font-family: 'Inter', sans-serif; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .bar-hit { transition: width 0.5s; }
+</style>
+</head>
+<body class="bg-bg text-gray-700 min-h-screen">
+<main class="max-w-6xl mx-auto px-4 py-8">
+
+<!-- Header -->
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900">TP1 달성 분석</h1>
+    <p class="text-muted text-sm mt-1">단타 3조건 (골든10분 / 굿모닝 / 세력감지) &middot; 1분봉 기반 특성 분석</p>
+  </div>
+  <div class="flex gap-3">
+    <a href="dashboard.html" class="text-sm text-accent hover:underline">&larr; 대시보드</a>
+    <a href="index.html" class="text-sm text-muted hover:underline">전략 대시보드</a>
+  </div>
+</div>
+
+<!-- Loading -->
+<div id="loading" class="text-center py-20 text-muted">데이터 로딩 중...</div>
+
+<!-- Content (hidden until loaded) -->
+<div id="content" class="hidden">
+
+<!-- 전체 요약 -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+  <div class="bg-card border border-border rounded-xl p-4 text-center">
+    <div class="text-2xl font-bold mono text-gray-900" id="totalCount"></div>
+    <div class="text-xs text-muted mt-1">분석 대상</div>
+  </div>
+  <div class="bg-card border border-border rounded-xl p-4 text-center">
+    <div class="text-2xl font-bold mono text-profit" id="hitCount"></div>
+    <div class="text-xs text-muted mt-1">TP1 달성</div>
+  </div>
+  <div class="bg-card border border-border rounded-xl p-4 text-center">
+    <div class="text-2xl font-bold mono text-loss" id="missCount"></div>
+    <div class="text-xs text-muted mt-1">TP1 미달성</div>
+  </div>
+  <div class="bg-card border border-border rounded-xl p-4 text-center">
+    <div class="text-2xl font-bold mono text-accent" id="hitRate"></div>
+    <div class="text-xs text-muted mt-1">전체 달성률</div>
+  </div>
+  <div class="bg-card border border-border rounded-xl p-4 text-center">
+    <div class="text-2xl font-bold mono text-warn" id="avgMaxProfit"></div>
+    <div class="text-xs text-muted mt-1">달성 평균 최대수익</div>
+  </div>
+</div>
+
+<!-- 조건별 달성률 -->
+<div class="bg-card border border-border rounded-xl p-5 mb-6">
+  <h2 class="text-sm font-semibold text-gray-900 mb-4">조건별 TP1 달성률</h2>
+  <div id="condBars" class="space-y-3"></div>
+</div>
+
+<!-- 핵심 발견 -->
+<div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5 mb-8">
+  <h2 class="text-sm font-semibold text-blue-800 mb-3">핵심 발견</h2>
+  <div id="keyFindings" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+</div>
+
+<!-- 구간별 분석 -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+  <!-- 시간대별 -->
+  <div class="bg-card border border-border rounded-xl p-5">
+    <h2 class="text-sm font-semibold text-gray-900 mb-4">시간대별 달성률</h2>
+    <div id="timeChart" style="height:280px"></div>
+  </div>
+  <!-- 시가대비 상승률별 -->
+  <div class="bg-card border border-border rounded-xl p-5">
+    <h2 class="text-sm font-semibold text-gray-900 mb-4">시가대비 상승률별 달성률</h2>
+    <div id="gapChart" style="height:280px"></div>
+  </div>
+  <!-- 포착후 1분별 -->
+  <div class="bg-card border border-border rounded-xl p-5">
+    <h2 class="text-sm font-semibold text-gray-900 mb-4">포착후 1분 수익률별 달성률</h2>
+    <div id="after1mChart" style="height:280px"></div>
+  </div>
+  <!-- 거래량비율별 -->
+  <div class="bg-card border border-border rounded-xl p-5">
+    <h2 class="text-sm font-semibold text-gray-900 mb-4">거래량 소진비율별 달성률</h2>
+    <div id="volChart" style="height:280px"></div>
+  </div>
+</div>
+
+<!-- 특성 비교 테이블 -->
+<div class="bg-card border border-border rounded-xl overflow-hidden mb-8">
+  <div class="px-5 py-3 bg-gray-50 border-b border-border">
+    <h2 class="text-sm font-semibold text-gray-900">특성별 비교 (달성 vs 미달성)</h2>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="bg-gray-50 text-left text-xs text-muted uppercase">
+          <th class="px-4 py-2">특성</th>
+          <th class="px-4 py-2 text-right">달성 평균</th>
+          <th class="px-4 py-2 text-right">달성 중앙</th>
+          <th class="px-4 py-2 text-right">미달 평균</th>
+          <th class="px-4 py-2 text-right">미달 중앙</th>
+          <th class="px-4 py-2 text-right">차이</th>
+          <th class="px-4 py-2">유의도</th>
+        </tr>
+      </thead>
+      <tbody id="featureTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 조건별 상세 -->
+<div id="condDetails" class="space-y-6 mb-8"></div>
+
+<!-- 실전 시사점 -->
+<div class="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-5 mb-8">
+  <h2 class="text-sm font-semibold text-emerald-800 mb-3">실전 시사점</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-emerald-900">
+    <div class="bg-white/60 rounded-lg p-3 border border-emerald-100">
+      <div class="font-semibold text-emerald-700 mb-1">11시 이후 포착 필터 강화</div>
+      <div class="text-xs">달성률 54%로 급락. 오전 장(09:00~11:00)이 80% 수준으로 월등히 높음</div>
+    </div>
+    <div class="bg-white/60 rounded-lg p-3 border border-emerald-100">
+      <div class="font-semibold text-emerald-700 mb-1">포착 후 1분 +1% = 확정 시그널</div>
+      <div class="text-xs">92% 확률로 TP1 달성. 초기 모멘텀이 가장 강한 예측 변수</div>
+    </div>
+    <div class="bg-white/60 rounded-lg p-3 border border-emerald-100">
+      <div class="font-semibold text-emerald-700 mb-1">거래량 70% 소진 후 포착 주의</div>
+      <div class="text-xs">미달성 종목의 거래량 비율이 69%로 높음. 이미 에너지 소진된 상태</div>
+    </div>
+    <div class="bg-white/60 rounded-lg p-3 border border-emerald-100">
+      <div class="font-semibold text-emerald-700 mb-1">갭률 10% 이상이면 유리</div>
+      <div class="text-xs">시가대비 상승률 10% 이상에서 달성률 71~72%. 강한 갭 = 강한 모멘텀</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</main>
+
+<script>
+let data = null;
+
+async function init() {
+  try {
+    const resp = await fetch('data/analysis.json');
+    data = await resp.json();
+  } catch (e) {
+    document.getElementById('loading').innerHTML = '<span class="text-loss">data/analysis.json 로드 실패</span>';
+    return;
+  }
+
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('content').classList.remove('hidden');
+
+  renderSummary();
+  renderCondBars();
+  renderKeyFindings();
+  renderBucketCharts();
+  renderFeatureTable();
+  renderCondDetails();
+}
+
+function renderSummary() {
+  const s = data.summary;
+  document.getElementById('totalCount').textContent = s.total + '건';
+  document.getElementById('hitCount').textContent = s.hit + '건';
+  document.getElementById('missCount').textContent = s.miss + '건';
+  document.getElementById('hitRate').textContent = s.hit_rate.toFixed(1) + '%';
+  // 달성 평균 최대수익 계산
+  const hitFeats = data.feature_comparison?.find(f => f.key === 'max_profit');
+  const avgMax = hitFeats ? hitFeats.hit.mean : 0;
+  document.getElementById('avgMaxProfit').textContent = '+' + avgMax.toFixed(1) + '%';
+}
+
+function renderCondBars() {
+  const el = document.getElementById('condBars');
+  const colors = { '골든10분': '#9333ea', '굿모닝': '#2563eb', '세력감지': '#059669' };
+
+  const tp1map = data.summary.tp1_thresholds || {};
+  el.innerHTML = data.by_condition.map(c => {
+    const pct = c.hit_rate;
+    const color = colors[c.condition] || '#6b7280';
+    const tp1 = tp1map[c.condition] || '?';
+    return `
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-sm font-semibold">${c.condition} <span class="text-xs text-muted font-normal">(TP1 +${tp1}%)</span></span>
+          <span class="mono text-sm font-bold" style="color:${color}">${c.hit}/${c.total} (${pct.toFixed(0)}%)</span>
+        </div>
+        <div class="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
+          <div class="bar-hit h-full rounded-full" style="width:${pct}%;background:${color}"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderKeyFindings() {
+  const findings = [
+    { title: '오전 장(~11시) 달성률 78%', desc: '11시 이후 54%로 급락. 오전 포착이 핵심.', icon: '&#9200;' },
+    { title: '포착 후 1분 +1% = 92% 달성', desc: '초기 모멘텀이 가장 강력한 예측 변수.', icon: '&#9889;' },
+    { title: '거래량 비율 40% vs 69%', desc: '달성 종목은 아직 거래량이 적을 때 포착됨.', icon: '&#128200;' },
+    { title: '갭 10%+ = 달성률 71%', desc: '시가 대비 상승률이 클수록 모멘텀 강함.', icon: '&#128640;' },
+  ];
+
+  document.getElementById('keyFindings').innerHTML = findings.map(f => `
+    <div class="bg-white/60 rounded-lg p-3 border border-blue-100">
+      <div class="font-semibold text-blue-800 mb-1">${f.icon} ${f.title}</div>
+      <div class="text-xs text-blue-700">${f.desc}</div>
+    </div>
+  `).join('');
+}
+
+function makeBucketChart(containerId, buckets, label) {
+  const el = document.getElementById(containerId);
+  if (!buckets || buckets.length === 0) { el.innerHTML = '<div class="text-muted text-sm text-center">데이터 없음</div>'; return; }
+
+  const chart = LightweightCharts.createChart(el, {
+    width: el.clientWidth, height: 280,
+    layout: { background: { color: '#fff' }, textColor: '#6b7280', fontSize: 10 },
+    grid: { vertLines: { color: '#f1f3f7' }, horzLines: { color: '#f1f3f7' } },
+    rightPriceScale: { borderColor: '#e2e5ed' },
+    timeScale: { borderColor: '#e2e5ed', fixLeftEdge: true, fixRightEdge: true },
+  });
+
+  const series = chart.addHistogramSeries({
+    priceFormat: { type: 'price', precision: 0, minMove: 1 },
+  });
+
+  series.setData(buckets.map((b, i) => ({
+    time: `2026-01-${String(i + 1).padStart(2, '0')}`,
+    value: b.hit_rate,
+    color: b.hit_rate >= 70 ? 'rgba(22,163,74,0.7)' : b.hit_rate >= 60 ? 'rgba(37,99,235,0.5)' : 'rgba(220,38,38,0.5)',
+  })));
+
+  // 라벨 추가 — time scale에 커스텀 라벨
+  chart.applyOptions({
+    timeScale: {
+      tickMarkFormatter: (time) => {
+        const day = parseInt(time.split('-')[2]);
+        return buckets[day - 1]?.label || '';
+      },
+    },
+  });
+  chart.timeScale().fitContent();
+}
+
+function renderBucketCharts() {
+  if (data.by_time) makeBucketChart('timeChart', data.by_time.map(b => ({...b, label: b.range || b.label})), '시간대');
+  if (data.by_rise_from_open) makeBucketChart('gapChart', data.by_rise_from_open.map(b => ({...b, label: b.range || b.label})), '갭률');
+  if (data.by_after_1m) makeBucketChart('after1mChart', data.by_after_1m.map(b => ({...b, label: b.range || b.label})), '1분후');
+  if (data.by_vol_ratio) makeBucketChart('volChart', data.by_vol_ratio.map(b => ({...b, label: b.range || b.label})), '거래량비율');
+}
+
+function renderFeatureTable() {
+  const tbody = document.getElementById('featureTable');
+  const features = data.feature_comparison || [];
+  if (!features.length) return;
+
+  tbody.innerHTML = features.map(f => {
+    const diff = f.diff_mean || (f.hit.mean - f.miss.mean);
+    const diffColor = Math.abs(diff) > 1.5 ? 'text-loss font-bold' : Math.abs(diff) > 0.7 ? 'text-warn' : 'text-muted';
+    const stars = Math.abs(diff) > 1.5 ? '&#9733;&#9733;&#9733;' : Math.abs(diff) > 0.7 ? '&#9733;&#9733;' : Math.abs(diff) > 0.3 ? '&#9733;' : '';
+    return `
+      <tr class="border-t border-gray-50 hover:bg-gray-50">
+        <td class="px-4 py-2 font-medium">${f.feature}</td>
+        <td class="px-4 py-2 text-right mono text-profit">${f.hit.mean.toFixed(2)}</td>
+        <td class="px-4 py-2 text-right mono text-muted">${f.hit.median.toFixed(2)}</td>
+        <td class="px-4 py-2 text-right mono text-loss">${f.miss.mean.toFixed(2)}</td>
+        <td class="px-4 py-2 text-right mono text-muted">${f.miss.median.toFixed(2)}</td>
+        <td class="px-4 py-2 text-right mono ${diffColor}">${diff > 0 ? '+' : ''}${diff.toFixed(2)}</td>
+        <td class="px-4 py-2 text-warn">${stars}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderCondDetails() {
+  const el = document.getElementById('condDetails');
+  const condFeats = data.condition_feature_comparison || {};
+  if (!Object.keys(condFeats).length) return;
+  const colors = { '골든10분': 'purple', '굿모닝': 'blue', '세력감지': 'emerald' };
+
+  el.innerHTML = Object.entries(condFeats).map(([cond, condData]) => {
+    const c = colors[cond] || 'gray';
+    const info = data.by_condition.find(x => x.condition === cond);
+    const features = condData.features || [];
+    return `
+      <div class="bg-card border border-${c}-200 rounded-xl overflow-hidden">
+        <div class="bg-${c}-50 border-b border-${c}-200 px-5 py-3 flex items-center justify-between">
+          <h3 class="text-sm font-bold text-${c}-700">${cond}</h3>
+          <span class="mono text-sm text-${c}-600">${info?.hit || condData.hit_count || 0}/${info?.total || (condData.hit_count + condData.miss_count) || 0} (${info?.hit_rate?.toFixed(0) || 0}%)</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50 text-left text-xs text-muted uppercase">
+                <th class="px-4 py-2">특성</th>
+                <th class="px-4 py-2 text-right">달성 평균</th>
+                <th class="px-4 py-2 text-right">미달 평균</th>
+                <th class="px-4 py-2 text-right">차이</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${features.map(f => {
+                const diff = f.diff_mean || (f.hit.mean - f.miss.mean);
+                const cl = Math.abs(diff) > 1.5 ? 'font-bold text-loss' : Math.abs(diff) > 0.7 ? 'text-warn' : '';
+                return `
+                  <tr class="border-t border-gray-50">
+                    <td class="px-4 py-2">${f.feature}</td>
+                    <td class="px-4 py-2 text-right mono text-profit">${f.hit.mean.toFixed(2)}</td>
+                    <td class="px-4 py-2 text-right mono text-loss">${f.miss.mean.toFixed(2)}</td>
+                    <td class="px-4 py-2 text-right mono ${cl}">${diff > 0 ? '+' : ''}${diff.toFixed(2)}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+init();
+</script>
+</body>
+</html>
