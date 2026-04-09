@@ -84,6 +84,10 @@ tailwind.config = {
         </div>
         <div id="chartContainer" style="height: 420px; width: 100%;"></div>
         <div id="volumeContainer" style="height: 100px; width: 100%; margin-top: -1px;"></div>
+        <!-- 지표 토글 -->
+        <div id="indicatorToggles" class="flex flex-wrap gap-2 mt-3 hidden">
+          <span class="text-[10px] text-muted font-semibold mr-1 self-center">지표:</span>
+        </div>
       </div>
     </div>
   </div>
@@ -310,12 +314,14 @@ function selectSignal(idx, el) {
 }
 
 function renderChart(signal) {
+  currentChartSignal = signal;
   const container = document.getElementById('chartContainer');
   const volContainer = document.getElementById('volumeContainer');
   container.innerHTML = '';
   volContainer.innerHTML = '';
 
   document.getElementById('chartTitle').textContent = `${signal.name} (${signal.code})`;
+  setupIndicatorToggles(signal);
 
   const badges = [];
   badges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-purple-100 text-purple-700">${signal.condition}</span>`);
@@ -464,6 +470,9 @@ function renderChart(signal) {
     if (range) volumeChart.timeScale().setVisibleLogicalRange(range);
   });
 
+  // 지표 오버레이
+  drawIndicators(mainChart, candleSeries, signal, candleData, candles);
+
   mainChart.timeScale().fitContent();
   volumeChart.timeScale().fitContent();
 }
@@ -535,6 +544,174 @@ function drawStrategyLines(series, signal) {
   });
 
   // 트레일링은 특이 케이스 — 차트 표기 생략
+}
+
+// ── 지표 계산 유틸 ──
+
+function calcSMA(data, period, field = 'c') {
+  const result = [];
+  for (let i = 0; i < data.length; i++) {
+    if (i < period - 1) { result.push(null); continue; }
+    let sum = 0;
+    for (let j = i - period + 1; j <= i; j++) sum += data[j][field];
+    result.push(sum / period);
+  }
+  return result;
+}
+
+function calcBB(data, period, mult, field = 'c') {
+  const sma = calcSMA(data, period, field);
+  const upper = [], lower = [], mid = [];
+  for (let i = 0; i < data.length; i++) {
+    if (sma[i] === null) { upper.push(null); lower.push(null); mid.push(null); continue; }
+    let sqSum = 0;
+    for (let j = i - period + 1; j <= i; j++) sqSum += (data[j][field] - sma[i]) ** 2;
+    const std = Math.sqrt(sqSum / period);
+    mid.push(sma[i]);
+    upper.push(sma[i] + mult * std);
+    lower.push(sma[i] - mult * std);
+  }
+  return { upper, mid, lower };
+}
+
+// ── 지표별 정의 (조건별 표시 가능 항목) ──
+
+const INDICATOR_DEFS = {
+  // 분봉용 (비스윙)
+  '시가': { type: 'hline', label: '당일 시가', color: '#6366f1', forMinute: true },
+  '갭률': { type: 'info', label: '갭률', forMinute: true },
+  // 일봉용 (스윙 + 분봉 모두 가능한 것들은 일봉만)
+  'MA5':   { type: 'ma', period: 5, color: '#ef4444', forDaily: true },
+  'MA20':  { type: 'ma', period: 20, color: '#f59e0b', forDaily: true },
+  'MA60':  { type: 'ma', period: 60, color: '#22c55e', forDaily: true },
+  'MA112': { type: 'ma', period: 112, color: '#3b82f6', forDaily: true },
+  'MA200': { type: 'ma', period: 200, color: '#8b5cf6', forDaily: true },
+  'BB(20,2)':  { type: 'bb', period: 20, mult: 2, color: '#ec4899', forDaily: true },
+  'BB(35,2)':  { type: 'bb', period: 35, mult: 2, color: '#06b6d4', forDaily: true },
+};
+
+// 조건별 추천 지표
+const CONDITION_INDICATORS = {
+  '굿모닝':  ['시가', '갭률'],
+  '골든10분': ['시가', '갭률'],
+  '세력감지': ['시가'],
+  '스윙검토': ['MA5', 'MA20', 'MA60', 'MA112', 'MA200', 'BB(35,2)'],
+};
+
+let activeIndicators = {};
+let currentChartSignal = null;
+
+function setupIndicatorToggles(signal) {
+  const bar = document.getElementById('indicatorToggles');
+  const isDaily = signal.candle_type === 'daily';
+  const condInds = CONDITION_INDICATORS[signal.condition] || [];
+
+  // 공통 + 조건별 합치기
+  const available = [];
+  for (const key of condInds) {
+    const def = INDICATOR_DEFS[key];
+    if (!def) continue;
+    if (isDaily && def.forDaily) available.push(key);
+    if (!isDaily && def.forMinute) available.push(key);
+  }
+  // 일봉이면 MA/BB도 모두 추가
+  if (isDaily) {
+    for (const key of Object.keys(INDICATOR_DEFS)) {
+      if (INDICATOR_DEFS[key].forDaily && !available.includes(key)) available.push(key);
+    }
+  }
+
+  if (available.length === 0) { bar.classList.add('hidden'); return; }
+
+  bar.classList.remove('hidden');
+  bar.innerHTML = '<span class="text-[10px] text-muted font-semibold mr-1 self-center">지표:</span>';
+
+  for (const key of available) {
+    const def = INDICATOR_DEFS[key];
+    const active = activeIndicators[key] || false;
+    const btn = document.createElement('button');
+    btn.className = `px-2 py-0.5 rounded text-[10px] font-medium border transition ${
+      active ? 'bg-gray-800 text-white border-gray-800' : 'bg-white text-gray-600 border-gray-300 hover:border-gray-500'
+    }`;
+    if (def.color && active) btn.style.cssText = `background:${def.color};color:white;border-color:${def.color};`;
+    btn.textContent = key;
+    btn.onclick = () => {
+      activeIndicators[key] = !activeIndicators[key];
+      renderChart(currentChartSignal);
+    };
+    bar.appendChild(btn);
+  }
+}
+
+function drawIndicators(chart, candleSeries, signal, candleData, candles) {
+  const isDaily = signal.candle_type === 'daily';
+
+  for (const [key, active] of Object.entries(activeIndicators)) {
+    if (!active) continue;
+    const def = INDICATOR_DEFS[key];
+    if (!def) continue;
+
+    if (def.type === 'hline' && key === '시가') {
+      // 당일 시가 수평선
+      const openPrice = candles[0]?.o;
+      if (openPrice) {
+        candleSeries.createPriceLine({
+          price: openPrice, color: def.color, lineWidth: 1, lineStyle: 2,
+          axisLabelVisible: true, title: '시가',
+        });
+      }
+    }
+
+    if (def.type === 'info' && key === '갭률') {
+      // 갭률 = (시가 - 전일종가) / 전일종가. 전일종가 없으므로 첫봉 시가 vs 신호가로 대체 표시
+      // 차트에 badge로만 표시
+      const openPrice = candles[0]?.o;
+      if (openPrice && signal.signal_price) {
+        const gap = ((openPrice - signal.signal_price) / signal.signal_price * 100).toFixed(1);
+        const el = document.getElementById('chartBadges');
+        if (el) el.innerHTML += ` <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-700">시가갭 ${gap > 0 ? '+' : ''}${gap}%</span>`;
+      }
+    }
+
+    if (def.type === 'ma' && isDaily) {
+      const sma = calcSMA(candles, def.period);
+      const lineData = [];
+      for (let i = 0; i < candles.length; i++) {
+        if (sma[i] === null) continue;
+        lineData.push({ time: candleData[i].time, value: Math.round(sma[i]) });
+      }
+      if (lineData.length > 0) {
+        const s = chart.addLineSeries({
+          color: def.color, lineWidth: 1,
+          lastValueVisible: true, priceLineVisible: false,
+          crosshairMarkerVisible: false,
+        });
+        s.setData(lineData);
+      }
+    }
+
+    if (def.type === 'bb' && isDaily) {
+      const bb = calcBB(candles, def.period, def.mult);
+      const upperData = [], lowerData = [];
+      for (let i = 0; i < candles.length; i++) {
+        if (bb.upper[i] === null) continue;
+        upperData.push({ time: candleData[i].time, value: Math.round(bb.upper[i]) });
+        lowerData.push({ time: candleData[i].time, value: Math.round(bb.lower[i]) });
+      }
+      if (upperData.length > 0) {
+        const sUp = chart.addLineSeries({
+          color: def.color, lineWidth: 1, lineStyle: 2,
+          lastValueVisible: false, priceLineVisible: false, crosshairMarkerVisible: false,
+        });
+        sUp.setData(upperData);
+        const sLo = chart.addLineSeries({
+          color: def.color, lineWidth: 1, lineStyle: 2,
+          lastValueVisible: false, priceLineVisible: false, crosshairMarkerVisible: false,
+        });
+        sLo.setData(lowerData);
+      }
+    }
+  }
 }
 
 // ── 신호 리스트 (전체) ──
