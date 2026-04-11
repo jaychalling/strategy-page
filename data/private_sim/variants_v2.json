@@ -1,0 +1,1533 @@
+{
+  "baseline": {
+    "total_pnl_pct": 36.17107227606774,
+    "winrate": 0.6222222222222222,
+    "mdd_pct": -14.133769442350008,
+    "n_trades": 45
+  },
+  "variants": [
+    {
+      "id": "P1",
+      "category": "parameter",
+      "title": "cutoff 11:00",
+      "description": "cutoff_time 12:00 → 11:00",
+      "config_diff": {
+        "first_buy.cutoff_time": "11:00"
+      },
+      "filter_id": null,
+      "status": "rejected",
+      "result": {
+        "n_trades": 36,
+        "winrate": 0.6111111111111112,
+        "expectancy": 0.9217707070575842,
+        "total_pnl_pct": 33.18374545407303,
+        "mdd_pct": -14.133769442350008,
+        "max_consec_loss": 4,
+        "delta_pnl": -2.9873268219947064,
+        "delta_winrate": -0.011111111111111072,
+        "delta_mdd": 0.0
+      },
+      "rationale": ""
+    },
+    {
+      "id": "P1b",
+      "category": "parameter",
+      "title": "cutoff 10:30",
+      "description": "cutoff_time 12:00 → 10:30",
+      "config_diff": {
+        "first_buy.cutoff_time": "10:30"
+      },
+      "filter_id": null,
+      "status": "rejected",
+      "result": {
+        "n_trades": 29,
+        "winrate": 0.6206896551724138,
+        "expectancy": 0.9727420552658468,
+        "total_pnl_pct": 28.209519602709555,
+        "mdd_pct": -14.133769442350008,
+        "max_consec_loss": 4,
+        "delta_pnl": -7.9615526733581845,
+        "delta_winrate": -0.0015325670498084198,
+        "delta_mdd": 0.0
+      },
+      "rationale": ""
+    },
+    {
+      "id": "P2",
+      "category": "parameter",
+      "title": "min_rise 8%",
+      "description": "min_rise_from_open_pct 5 → 8",
+      "config_diff": {
+        "first_buy.min_rise_from_open_pct": 8.0
+      },
+      "filter_id": null,
+      "status": "accepted",
+      "result": {
+        "n_trades": 36,
+        "winrate": 0.6666666666666666,
+        "expectancy": 1.0968075895295553,
+        "total_pnl_pct": 39.48507322306399,
+        "mdd_pct": -6.985140458607586,
+        "max_consec_loss": 2,
+        "delta_pnl": 3.314000946996252,
+        "delta_winrate": 0.0444444444444444,
+        "delta_mdd": 7.148628983742422
+      },
+      "rationale": ""
+    },
+    {
+      "id": "P3",
+      "category": "parameter",
+      "title": "SL -2.0%",
+      "description": "전 조건 stop_loss.first_only -2.9 → -2.0",
+      "config_diff": {
+        "strategies.골든10분.stop_loss.first_only": -0.02,
+        "strategies.굿모닝.stop_loss.first_only": -0.02,
+        "strategies.세력감지.stop_loss.first_only": -0.02
+      },
+      "filter_id": null,
+      "status": "rejected",
+      "result": {
+        "n_trades": 47,
+        "winrate": 0.5531914893617021,
+        "expectancy": 0.7301490951114115,
+        "total_pnl_pct": 34.31700747023634,
+        "mdd_pct": -11.821712057058132,
+        "max_consec_loss": 4,
+        "delta_pnl": -1.854064805831399,
+        "delta_winrate": -0.06903073286052008,
+        "delta_mdd": 2.312057385291876
+      },
+      "rationale": ""
+    },
+    {
+      "id": "P3b",
+      "category": "parameter",
+      "title": "SL -2.5%",
+      "description": "전 조건 stop_loss.first_only -2.9 → -2.5",
+      "config_diff": {
+        "strategies.골든10분.stop_loss.first_only": -0.025,
+        "strategies.굿모닝.stop_loss.first_only": -0.025,
+        "strategies.세력감지.stop_loss.first_only": -0.025
+      },
+      "filter_id": null,
+      "status": "rejected",
+      "result": {
+        "n_trades": 46,
+        "winrate": 0.5869565217391305,
+        "expectancy": 0.7276075967689303,
+        "total_pnl_pct": 33.469949451370795,
+        "mdd_pct": -12.690804405878954,
+        "max_consec_loss": 4,
+        "delta_pnl": -2.701122824696945,
+        "delta_winrate": -0.035265700483091744,
+        "delta_mdd": 1.4429650364710547
+      },
+      "rationale": ""
+    },
+    {
+      "id": "P5",
+      "category": "parameter",
+      "title": "세력감지 dip -0.5%",
+      "description": "세력감지 dip_entry_pct -1.0 → -0.5",
+      "config_diff": {
+        "strategies.세력감지.dip_entry_pct": -0.5
+      },
+      "filter_id": null,
+      "status": "rejected",
+      "result": {
+        "n_trades": 46,
+        "winrate": 0.6304347826086957,
+        "expectancy": 0.8204744198954022,
+        "total_pnl_pct": 37.7418233151885,
+        "mdd_pct": -12.552281818467815,
+        "max_consec_loss": 3,
+        "delta_pnl": 1.5707510391207578,
+        "delta_winrate": 0.008212560386473444,
+        "delta_mdd": 1.581487623882193
+      },
+      "rationale": ""
+    },
+    {
+      "id": "P6",
+      "category": "parameter",
+      "title": "dip_timeout 10분",
+      "description": "dip_timeout_minutes 20 → 10",
+      "config_diff": {
+        "first_buy.dip_timeout_minutes": 10
+      },
+      "filter_id": null,
+      "status": "rejected",
+      "result": {
+        "n_trades": 42,
+        "winrate": 0.5952380952380952,
+        "expectancy": 0.6465846646724246,
+        "total_pnl_pct": 27.15655591624183,
+        "mdd_pct": -14.133769442350008,
+        "max_consec_loss": 4,
+        "delta_pnl": -9.014516359825908,
+        "delta_winrate": -0.026984126984127,
+        "delta_mdd": 0.0
+      },
+      "rationale": ""
+    },
+    {
+      "id": "P6b",
+      "category": "parameter",
+      "title": "dip_timeout 30분",
+      "description": "dip_timeout_minutes 20 → 30",
+      "config_diff": {
+        "first_buy.dip_timeout_minutes": 30
+      },
+      "filter_id": null,
+      "status": "rejected",
+      "result": {
+        "n_trades": 45,
+        "winrate": 0.6222222222222222,
+        "expectancy": 0.7707395121889814,
+        "total_pnl_pct": 34.683278048504164,
+        "mdd_pct": -14.133769442350008,
+        "max_consec_loss": 4,
+        "delta_pnl": -1.487794227563576,
+        "delta_winrate": 0.0,
+        "delta_mdd": 0.0
+      },
+      "rationale": ""
+    },
+    {
+      "id": "F1",
+      "category": "filter",
+      "title": "고점 근접 -1% 내 스킵",
+      "description": "신호가가 intraday 최고 대비 -1% 이내면 reject",
+      "config_diff": {},
+      "filter_id": "F1",
+      "status": "rejected",
+      "result": {
+        "n_trades": 38,
+        "winrate": 0.6578947368421053,
+        "expectancy": 0.9735819291293898,
+        "total_pnl_pct": 36.99611330691681,
+        "mdd_pct": -6.948537674044086,
+        "max_consec_loss": 3,
+        "delta_pnl": 0.8250410308490714,
+        "delta_winrate": 0.03567251461988308,
+        "delta_mdd": 7.185231768305922
+      },
+      "rationale": ""
+    },
+    {
+      "id": "F5",
+      "category": "filter",
+      "title": "고점 대비 -5% 빠진 종목 스킵",
+      "description": "시가대비 일중 최고가 대비 -5% 이상 하락 시 reject",
+      "config_diff": {},
+      "filter_id": "F5",
+      "status": "rejected",
+      "result": {
+        "n_trades": 40,
+        "winrate": 0.6,
+        "expectancy": 0.6526453124770174,
+        "total_pnl_pct": 26.105812499080695,
+        "mdd_pct": -14.133769442350008,
+        "max_consec_loss": 4,
+        "delta_pnl": -10.065259776987045,
+        "delta_winrate": -0.022222222222222254,
+        "delta_mdd": 0.0
+      },
+      "rationale": ""
+    },
+    {
+      "id": "F6",
+      "category": "filter",
+      "title": "09:00~09:02 스킵",
+      "description": "장초반 2분 신호 제외",
+      "config_diff": {},
+      "filter_id": "F6",
+      "status": "rejected",
+      "result": {
+        "n_trades": 45,
+        "winrate": 0.6222222222222222,
+        "expectancy": 0.8038016061348386,
+        "total_pnl_pct": 36.17107227606774,
+        "mdd_pct": -14.133769442350008,
+        "max_consec_loss": 4,
+        "delta_pnl": 0.0,
+        "delta_winrate": 0.0,
+        "delta_mdd": 0.0
+      },
+      "rationale": ""
+    },
+    {
+      "id": "S1a",
+      "category": "structure",
+      "title": "세력감지 제외",
+      "description": "세력감지 조건 완전 배제",
+      "config_diff": {},
+      "filter_id": "S1_exclude_세력감지",
+      "status": "rejected",
+      "result": {
+        "n_trades": 37,
+        "winrate": 0.5945945945945946,
+        "expectancy": 0.8847323799464548,
+        "total_pnl_pct": 32.73509805801883,
+        "mdd_pct": -14.133769442350008,
+        "max_consec_loss": 4,
+        "delta_pnl": -3.435974218048912,
+        "delta_winrate": -0.027627627627627604,
+        "delta_mdd": 0.0
+      },
+      "rationale": ""
+    },
+    {
+      "id": "S1b",
+      "category": "structure",
+      "title": "굿모닝 제외",
+      "description": "굿모닝 조건 완전 배제",
+      "config_diff": {},
+      "filter_id": "S1_exclude_굿모닝",
+      "status": "rejected",
+      "result": {
+        "n_trades": 16,
+        "winrate": 0.8125,
+        "expectancy": 1.2379624318471658,
+        "total_pnl_pct": 19.807398909554653,
+        "mdd_pct": -4.712006874133268,
+        "max_consec_loss": 1,
+        "delta_pnl": -16.363673366513087,
+        "delta_winrate": 0.19027777777777777,
+        "delta_mdd": 9.42176256821674
+      },
+      "rationale": ""
+    },
+    {
+      "id": "S3",
+      "category": "structure",
+      "title": "profit_floor 조기 발동",
+      "description": "trigger 0.035→0.020, floor 0.008→0.005",
+      "config_diff": {
+        "strategies.골든10분.profit_floor.trigger": 0.02,
+        "strategies.골든10분.profit_floor.floor": 0.005,
+        "strategies.굿모닝.profit_floor.trigger": 0.02,
+        "strategies.굿모닝.profit_floor.floor": 0.005,
+        "strategies.세력감지.profit_floor.trigger": 0.02,
+        "strategies.세력감지.profit_floor.floor": 0.005
+      },
+      "filter_id": null,
+      "status": "rejected",
+      "result": {
+        "n_trades": 45,
+        "winrate": 0.5777777777777777,
+        "expectancy": 0.5266804735165352,
+        "total_pnl_pct": 23.700621308244084,
+        "mdd_pct": -11.700071307385052,
+        "max_consec_loss": 4,
+        "delta_pnl": -12.470450967823655,
+        "delta_winrate": -0.04444444444444451,
+        "delta_mdd": 2.4336981349649562
+      },
+      "rationale": ""
+    },
+    {
+      "id": "S6",
+      "category": "structure",
+      "title": "일일 손실 한도 -5%",
+      "description": "당일 누적 pnl -5% 도달 시 이후 신호 차단",
+      "config_diff": {},
+      "filter_id": "S6",
+      "status": "rejected",
+      "result": {
+        "n_trades": 45,
+        "winrate": 0.6222222222222222,
+        "expectancy": 0.8038016061348386,
+        "total_pnl_pct": 36.17107227606774,
+        "mdd_pct": -14.133769442350008,
+        "max_consec_loss": 4,
+        "delta_pnl": 0.0,
+        "delta_winrate": 0.0,
+        "delta_mdd": 0.0
+      },
+      "rationale": ""
+    },
+    {
+      "id": "S7",
+      "category": "structure",
+      "title": "강한 날 2차 시도",
+      "description": "TP1 이상 도달한 날은 closed_today 해제 후 1번 더",
+      "config_diff": {},
+      "filter_id": "S7",
+      "status": "rejected",
+      "result": {
+        "n_trades": 45,
+        "winrate": 0.6222222222222222,
+        "expectancy": 0.8038016061348386,
+        "total_pnl_pct": 36.17107227606774,
+        "mdd_pct": -14.133769442350008,
+        "max_consec_loss": 4,
+        "delta_pnl": 0.0,
+        "delta_winrate": 0.0,
+        "delta_mdd": 0.0
+      },
+      "rationale": ""
+    }
+  ],
+  "final": {
+    "id": "FINAL_V2",
+    "combined_ids": [
+      "T1",
+      "P2"
+    ],
+    "config": {
+      "first_buy": {
+        "min_trading_intensity": 98,
+        "max_positions": 1,
+        "use_full_balance": true,
+        "dip_entry_pct": -1.0,
+        "dip_timeout_minutes": 20,
+        "cutoff_time": "12:00",
+        "min_rise_from_open_pct": 8.0
+      },
+      "_dip_comment": "전략별 dip_entry_pct 우선, 없으면 first_buy.dip_entry_pct 사용",
+      "condition_map": {
+        "골든10분": [
+          "골든10분"
+        ],
+        "굿모닝": [
+          "굿모닝"
+        ],
+        "세력감지": [
+          "세력감지"
+        ]
+      },
+      "strategies": {
+        "굿모닝": {
+          "dip_entry_pct": -0.7,
+          "time_window": {
+            "start": "09:00",
+            "end": "09:15"
+          },
+          "price_range": {
+            "min": 1400,
+            "max": 135000
+          },
+          "buy_timeout": 180,
+          "sell_timeout": 30,
+          "below_price_rule": "prev_close",
+          "second_buy": null,
+          "stop_loss": {
+            "first_only": -0.029,
+            "after_second": null
+          },
+          "take_profit": {
+            "first_only": [
+              {
+                "profit": 0.034,
+                "sell_ratio": 0.25
+              },
+              {
+                "profit": 0.049,
+                "sell_ratio": 0.4
+              },
+              {
+                "profit": 0.063,
+                "sell_ratio": 0.5
+              },
+              {
+                "profit": 0.085,
+                "sell_ratio": 1.0
+              }
+            ],
+            "after_second": [],
+            "trailing": {
+              "trigger_profit": 0.035,
+              "trailing_drop": 0.031
+            }
+          },
+          "profit_floor": {
+            "trigger": 0.035,
+            "floor": 0.008
+          },
+          "retracement_rules": {
+            "first_only": {
+              "3": "all"
+            },
+            "after_second": {}
+          },
+          "intensity_floor": {
+            "threshold": 97,
+            "duration_seconds": 15
+          }
+        },
+        "골든10분": {
+          "dip_entry_pct": -1.0,
+          "time_window": {
+            "start": "09:00",
+            "end": "09:10"
+          },
+          "price_range": {
+            "min": 1400,
+            "max": 135000
+          },
+          "buy_timeout": 70,
+          "sell_timeout": 10,
+          "below_price_rule": "prev_close",
+          "second_buy": null,
+          "stop_loss": {
+            "first_only": -0.029,
+            "after_second": null
+          },
+          "take_profit": {
+            "first_only": [
+              {
+                "profit": 0.025,
+                "sell_ratio": 0.25
+              },
+              {
+                "profit": 0.049,
+                "sell_ratio": 0.4
+              },
+              {
+                "profit": 0.063,
+                "sell_ratio": 0.5
+              },
+              {
+                "profit": 0.085,
+                "sell_ratio": 1.0
+              }
+            ],
+            "after_second": [],
+            "trailing": {
+              "trigger_profit": 0.035,
+              "trailing_drop": 0.031
+            }
+          },
+          "profit_floor": {
+            "trigger": 0.035,
+            "floor": 0.008
+          },
+          "retracement_rules": {
+            "first_only": {
+              "3": "all"
+            },
+            "after_second": {}
+          },
+          "intensity_floor": {
+            "threshold": 92,
+            "duration_seconds": 15
+          }
+        },
+        "세력감지": {
+          "dip_entry_pct": -1.0,
+          "time_window": {
+            "start": "09:14",
+            "end": "12:00"
+          },
+          "price_range": {
+            "min": 1800,
+            "max": 135000
+          },
+          "buy_timeout": 190,
+          "sell_timeout": 210,
+          "below_price_rule": "open_after_0930",
+          "second_buy": null,
+          "stop_loss": {
+            "first_only": -0.029,
+            "after_second": null
+          },
+          "take_profit": {
+            "first_only": [
+              {
+                "profit": 0.014,
+                "sell_ratio": 0.25
+              },
+              {
+                "profit": 0.034,
+                "sell_ratio": 0.4
+              },
+              {
+                "profit": 0.055,
+                "sell_ratio": 0.5
+              },
+              {
+                "profit": 0.074,
+                "sell_ratio": 1.0
+              }
+            ],
+            "after_second": [],
+            "trailing": {
+              "trigger_profit": 0.031,
+              "trailing_drop": 0.03
+            }
+          },
+          "profit_floor": {
+            "trigger": 0.07,
+            "floor": 0.04
+          },
+          "retracement_rules": {
+            "first_only": {
+              "1": "all",
+              "2": "all",
+              "3": "all",
+              "4": "all"
+            },
+            "after_second": {}
+          },
+          "intensity_floor": {
+            "threshold": 92,
+            "duration_seconds": 62
+          }
+        }
+      }
+    },
+    "result": {
+      "n_trades": 36,
+      "winrate": 0.6666666666666666,
+      "expectancy": 1.0968075895295553,
+      "total_pnl_pct": 39.48507322306399,
+      "mdd_pct": -6.985140458607586,
+      "max_consec_loss": 2
+    },
+    "trades": [
+      {
+        "date": "2026-02-11",
+        "code": "066570",
+        "name": "LG전자",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "10:40:53",
+        "signal_price": 118800,
+        "dip_target": 118800,
+        "fill_minute": 1044,
+        "fill_time": "10:44",
+        "fill_price": 117968,
+        "exit_minute": 1138,
+        "exit_time": "11:38",
+        "exit_price": 122500,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 3.6029196529241414,
+        "pnl_gross_pct": 3.841719788417198,
+        "hold_minutes": 54
+      },
+      {
+        "date": "2026-02-12",
+        "code": "042700",
+        "name": "한미반도체",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "09:38:49",
+        "signal_price": 219000,
+        "dip_target": 219000,
+        "fill_minute": 945,
+        "fill_time": "09:45",
+        "fill_price": 217467,
+        "exit_minute": 1130,
+        "exit_time": "11:30",
+        "exit_price": 211000,
+        "exit_type": "stop_loss",
+        "pnl_pct": -3.1969113547883787,
+        "pnl_gross_pct": -2.973784528227271,
+        "hold_minutes": 105
+      },
+      {
+        "date": "2026-02-13",
+        "code": "011690",
+        "name": "와이투솔루션",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "09:24:16",
+        "signal_price": 6940,
+        "dip_target": 6940,
+        "fill_minute": 925,
+        "fill_time": "09:25",
+        "fill_price": 6891,
+        "exit_minute": 948,
+        "exit_time": "09:48",
+        "exit_price": 7190,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 4.099049197184335,
+        "pnl_gross_pct": 4.338992889275867,
+        "hold_minutes": 23
+      },
+      {
+        "date": "2026-02-13",
+        "code": "047770",
+        "name": "코데즈컴바인",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "10:12:38",
+        "signal_price": 4680,
+        "dip_target": 4680,
+        "fill_minute": 1013,
+        "fill_time": "10:13",
+        "fill_price": 4647,
+        "exit_minute": 1017,
+        "exit_time": "10:17",
+        "exit_price": 4505,
+        "exit_type": "stop_loss",
+        "pnl_pct": -3.278673251734432,
+        "pnl_gross_pct": -3.0557348827200346,
+        "hold_minutes": 4
+      },
+      {
+        "date": "2026-02-13",
+        "code": "078020",
+        "name": "LS증권",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "10:46:20",
+        "signal_price": 7720,
+        "dip_target": 7720,
+        "fill_minute": 1048,
+        "fill_time": "10:48",
+        "fill_price": 7665,
+        "exit_minute": 1050,
+        "exit_time": "10:50",
+        "exit_price": 7430,
+        "exit_type": "stop_loss",
+        "pnl_pct": -3.2887989176052956,
+        "pnl_gross_pct": -3.0658838878016956,
+        "hold_minutes": 2
+      },
+      {
+        "date": "2026-02-20",
+        "code": "082640",
+        "name": "동양생명",
+        "condition": "세력감지",
+        "strat_name": "세력감지",
+        "signal_time": "10:35:19",
+        "signal_price": 8520,
+        "dip_target": 8520,
+        "fill_minute": 1036,
+        "fill_time": "10:36",
+        "fill_price": 8434,
+        "exit_minute": 1039,
+        "exit_time": "10:39",
+        "exit_price": 8620,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 1.9703221893998313,
+        "pnl_gross_pct": 2.2053592601375382,
+        "hold_minutes": 3
+      },
+      {
+        "date": "2026-02-20",
+        "code": "010170",
+        "name": "대한광통신",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "11:10:51",
+        "signal_price": 4170,
+        "dip_target": 4170,
+        "fill_minute": 1116,
+        "fill_time": "11:16",
+        "fill_price": 4140,
+        "exit_minute": 1205,
+        "exit_time": "12:05",
+        "exit_price": 4295,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 3.505386027844626,
+        "pnl_gross_pct": 3.7439613526570046,
+        "hold_minutes": 49
+      },
+      {
+        "date": "2026-02-23",
+        "code": "306620",
+        "name": "지아이에스",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "09:55:37",
+        "signal_price": 3025,
+        "dip_target": 3025,
+        "fill_minute": 1011,
+        "fill_time": "10:11",
+        "fill_price": 3003,
+        "exit_minute": 1519,
+        "exit_time": "15:19",
+        "exit_price": 3115,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 3.491061422371722,
+        "pnl_gross_pct": 3.7296037296037294,
+        "hold_minutes": 308
+      },
+      {
+        "date": "2026-02-27",
+        "code": "047770",
+        "name": "코데즈컴바인",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "10:13:47",
+        "signal_price": 5840,
+        "dip_target": 5840,
+        "fill_minute": 1014,
+        "fill_time": "10:14",
+        "fill_price": 5799,
+        "exit_minute": 1021,
+        "exit_time": "10:21",
+        "exit_price": 5630,
+        "exit_type": "stop_loss",
+        "pnl_pct": -3.1375591988499707,
+        "pnl_gross_pct": -2.914295568201414,
+        "hold_minutes": 7
+      },
+      {
+        "date": "2026-03-04",
+        "code": "402490",
+        "name": "그린리소스",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "10:06:56",
+        "signal_price": 11610,
+        "dip_target": 11610,
+        "fill_minute": 1010,
+        "fill_time": "10:10",
+        "fill_price": 11528,
+        "exit_minute": 1020,
+        "exit_time": "10:20",
+        "exit_price": 11110,
+        "exit_type": "stop_loss",
+        "pnl_pct": -3.8475812597576153,
+        "pnl_gross_pct": -3.6259541984732824,
+        "hold_minutes": 10
+      },
+      {
+        "date": "2026-03-06",
+        "code": "015260",
+        "name": "에이엔피",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "09:12:11",
+        "signal_price": 662,
+        "dip_target": 662,
+        "fill_minute": 913,
+        "fill_time": "09:13",
+        "fill_price": 657,
+        "exit_minute": 913,
+        "exit_time": "09:13",
+        "exit_price": 707,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 7.36288339093123,
+        "pnl_gross_pct": 7.610350076103501,
+        "hold_minutes": 0
+      },
+      {
+        "date": "2026-03-06",
+        "code": "474610",
+        "name": "RF시스템즈",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "09:38:21",
+        "signal_price": 7750,
+        "dip_target": 7750,
+        "fill_minute": 940,
+        "fill_time": "09:40",
+        "fill_price": 7695,
+        "exit_minute": 1009,
+        "exit_time": "10:09",
+        "exit_price": 7420,
+        "exit_type": "stop_loss",
+        "pnl_pct": -3.795496302585155,
+        "pnl_gross_pct": -3.5737491877842755,
+        "hold_minutes": 29
+      },
+      {
+        "date": "2026-03-09",
+        "code": "002100",
+        "name": "경농",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "09:05:43",
+        "signal_price": 10260,
+        "dip_target": 10260,
+        "fill_minute": 927,
+        "fill_time": "09:27",
+        "fill_price": 11101,
+        "exit_minute": 929,
+        "exit_time": "09:29",
+        "exit_price": 11540,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 3.715538966785825,
+        "pnl_gross_pct": 3.9545986848031704,
+        "hold_minutes": 2
+      },
+      {
+        "date": "2026-03-09",
+        "code": "137950",
+        "name": "제이씨케미칼",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "10:32:38",
+        "signal_price": 4335,
+        "dip_target": 4335,
+        "fill_minute": 1034,
+        "fill_time": "10:34",
+        "fill_price": 4304,
+        "exit_minute": 1036,
+        "exit_time": "10:36",
+        "exit_price": 4500,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 4.313465433716512,
+        "pnl_gross_pct": 4.553903345724907,
+        "hold_minutes": 2
+      },
+      {
+        "date": "2026-03-10",
+        "code": "289080",
+        "name": "SV인베스트먼트",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "11:23:05",
+        "signal_price": 3785,
+        "dip_target": 3785,
+        "fill_minute": 1124,
+        "fill_time": "11:24",
+        "fill_price": 3758,
+        "exit_minute": 1131,
+        "exit_time": "11:31",
+        "exit_price": 3620,
+        "exit_type": "stop_loss",
+        "pnl_pct": -3.893686835745258,
+        "pnl_gross_pct": -3.6721660457690266,
+        "hold_minutes": 7
+      },
+      {
+        "date": "2026-03-11",
+        "code": "306620",
+        "name": "지아이에스",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "11:16:39",
+        "signal_price": 3160,
+        "dip_target": 3160,
+        "fill_minute": 1117,
+        "fill_time": "11:17",
+        "fill_price": 3137,
+        "exit_minute": 1120,
+        "exit_time": "11:20",
+        "exit_price": 3020,
+        "exit_type": "stop_loss",
+        "pnl_pct": -3.951066568577044,
+        "pnl_gross_pct": -3.7296780363404523,
+        "hold_minutes": 3
+      },
+      {
+        "date": "2026-03-11",
+        "code": "389020",
+        "name": "자람테크놀로지",
+        "condition": "세력감지",
+        "strat_name": "세력감지",
+        "signal_time": "11:21:02",
+        "signal_price": 52500,
+        "dip_target": 52500,
+        "fill_minute": 1124,
+        "fill_time": "11:24",
+        "fill_price": 51975,
+        "exit_minute": 1126,
+        "exit_time": "11:26",
+        "exit_price": 52800,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 1.353685836013474,
+        "pnl_gross_pct": 1.5873015873015872,
+        "hold_minutes": 2
+      },
+      {
+        "date": "2026-03-12",
+        "code": "322310",
+        "name": "오로스테크놀로지",
+        "condition": "세력감지",
+        "strat_name": "세력감지",
+        "signal_time": "10:41:09",
+        "signal_price": 30300,
+        "dip_target": 30300,
+        "fill_minute": 1054,
+        "fill_time": "10:54",
+        "fill_price": 29997,
+        "exit_minute": 1317,
+        "exit_time": "13:17",
+        "exit_price": 30600,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 1.7756127459968685,
+        "pnl_gross_pct": 2.01020102010201,
+        "hold_minutes": 143
+      },
+      {
+        "date": "2026-03-16",
+        "code": "465770",
+        "name": "STX그린로지스",
+        "condition": "골든10분",
+        "strat_name": "골든10분",
+        "signal_time": "09:39:29",
+        "signal_price": 7750,
+        "dip_target": 7750,
+        "fill_minute": 940,
+        "fill_time": "09:40",
+        "fill_price": 7672,
+        "exit_minute": 1015,
+        "exit_time": "10:15",
+        "exit_price": 7900,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 2.7350459474874356,
+        "pnl_gross_pct": 2.9718456725755993,
+        "hold_minutes": 35
+      },
+      {
+        "date": "2026-03-17",
+        "code": "412350",
+        "name": "레이저쎌",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "10:25:52",
+        "signal_price": 6020,
+        "dip_target": 6020,
+        "fill_minute": 1026,
+        "fill_time": "10:26",
+        "fill_price": 5977,
+        "exit_minute": 1026,
+        "exit_time": "10:26",
+        "exit_price": 6200,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 3.492423267177469,
+        "pnl_gross_pct": 3.7309687134013716,
+        "hold_minutes": 0
+      },
+      {
+        "date": "2026-03-19",
+        "code": "033160",
+        "name": "엠케이전자",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "10:29:21",
+        "signal_price": 17020,
+        "dip_target": 17020,
+        "fill_minute": 1033,
+        "fill_time": "10:33",
+        "fill_price": 16900,
+        "exit_minute": 1053,
+        "exit_time": "10:53",
+        "exit_price": 17490,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 3.2531303736392125,
+        "pnl_gross_pct": 3.4911242603550297,
+        "hold_minutes": 20
+      },
+      {
+        "date": "2026-03-20",
+        "code": "100130",
+        "name": "동국S&C",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "09:14:58",
+        "signal_price": 2600,
+        "dip_target": 2600,
+        "fill_minute": 915,
+        "fill_time": "09:15",
+        "fill_price": 2581,
+        "exit_minute": 917,
+        "exit_time": "09:17",
+        "exit_price": 2505,
+        "exit_type": "stop_loss",
+        "pnl_pct": -3.167789070306637,
+        "pnl_gross_pct": -2.9445951181712515,
+        "hold_minutes": 2
+      },
+      {
+        "date": "2026-03-20",
+        "code": "388050",
+        "name": "지투파워",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "09:17:24",
+        "signal_price": 12810,
+        "dip_target": 12810,
+        "fill_minute": 951,
+        "fill_time": "09:51",
+        "fill_price": 13256,
+        "exit_minute": 1037,
+        "exit_time": "10:37",
+        "exit_price": 13740,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 3.4128148731824126,
+        "pnl_gross_pct": 3.6511768255884127,
+        "hold_minutes": 46
+      },
+      {
+        "date": "2026-03-23",
+        "code": "014970",
+        "name": "삼륭물산",
+        "condition": "골든10분",
+        "strat_name": "골든10분",
+        "signal_time": "09:18:59",
+        "signal_price": 7620,
+        "dip_target": 7620,
+        "fill_minute": 919,
+        "fill_time": "09:19",
+        "fill_price": 7543,
+        "exit_minute": 919,
+        "exit_time": "09:19",
+        "exit_price": 7790,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 3.037063332187828,
+        "pnl_gross_pct": 3.27455919395466,
+        "hold_minutes": 0
+      },
+      {
+        "date": "2026-03-23",
+        "code": "038110",
+        "name": "에코플라스틱",
+        "condition": "골든10분",
+        "strat_name": "골든10분",
+        "signal_time": "09:26:33",
+        "signal_price": 3765,
+        "dip_target": 3765,
+        "fill_minute": 935,
+        "fill_time": "09:35",
+        "fill_price": 3727,
+        "exit_minute": 942,
+        "exit_time": "09:42",
+        "exit_price": 3830,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 2.527295979388966,
+        "pnl_gross_pct": 2.7636168500134155,
+        "hold_minutes": 7
+      },
+      {
+        "date": "2026-03-24",
+        "code": "003000",
+        "name": "부광약품",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "10:06:46",
+        "signal_price": 6960,
+        "dip_target": 6960,
+        "fill_minute": 1007,
+        "fill_time": "10:07",
+        "fill_price": 6911,
+        "exit_minute": 1059,
+        "exit_time": "10:59",
+        "exit_price": 6700,
+        "exit_type": "stop_loss",
+        "pnl_pct": -3.27604816736613,
+        "pnl_gross_pct": -3.053103747648676,
+        "hold_minutes": 52
+      },
+      {
+        "date": "2026-03-24",
+        "code": "115440",
+        "name": "우리넷",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "11:02:43",
+        "signal_price": 9840,
+        "dip_target": 9840,
+        "fill_minute": 1103,
+        "fill_time": "11:03",
+        "fill_price": 9771,
+        "exit_minute": 1105,
+        "exit_time": "11:05",
+        "exit_price": 10220,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 4.35469783411313,
+        "pnl_gross_pct": 4.595230784975949,
+        "hold_minutes": 2
+      },
+      {
+        "date": "2026-03-25",
+        "code": "083500",
+        "name": "에프엔에스테크",
+        "condition": "세력감지",
+        "strat_name": "세력감지",
+        "signal_time": "11:09:10",
+        "signal_price": 18810,
+        "dip_target": 18810,
+        "fill_minute": 1112,
+        "fill_time": "11:12",
+        "fill_price": 18621,
+        "exit_minute": 1119,
+        "exit_time": "11:19",
+        "exit_price": 19190,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 2.818697274888926,
+        "pnl_gross_pct": 3.055689812577198,
+        "hold_minutes": 7
+      },
+      {
+        "date": "2026-03-26",
+        "code": "104480",
+        "name": "티케이케미칼",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "09:51:23",
+        "signal_price": 2530,
+        "dip_target": 2530,
+        "fill_minute": 957,
+        "fill_time": "09:57",
+        "fill_price": 2512,
+        "exit_minute": 1034,
+        "exit_time": "10:34",
+        "exit_price": 2600,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 3.265163091778245,
+        "pnl_gross_pct": 3.5031847133757963,
+        "hold_minutes": 37
+      },
+      {
+        "date": "2026-03-30",
+        "code": "053950",
+        "name": "경남제약",
+        "condition": "세력감지",
+        "strat_name": "세력감지",
+        "signal_time": "11:36:46",
+        "signal_price": 999,
+        "dip_target": 999,
+        "fill_minute": 1139,
+        "fill_time": "11:39",
+        "fill_price": 989,
+        "exit_minute": 1139,
+        "exit_time": "11:39",
+        "exit_price": 1003,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 1.1823504532965101,
+        "pnl_gross_pct": 1.4155712841253791,
+        "hold_minutes": 0
+      },
+      {
+        "date": "2026-04-01",
+        "code": "064290",
+        "name": "인텍플러스",
+        "condition": "골든10분",
+        "strat_name": "골든10분",
+        "signal_time": "09:36:08",
+        "signal_price": 19220,
+        "dip_target": 19220,
+        "fill_minute": 937,
+        "fill_time": "09:37",
+        "fill_price": 19027,
+        "exit_minute": 943,
+        "exit_time": "09:43",
+        "exit_price": 19760,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 3.613595502063238,
+        "pnl_gross_pct": 3.85242024491512,
+        "hold_minutes": 6
+      },
+      {
+        "date": "2026-04-01",
+        "code": "230240",
+        "name": "에치에프알",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "10:30:12",
+        "signal_price": 33900,
+        "dip_target": 33900,
+        "fill_minute": 1033,
+        "fill_time": "10:33",
+        "fill_price": 33662,
+        "exit_minute": 1525,
+        "exit_time": "15:25",
+        "exit_price": 33700,
+        "exit_type": "market_close",
+        "pnl_pct": -0.11733817136153624,
+        "pnl_gross_pct": 0.1128869348226487,
+        "hold_minutes": 292
+      },
+      {
+        "date": "2026-04-02",
+        "code": "065450",
+        "name": "빅텍",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "09:37:06",
+        "signal_price": 5770,
+        "dip_target": 5770,
+        "fill_minute": 938,
+        "fill_time": "09:38",
+        "fill_price": 5729,
+        "exit_minute": 941,
+        "exit_time": "09:41",
+        "exit_price": 5990,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 4.3153266929667256,
+        "pnl_gross_pct": 4.55576889509513,
+        "hold_minutes": 3
+      },
+      {
+        "date": "2026-04-06",
+        "code": "062970",
+        "name": "한국첨단소재",
+        "condition": "굿모닝",
+        "strat_name": "굿모닝",
+        "signal_time": "09:12:03",
+        "signal_price": 4175,
+        "dip_target": 4175,
+        "fill_minute": 927,
+        "fill_time": "09:27",
+        "fill_price": 4145,
+        "exit_minute": 927,
+        "exit_time": "09:27",
+        "exit_price": 4305,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 3.62123003624244,
+        "pnl_gross_pct": 3.8600723763570564,
+        "hold_minutes": 0
+      },
+      {
+        "date": "2026-04-08",
+        "code": "307930",
+        "name": "컴퍼니케이",
+        "condition": "세력감지",
+        "strat_name": "세력감지",
+        "signal_time": "10:51:29",
+        "signal_price": 8270,
+        "dip_target": 8270,
+        "fill_minute": 1118,
+        "fill_time": "11:18",
+        "fill_price": 8316,
+        "exit_minute": 1119,
+        "exit_time": "11:19",
+        "exit_price": 8440,
+        "exit_type": "take_profit_1",
+        "pnl_pct": 1.2577069668505914,
+        "pnl_gross_pct": 1.491101491101491,
+        "hold_minutes": 1
+      },
+      {
+        "date": "2026-04-09",
+        "code": "310870",
+        "name": "디와이씨",
+        "condition": "세력감지",
+        "strat_name": "세력감지",
+        "signal_time": "11:44:05",
+        "signal_price": 1862,
+        "dip_target": 1862,
+        "fill_minute": 1145,
+        "fill_time": "11:45",
+        "fill_price": 1843,
+        "exit_minute": 1153,
+        "exit_time": "11:53",
+        "exit_price": 1780,
+        "exit_type": "stop_loss",
+        "pnl_pct": -3.6404441666902487,
+        "pnl_gross_pct": -3.41833966359197,
+        "hold_minutes": 8
+      }
+    ],
+    "equity_curve": [
+      {
+        "date": "2026-02-11",
+        "daily_pnl": 3.6029196529241414,
+        "cum_pnl": 3.6029196529241414,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-12",
+        "daily_pnl": -3.1969113547883787,
+        "cum_pnl": 0.40600829813576267,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-13",
+        "daily_pnl": -2.468422972155393,
+        "cum_pnl": -2.0624146740196303,
+        "n_trades": 3
+      },
+      {
+        "date": "2026-02-20",
+        "daily_pnl": 5.475708217244457,
+        "cum_pnl": 3.413293543224827,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-02-23",
+        "daily_pnl": 3.491061422371722,
+        "cum_pnl": 6.904354965596548,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-27",
+        "daily_pnl": -3.1375591988499707,
+        "cum_pnl": 3.7667957667465775,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-04",
+        "daily_pnl": -3.8475812597576153,
+        "cum_pnl": -0.08078549301103788,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-06",
+        "daily_pnl": 3.5673870883460745,
+        "cum_pnl": 3.4866015953350367,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-09",
+        "daily_pnl": 8.029004400502338,
+        "cum_pnl": 11.515605995837374,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-10",
+        "daily_pnl": -3.893686835745258,
+        "cum_pnl": 7.621919160092116,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-11",
+        "daily_pnl": -2.59738073256357,
+        "cum_pnl": 5.024538427528546,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-12",
+        "daily_pnl": 1.7756127459968685,
+        "cum_pnl": 6.800151173525414,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-16",
+        "daily_pnl": 2.7350459474874356,
+        "cum_pnl": 9.53519712101285,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-17",
+        "daily_pnl": 3.492423267177469,
+        "cum_pnl": 13.027620388190318,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-19",
+        "daily_pnl": 3.2531303736392125,
+        "cum_pnl": 16.28075076182953,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-20",
+        "daily_pnl": 0.2450258028757757,
+        "cum_pnl": 16.525776564705307,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-23",
+        "daily_pnl": 5.564359311576794,
+        "cum_pnl": 22.0901358762821,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-24",
+        "daily_pnl": 1.0786496667470002,
+        "cum_pnl": 23.168785543029102,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-25",
+        "daily_pnl": 2.818697274888926,
+        "cum_pnl": 25.98748281791803,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-26",
+        "daily_pnl": 3.265163091778245,
+        "cum_pnl": 29.252645909696273,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-30",
+        "daily_pnl": 1.1823504532965101,
+        "cum_pnl": 30.434996362992784,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-04-01",
+        "daily_pnl": 3.496257330701702,
+        "cum_pnl": 33.93125369369449,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-04-02",
+        "daily_pnl": 4.3153266929667256,
+        "cum_pnl": 38.246580386661215,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-04-06",
+        "daily_pnl": 3.62123003624244,
+        "cum_pnl": 41.86781042290365,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-04-08",
+        "daily_pnl": 1.2577069668505914,
+        "cum_pnl": 43.12551738975424,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-04-09",
+        "daily_pnl": -3.6404441666902487,
+        "cum_pnl": 39.48507322306399,
+        "n_trades": 1
+      }
+    ]
+  },
+  "robustness": {
+    "train_feb_mar": {
+      "baseline_pnl": 19.527872326418528,
+      "final_pnl": 30.434996362992784
+    },
+    "test_apr": {
+      "baseline_pnl": 16.643199949649212,
+      "final_pnl": 9.05007686007121
+    },
+    "worst5_baseline": [
+      {
+        "date": "2026-03-10",
+        "pnl": -3.893686835745258
+      },
+      {
+        "date": "2026-03-04",
+        "pnl": -3.8475812597576153
+      },
+      {
+        "date": "2026-02-24",
+        "pnl": -3.8109784751941156
+      },
+      {
+        "date": "2026-02-25",
+        "pnl": -3.3376505085483066
+      },
+      {
+        "date": "2026-03-18",
+        "pnl": -3.307411352120493
+      }
+    ],
+    "worst5_final": [
+      {
+        "date": "2026-03-10",
+        "pnl": -3.893686835745258
+      },
+      {
+        "date": "2026-03-04",
+        "pnl": -3.8475812597576153
+      },
+      {
+        "date": "2026-04-09",
+        "pnl": -3.6404441666902487
+      },
+      {
+        "date": "2026-02-12",
+        "pnl": -3.1969113547883787
+      },
+      {
+        "date": "2026-02-27",
+        "pnl": -3.1375591988499707
+      }
+    ],
+    "consec_loss_baseline": {
+      "1": 9,
+      "2": 2,
+      "4": 1
+    },
+    "consec_loss_final": {
+      "1": 6,
+      "2": 3
+    }
+  }
+}

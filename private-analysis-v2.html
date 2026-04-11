@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Private 전략 백테스트 분석</title>
+<title>Private 전략 백테스트 분석 v2 (T1 baseline)</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   :root {
@@ -62,6 +62,11 @@
   .evidence-line { margin-bottom: 3px; font-family: "SF Mono", "Consolas", "Monaco", "Courier New", monospace; color: #c8cdd4; }
   .evidence-line:last-child { margin-bottom: 0; }
   .evidence-line b { color: var(--text); background: rgba(79, 209, 197, 0.15); padding: 1px 4px; border-radius: 2px; font-weight: 600; }
+  .v2-banner { background: linear-gradient(135deg, rgba(79, 209, 197, 0.15), rgba(79, 209, 197, 0.05)); border: 2px solid var(--accent); border-radius: 10px; padding: 18px 22px; margin-bottom: 24px; }
+  .v2-banner-title { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+  .v2-banner-body { font-size: 13px; line-height: 1.7; color: var(--text); }
+  .v2-warning { background: rgba(240, 176, 80, 0.08); border: 1px solid #f0b050; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+  .v2-warning-title { color: #f0b050; font-weight: 600; margin-bottom: 6px; }
   .recommendation-highlight { background: linear-gradient(135deg, rgba(79, 209, 197, 0.12), rgba(16, 185, 129, 0.08)); border: 2px solid var(--accent); border-radius: 10px; padding: 20px 24px; margin-bottom: 16px; }
   .rec-title { font-size: 18px; font-weight: 700; color: var(--accent); margin-bottom: 12px; }
   .rec-body p { margin: 8px 0; line-height: 1.6; }
@@ -84,8 +89,20 @@
 </head>
 <body>
 <div class="container">
-  <h1>Private 전략 백테스트 분석</h1>
+  <h1>Private 전략 백테스트 분석 <span style="color:var(--accent);font-size:0.6em">v2</span></h1>
   <p id="meta-line" style="color: var(--muted)">로딩 중...</p>
+
+  <div class="v2-banner">
+    <div class="v2-banner-title">📊 v2: T1 (조건식별 time_window 최적화) 을 새로운 Baseline 으로 재분석</div>
+    <div class="v2-banner-body">
+      v1 에서 가장 강력했던 <b>T1</b> (골든10분 09:15~10:00 · 굿모닝 09:10~11:30 · 세력감지 10:30~12:00) 을
+      <b>새로운 baseline</b> 으로 고정하고, 그 위에서 <b>추가 최적화 여지가 있는지</b> 재분석.
+      v1 의 다른 15개 variants (T1 제외) 를 T1 위에서 다시 돌려 accepted/rejected 재판정.
+      <br>⇢ 결과: 대부분 variant 가 효과 0 또는 음수. T1 이 이미 개선 여지 대부분을 흡수했음.
+      <br><br>
+      <b>v1 보고서:</b> <a href="private-analysis.html" style="color:var(--accent)">private-analysis.html</a>
+    </div>
+  </div>
 
   <section class="section" id="summary">
     <h2>요약</h2>
@@ -124,8 +141,8 @@ const STATE = { baseline: null, variants: null };
 
 async function loadData() {
   const [baseline, variants] = await Promise.all([
-    fetch('data/private_sim/baseline.json').then(r => r.json()),
-    fetch('data/private_sim/variants.json').then(r => r.json()),
+    fetch('data/private_sim/baseline_v2.json').then(r => r.json()),
+    fetch('data/private_sim/variants_v2.json').then(r => r.json()),
   ]);
   STATE.baseline = baseline;
   STATE.variants = variants;
@@ -315,6 +332,28 @@ function renderHeatmap(containerId, crossData) {
 }
 
 const VARIANT_EXPLANATIONS = {
+  "P2": {
+    change: "min_rise_from_open_pct 5% → 8% (시가대비 상승률 하한 강화)",
+    why: "T1 baseline 위에서 유일하게 채택된 variant. 시가대비 상승률이 5~8% 인 '약한 상승' 종목을 걸러내면 남는 종목의 품질이 올라감.",
+    real: "신호 도착 시점에 시가대비 8% 이상 상승 중인 종목만 수용. 5~8% 구간 종목은 reject.",
+    caution: "⚠️ <b>매우 심각한 overfit 신호 발견</b>: Train(Feb-Mar)에서는 +10.90%p 크게 개선되지만 <b>Test(Apr)에서는 -7.59%p 악화</b>. 방향이 정반대. 실전 미사용 강력 권장.",
+    evidence: [
+      "T1 baseline: +36.17% / MDD -14.13% / 승률 62.2% / n=45",
+      "T1 + P2:     +39.49% / MDD -6.99%  / 승률 66.7% / n=36 (9건 감소)",
+      "",
+      "━━━ Robustness (Train/Test 분리) ━━━",
+      "• Train(Feb-Mar): T1 +19.53% → T1+P2 <b>+30.43%</b> (+10.90%p 🟢)",
+      "• Test(Apr):     T1 +16.64% → T1+P2 <b>+9.05%</b> (<b class='neg'>-7.59%p 🔴</b>)",
+      "",
+      "━━━ 해석 ━━━",
+      "Apr 4거래일 기간에 <b>5~8% 상승 구간에서 수익을 낸 종목</b>이 있었고, 이를 P2 로 차단해서 그 수익을 놓침.",
+      "즉 P2 의 기준(8% 이상만)이 Feb-Mar 에 맞춰진 cut-off 라 4월 장세와 다름.",
+      "결론: <b>실전 반영 금지</b>. Feb-Mar 샘플 38일에 과적합된 전형적 케이스."
+    ]
+  },
+  "_zero_effect_explanation": {
+    note: "F6 / S6 / S7 는 T1 baseline 위에서 Δ=0 — T1 이 이미 효과 흡수"
+  },
   "P1": {
     change: "신호 수신 cutoff 시각 12:00 → 11:00",
     why: "11~12시 구간에 잡히는 신호는 이미 장초반 모멘텀이 소진된 후라 진입 후 상승 여력이 낮음. 11시 이후 신호를 차단하면 평균 거래 품질이 올라가고 슬롯을 헛되이 소모하는 일이 줄어듦.",
@@ -509,9 +548,42 @@ function renderFinal() {
     `;
   }).join('');
 
-  // T1 단독 대안 (수동 계산 결과 하드코딩)
-  const t1Alternative = `
+  // v2 전용 결론 박스 — T1 이 사실상 최적임을 확인
+  const v2Conclusion = `
     <div class="recommendation-highlight">
+      <div class="rec-title">🎯 v2 결론: T1 단독이 out-of-sample 최적</div>
+      <div class="rec-body">
+        <p>T1 baseline 위에서 15개 variants 를 재평가한 결과:</p>
+        <ul style="margin:8px 0 12px 20px;line-height:1.8">
+          <li><b>대부분 variant 가 ΔPnL = 0 또는 음수</b> — T1 이 이미 그 효과를 흡수했거나, 오히려 T1 의 장점을 훼손</li>
+          <li><b>F6 / S6 / S7: ΔPnL = 0.00%</b> — T1 의 time_window 제약이 이미 이들 효과를 자동 구현 (골든10분 09:15+ = F6 중복, 연속손실 max 2회 = S6 불필요, 최적 슬롯만 사용 = S7 무의미)</li>
+          <li><b>S1a (세력감지 제외): -3.44%</b> — T1 이 세력감지 10:30~12:00 만 허용하는데 이를 배제하면 손해 (S1a 는 잘못된 접근이었다는 것 확정)</li>
+          <li><b>P2 (min_rise 8%) 만 유일 accepted: +3.31%</b> — 하지만 <b class="neg">⚠️ Apr test 에서 -7.59%p 악화 (overfit)</b></li>
+        </ul>
+
+        <div class="v2-warning">
+          <div class="v2-warning-title">⚠️ P2 는 overfit — 실전 금지</div>
+          <div style="font-size:13px;line-height:1.7">
+            <b>Train(Feb-Mar)</b>: T1 +19.53% → T1+P2 <span class="pos">+30.43% (+10.90%p)</span><br>
+            <b>Test(Apr)</b>:     T1 +16.64% → T1+P2 <span class="neg">+9.05% (-7.59%p)</span><br>
+            방향이 Train/Test 에서 정반대. <b>Feb-Mar 특성에 과적합된 전형</b>. 실전 미사용.
+          </div>
+        </div>
+
+        <p style="margin-top:16px"><b>최종 권장:</b></p>
+        <ol style="margin:8px 0 0 20px;line-height:1.8">
+          <li><b>T1 단독 적용</b> — 추가 variant 없이 time_window 만 조정. +36.17% / MDD -14.13% 달성</li>
+          <li><b>1~2주 페이퍼 트레이딩 검증</b> — Apr +3.99%p 개선이 5월 실전에서 유지되는지 확인</li>
+          <li><b>P2 미적용</b> — Apr 에서 정반대 방향으로 악화, 실전 반영 금지</li>
+        </ol>
+      </div>
+    </div>
+  `;
+
+  // v1 에서 가져온 T1 단독 하이라이트 — v2 에서는 비활성화 (v2Conclusion 이 대체)
+  const t1Alternative = `
+    <div style="display:none">
+      <div class="recommendation-highlight">
       <div class="rec-title">💡 대안 추천: T1 단독</div>
       <div class="rec-body">
         <p><b>조건식별 time_window 최적화(T1) 단 하나만 적용</b>해도 현재 Final 조합보다 강력한 결과:</p>
@@ -545,18 +617,18 @@ function renderFinal() {
           </tbody>
         </table>
         <p style="margin-top:14px;font-size:12px;color:var(--muted)">
-          <b>현재 Final 조합(${f.combined_ids.join(' + ')})</b>: n=${f.result.n_trades}, PnL ${fmt(f.result.total_pnl_pct)}%, MDD ${fmt(f.result.mdd_pct)}%<br>
-          <b>T1 단독</b>: n=45, PnL +36.17%, MDD -14.13% — 조합보다 +${fmt(36.17 - f.result.total_pnl_pct)}%p 강력, MDD ${fmt(-14.13 - f.result.mdd_pct)}%p 개선<br>
-          <b>Robustness</b>: Train(Feb-Mar) +16.17%p / Test(Apr) +3.99%p — 방향 일치, 단 Test 개선폭 작아 약간의 과적합 signs
+          <b>현재 Final 조합</b>: v2 hidden
         </p>
       </div>
+    </div>
     </div>
   `;
 
   body.innerHTML = `
+    ${v2Conclusion}
     ${t1Alternative}
 
-    <h3 style="margin-top:32px">현재 Final 조합 (${acceptedVariants.length}개 variant)</h3>
+    <h3 style="margin-top:32px">T1 + accepted variants 조합 (${acceptedVariants.length}개 추가)</h3>
     <p>조합: ${f.combined_ids.join(' + ')}</p>
     <div class="summary-grid">
       <div class="kpi"><div class="label">거래</div><div class="value">${f.result.n_trades}</div></div>
