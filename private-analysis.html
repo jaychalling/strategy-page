@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Private 전략 백테스트 분석</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1419;
+    --panel: #1a1f2e;
+    --text: #e4e6eb;
+    --muted: #8a8f98;
+    --accent: #4fd1c5;
+    --pos: #10b981;
+    --neg: #ef4444;
+    --border: #2a2f3e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  h1, h2, h3 { margin: 0 0 12px 0; }
+  .container { max-width: 1400px; margin: 0 auto; }
+  .section { background: var(--panel); border: 1px solid var(--border);
+              border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+  .kpi { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+  .kpi .label { color: var(--muted); font-size: 12px; }
+  .kpi .value { font-size: 24px; font-weight: 600; margin-top: 4px; }
+  .kpi .delta { font-size: 13px; margin-top: 2px; }
+  .delta.pos, .pos { color: var(--pos); }
+  .delta.neg, .neg { color: var(--neg); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .variant-card { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+  .variant-card.accepted { border-color: var(--pos); }
+  .variant-card.rejected { opacity: 0.6; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px;
+           background: var(--border); color: var(--muted); }
+  .badge.parameter { background: #3b4b6b; color: #9cb3d9; }
+  .badge.filter    { background: #4b3b6b; color: #b39cd9; }
+  .badge.structure { background: #6b4b3b; color: #d9b39c; }
+  .heatmap { display: grid; gap: 2px; margin-top: 12px; }
+  .heatmap-cell { padding: 8px; text-align: center; font-size: 11px; border-radius: 2px; }
+  button { background: var(--border); color: var(--text); border: 1px solid var(--muted);
+            padding: 6px 12px; border-radius: 4px; margin-right: 6px; cursor: pointer; }
+  button:hover { background: var(--muted); color: var(--bg); }
+  canvas { max-width: 100%; }
+  @media (max-width: 768px) {
+    .card-grid { grid-template-columns: 1fr; }
+    table { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Private 전략 백테스트 분석</h1>
+  <p id="meta-line" style="color: var(--muted)">로딩 중...</p>
+
+  <section class="section" id="summary">
+    <h2>요약</h2>
+    <div class="summary-grid" id="summary-grid"></div>
+  </section>
+
+  <section class="section" id="baseline-diagnostic">
+    <h2>베이스라인 진단</h2>
+    <div id="baseline-body">로딩 중...</div>
+  </section>
+
+  <section class="section" id="variant-catalog">
+    <h2>가설 카탈로그</h2>
+    <div style="margin-bottom: 12px">
+      <button data-filter="all">전체</button>
+      <button data-filter="parameter">파라미터</button>
+      <button data-filter="filter">필터</button>
+      <button data-filter="structure">구조</button>
+    </div>
+    <div class="card-grid" id="variant-cards">로딩 중...</div>
+  </section>
+
+  <section class="section" id="final">
+    <h2>최종 추천안</h2>
+    <div id="final-body">로딩 중...</div>
+  </section>
+
+  <section class="section" id="robustness">
+    <h2>견고성 체크</h2>
+    <div id="robustness-body">로딩 중...</div>
+  </section>
+</div>
+
+<script>
+const STATE = { baseline: null, variants: null };
+
+async function loadData() {
+  const [baseline, variants] = await Promise.all([
+    fetch('data/private_sim/baseline.json').then(r => r.json()),
+    fetch('data/private_sim/variants.json').then(r => r.json()),
+  ]);
+  STATE.baseline = baseline;
+  STATE.variants = variants;
+  render();
+}
+
+function fmt(v, digits = 2) {
+  if (v === null || v === undefined) return '-';
+  return v.toFixed(digits);
+}
+
+function render() {
+  renderMeta();
+  renderSummary();
+  // 나머지는 Task 14~15 에서 추가
+}
+
+function renderMeta() {
+  const m = STATE.baseline.meta;
+  document.getElementById('meta-line').textContent =
+    `${m.start_date} ~ ${m.end_date} · ${m.n_days}거래일 · 신호 ${m.n_signals_dedup}건 · ${new Date(m.generated_at).toLocaleString('ko-KR')} 생성`;
+}
+
+function renderSummary() {
+  const b = STATE.baseline.overall;
+  const f = STATE.variants.final ? STATE.variants.final.result : null;
+  const kpis = [
+    { label: '거래 수', base: b.n_trades, final: f?.n_trades, fmt: v => v },
+    { label: '승률', base: b.winrate * 100, final: f ? f.winrate * 100 : null, suffix: '%' },
+    { label: '기대값', base: b.expectancy, final: f?.expectancy, suffix: '%' },
+    { label: '총 PnL', base: b.total_pnl_pct, final: f?.total_pnl_pct, suffix: '%' },
+    { label: 'MDD', base: b.mdd_pct, final: f?.mdd_pct, suffix: '%' },
+    { label: '최대 연속손실', base: b.max_consec_loss, final: f?.max_consec_loss, fmt: v => v },
+  ];
+  const grid = document.getElementById('summary-grid');
+  grid.innerHTML = kpis.map(k => {
+    const delta = (k.final !== null && k.final !== undefined) ? (k.final - k.base) : null;
+    const deltaCls = delta === null ? '' : (delta > 0 ? 'pos' : 'neg');
+    const deltaStr = delta === null ? '' :
+      `<div class="delta ${deltaCls}">${delta > 0 ? '+' : ''}${fmt(delta)}${k.suffix || ''}</div>`;
+    const baseStr = k.fmt ? k.fmt(k.base) : `${fmt(k.base)}${k.suffix || ''}`;
+    return `
+      <div class="kpi">
+        <div class="label">${k.label}</div>
+        <div class="value">${baseStr}</div>
+        ${deltaStr}
+      </div>
+    `;
+  }).join('');
+}
+
+loadData().catch(err => {
+  document.getElementById('meta-line').textContent = '데이터 로드 실패: ' + err.message;
+  console.error(err);
+});
+</script>
+</body>
+</html>
