@@ -117,7 +117,8 @@ function fmt(v, digits = 2) {
 function render() {
   renderMeta();
   renderSummary();
-  // 나머지는 Task 14~15 에서 추가
+  renderBaselineDiagnostic();
+  // renderVariantCatalog, renderFinal, renderRobustness will be added in Task 15
 }
 
 function renderMeta() {
@@ -152,6 +153,140 @@ function renderSummary() {
       </div>
     `;
   }).join('');
+}
+
+function renderBaselineDiagnostic() {
+  const b = STATE.baseline;
+  const body = document.getElementById('baseline-body');
+  body.innerHTML = `
+    <h3>일별 Equity Curve</h3>
+    <canvas id="equityChart" height="80"></canvas>
+
+    <h3 style="margin-top:24px">조건별 분해</h3>
+    <table id="conditionTable"><thead><tr>
+      <th>조건</th><th>거래</th><th>승률</th><th>기대값</th><th>평균수익</th><th>평균손실</th><th>총PnL</th>
+    </tr></thead><tbody></tbody></table>
+
+    <h3 style="margin-top:24px">진입 시간대별 기대값</h3>
+    <canvas id="entryTimeChart" height="80"></canvas>
+
+    <h3 style="margin-top:24px">딥 하락폭 분해</h3>
+    <canvas id="dipDepthChart" height="80"></canvas>
+
+    <h3 style="margin-top:24px">Exit 유형</h3>
+    <table id="exitTable"><thead><tr>
+      <th>유형</th><th>거래</th><th>승률</th><th>기대값</th>
+    </tr></thead><tbody></tbody></table>
+
+    <h3 style="margin-top:24px">교차 히트맵: 조건 × 진입시간대</h3>
+    <div id="heatmap"></div>
+  `;
+
+  // Equity curve
+  const ec = b.equity_curve;
+  new Chart(document.getElementById('equityChart'), {
+    type: 'line',
+    data: {
+      labels: ec.map(r => r.date),
+      datasets: [{
+        label: '누적 PnL (%)',
+        data: ec.map(r => r.cum_pnl),
+        borderColor: '#4fd1c5',
+        backgroundColor: 'rgba(79, 209, 197, 0.1)',
+        tension: 0.2,
+        fill: true,
+      }]
+    },
+    options: { plugins: { legend: { display: false } }, responsive: true }
+  });
+
+  // Condition table
+  const condBody = document.querySelector('#conditionTable tbody');
+  condBody.innerHTML = Object.entries(b.buckets.condition).map(([k, v]) => `
+    <tr>
+      <td>${k}</td>
+      <td>${v.n_trades}</td>
+      <td>${fmt(v.winrate * 100)}%</td>
+      <td>${fmt(v.expectancy)}%</td>
+      <td>${fmt(v.avg_win)}%</td>
+      <td>${fmt(v.avg_loss)}%</td>
+      <td class="${v.total_pnl_pct >= 0 ? 'pos' : 'neg'}">${fmt(v.total_pnl_pct)}%</td>
+    </tr>
+  `).join('');
+
+  // Entry time bar
+  const et = b.buckets.entry_time;
+  const etLabels = Object.keys(et);
+  new Chart(document.getElementById('entryTimeChart'), {
+    type: 'bar',
+    data: {
+      labels: etLabels,
+      datasets: [{
+        label: '기대값 (%)',
+        data: etLabels.map(k => et[k].expectancy),
+        backgroundColor: etLabels.map(k => et[k].expectancy >= 0 ? '#10b981' : '#ef4444'),
+      }]
+    },
+    options: { plugins: { legend: { display: false } } }
+  });
+
+  // Dip depth bar
+  const dd = b.buckets.dip_depth;
+  const ddLabels = Object.keys(dd);
+  new Chart(document.getElementById('dipDepthChart'), {
+    type: 'bar',
+    data: {
+      labels: ddLabels,
+      datasets: [{
+        label: '총 PnL (%)',
+        data: ddLabels.map(k => dd[k].total_pnl_pct),
+        backgroundColor: ddLabels.map(k => dd[k].total_pnl_pct >= 0 ? '#10b981' : '#ef4444'),
+      }]
+    }
+  });
+
+  // Exit table
+  const exitBody = document.querySelector('#exitTable tbody');
+  exitBody.innerHTML = Object.entries(b.buckets.exit_type).map(([k, v]) => `
+    <tr>
+      <td>${k}</td>
+      <td>${v.n_trades}</td>
+      <td>${fmt(v.winrate * 100)}%</td>
+      <td class="${v.expectancy >= 0 ? 'pos' : 'neg'}">${fmt(v.expectancy)}%</td>
+    </tr>
+  `).join('');
+
+  // Heatmap
+  renderHeatmap('heatmap', b.cross.condition_x_entry_time);
+}
+
+function renderHeatmap(containerId, crossData) {
+  const { rows, cols, cells } = crossData;
+  const el = document.getElementById(containerId);
+  // 최대 절대값으로 정규화
+  let maxAbs = 0.01;
+  cells.forEach(row => row.forEach(c => {
+    if (Math.abs(c.expectancy) > maxAbs) maxAbs = Math.abs(c.expectancy);
+  }));
+
+  const colWidths = `150px repeat(${cols.length}, 1fr)`;
+  let html = `<div class="heatmap" style="grid-template-columns: ${colWidths}">`;
+  html += `<div></div>`;
+  cols.forEach(c => html += `<div style="text-align:center;font-size:11px;color:var(--muted)">${c}</div>`);
+  rows.forEach((r, ri) => {
+    html += `<div style="padding:8px;font-size:12px">${r}</div>`;
+    cells[ri].forEach(cell => {
+      const ratio = cell.expectancy / maxAbs;
+      const color = ratio >= 0
+        ? `rgba(16, 185, 129, ${Math.min(1, Math.abs(ratio))})`
+        : `rgba(239, 68, 68, ${Math.min(1, Math.abs(ratio))})`;
+      html += `<div class="heatmap-cell" style="background:${color}" title="${cell.n_trades}건">
+                 ${cell.n_trades > 0 ? fmt(cell.expectancy, 2) + '%' : '-'}
+               </div>`;
+    });
+  });
+  html += `</div>`;
+  el.innerHTML = html;
 }
 
 loadData().catch(err => {
