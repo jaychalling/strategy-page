@@ -1,11 +1,11 @@
 {
   "meta": {
     "start_date": "2026-02-10",
-    "end_date": "2026-04-09",
-    "n_signals_dedup": 235,
-    "n_days": 38,
+    "end_date": "2026-04-10",
+    "n_signals_dedup": 238,
+    "n_days": 39,
     "strategy_file": "strategy_private.json",
-    "generated_at": "2026-04-11T22:36:30.439691+09:00"
+    "generated_at": "2026-04-11T23:15:09.685398+09:00"
   },
   "overall": {
     "n_trades": 69,

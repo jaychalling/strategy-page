@@ -368,6 +368,27 @@
         "delta_mdd": -6.685171280773133
       },
       "rationale": ""
+    },
+    {
+      "id": "T1",
+      "category": "structure",
+      "title": "조건별 time_window 최적화",
+      "description": "골든10분 09:15~10:00 / 굿모닝 09:10~11:30 / 세력감지 10:30~12:00 만 허용",
+      "config_diff": {},
+      "filter_id": "T1",
+      "status": "accepted",
+      "result": {
+        "n_trades": 45,
+        "winrate": 0.6222222222222222,
+        "expectancy": 0.8038016061348386,
+        "total_pnl_pct": 36.17107227606774,
+        "mdd_pct": -14.133769442350008,
+        "max_consec_loss": 4,
+        "delta_pnl": 20.164647672378145,
+        "delta_winrate": 0.05700483091787445,
+        "delta_mdd": 14.614860580599277
+      },
+      "rationale": ""
     }
   ],
   "final": {
@@ -377,7 +398,8 @@
       "P3b",
       "F6",
       "S1a",
-      "S6"
+      "S6",
+      "T1"
     ],
     "config": {
       "first_buy": {
@@ -582,34 +604,14 @@
       }
     },
     "result": {
-      "n_trades": 46,
-      "winrate": 0.5217391304347826,
-      "expectancy": 0.5467902754090407,
-      "total_pnl_pct": 25.15235266881587,
-      "mdd_pct": -20.98791623819153,
+      "n_trades": 34,
+      "winrate": 0.5588235294117647,
+      "expectancy": 0.7989491609030227,
+      "total_pnl_pct": 27.164271470702772,
+      "mdd_pct": -14.884555541416367,
       "max_consec_loss": 4
     },
     "trades": [
-      {
-        "date": "2026-02-11",
-        "code": "294630",
-        "name": "서남",
-        "condition": "골든10분",
-        "strat_name": "골든10분",
-        "signal_time": "09:06:12",
-        "signal_price": 3475,
-        "dip_target": 3475,
-        "fill_minute": 907,
-        "fill_time": "09:07",
-        "fill_price": 3440,
-        "exit_minute": 907,
-        "exit_time": "09:07",
-        "exit_price": 3295,
-        "exit_type": "stop_loss",
-        "pnl_pct": -4.435388470799162,
-        "pnl_gross_pct": -4.215116279069767,
-        "hold_minutes": 0
-      },
       {
         "date": "2026-02-11",
         "code": "066570",
@@ -629,26 +631,6 @@
         "pnl_pct": 3.6029196529241414,
         "pnl_gross_pct": 3.841719788417198,
         "hold_minutes": 54
-      },
-      {
-        "date": "2026-02-12",
-        "code": "443670",
-        "name": "에스피소프트",
-        "condition": "골든10분",
-        "strat_name": "골든10분",
-        "signal_time": "09:04:28",
-        "signal_price": 6090,
-        "dip_target": 6090,
-        "fill_minute": 905,
-        "fill_time": "09:05",
-        "fill_price": 6029,
-        "exit_minute": 906,
-        "exit_time": "09:06",
-        "exit_price": 5850,
-        "exit_type": "stop_loss",
-        "pnl_pct": -3.1921211154867013,
-        "pnl_gross_pct": -2.968983247636424,
-        "hold_minutes": 1
       },
       {
         "date": "2026-02-12",
@@ -771,46 +753,6 @@
         "hold_minutes": 2
       },
       {
-        "date": "2026-02-20",
-        "code": "052710",
-        "name": "아모텍",
-        "condition": "골든10분",
-        "strat_name": "골든10분",
-        "signal_time": "09:10:10",
-        "signal_price": 11910,
-        "dip_target": 11910,
-        "fill_minute": 911,
-        "fill_time": "09:11",
-        "fill_price": 11790,
-        "exit_minute": 936,
-        "exit_time": "09:36",
-        "exit_price": 12130,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 2.647202580342367,
-        "pnl_gross_pct": 2.883799830364716,
-        "hold_minutes": 25
-      },
-      {
-        "date": "2026-02-23",
-        "code": "066360",
-        "name": "체리부로",
-        "condition": "굿모닝",
-        "strat_name": "굿모닝",
-        "signal_time": "09:07:30",
-        "signal_price": 1263,
-        "dip_target": 1263,
-        "fill_minute": 908,
-        "fill_time": "09:08",
-        "fill_price": 1254,
-        "exit_minute": 908,
-        "exit_time": "09:08",
-        "exit_price": 1212,
-        "exit_type": "stop_loss",
-        "pnl_pct": -3.571545607871751,
-        "pnl_gross_pct": -3.349282296650718,
-        "hold_minutes": 0
-      },
-      {
         "date": "2026-02-23",
         "code": "306620",
         "name": "지아이에스",
@@ -829,26 +771,6 @@
         "pnl_pct": 3.491061422371722,
         "pnl_gross_pct": 3.7296037296037294,
         "hold_minutes": 308
-      },
-      {
-        "date": "2026-02-24",
-        "code": "131180",
-        "name": "딜리",
-        "condition": "골든10분",
-        "strat_name": "골든10분",
-        "signal_time": "09:09:19",
-        "signal_price": 1116,
-        "dip_target": 1116,
-        "fill_minute": 910,
-        "fill_time": "09:10",
-        "fill_price": 1104,
-        "exit_minute": 910,
-        "exit_time": "09:10",
-        "exit_price": 1067,
-        "exit_type": "stop_loss",
-        "pnl_pct": -3.5737076032797965,
-        "pnl_gross_pct": -3.3514492753623193,
-        "hold_minutes": 0
       },
       {
         "date": "2026-02-24",
@@ -911,26 +833,6 @@
         "hold_minutes": 7
       },
       {
-        "date": "2026-03-03",
-        "code": "054670",
-        "name": "대한뉴팜",
-        "condition": "골든10분",
-        "strat_name": "골든10분",
-        "signal_time": "09:14:22",
-        "signal_price": 7380,
-        "dip_target": 7380,
-        "fill_minute": 915,
-        "fill_time": "09:15",
-        "fill_price": 7306,
-        "exit_minute": 920,
-        "exit_time": "09:20",
-        "exit_price": 7500,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 2.4192798673957405,
-        "pnl_gross_pct": 2.6553517656720502,
-        "hold_minutes": 5
-      },
-      {
         "date": "2026-03-04",
         "code": "402490",
         "name": "그린리소스",
@@ -949,26 +851,6 @@
         "pnl_pct": -2.8090312823652597,
         "pnl_gross_pct": -2.5850104094378903,
         "hold_minutes": 8
-      },
-      {
-        "date": "2026-03-06",
-        "code": "095910",
-        "name": "에스에너지",
-        "condition": "굿모닝",
-        "strat_name": "굿모닝",
-        "signal_time": "09:03:33",
-        "signal_price": 1498,
-        "dip_target": 1498,
-        "fill_minute": 904,
-        "fill_time": "09:04",
-        "fill_price": 1487,
-        "exit_minute": 905,
-        "exit_time": "09:05",
-        "exit_price": 1579,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 5.942760233577604,
-        "pnl_gross_pct": 6.186953597848016,
-        "hold_minutes": 1
       },
       {
         "date": "2026-03-06",
@@ -1011,26 +893,6 @@
         "hold_minutes": 11
       },
       {
-        "date": "2026-03-06",
-        "code": "005870",
-        "name": "휴니드",
-        "condition": "골든10분",
-        "strat_name": "골든10분",
-        "signal_time": "10:12:36",
-        "signal_price": 9540,
-        "dip_target": 9540,
-        "fill_minute": 1014,
-        "fill_time": "10:14",
-        "fill_price": 9444,
-        "exit_minute": 1021,
-        "exit_time": "10:21",
-        "exit_price": 9160,
-        "exit_type": "stop_loss",
-        "pnl_pct": -3.2302503205628885,
-        "pnl_gross_pct": -3.007200338839475,
-        "hold_minutes": 7
-      },
-      {
         "date": "2026-03-09",
         "code": "002100",
         "name": "경농",
@@ -1068,46 +930,6 @@
         "exit_type": "take_profit_1",
         "pnl_pct": 4.313465433716512,
         "pnl_gross_pct": 4.553903345724907,
-        "hold_minutes": 2
-      },
-      {
-        "date": "2026-03-13",
-        "code": "218150",
-        "name": "미래생명자원",
-        "condition": "골든10분",
-        "strat_name": "골든10분",
-        "signal_time": "09:07:26",
-        "signal_price": 3645,
-        "dip_target": 3645,
-        "fill_minute": 915,
-        "fill_time": "09:15",
-        "fill_price": 3608,
-        "exit_minute": 921,
-        "exit_time": "09:21",
-        "exit_price": 3510,
-        "exit_type": "stop_loss",
-        "pnl_pct": -2.939905466508186,
-        "pnl_gross_pct": -2.7161862527716183,
-        "hold_minutes": 6
-      },
-      {
-        "date": "2026-03-16",
-        "code": "095270",
-        "name": "웨이브일렉트로",
-        "condition": "골든10분",
-        "strat_name": "골든10분",
-        "signal_time": "09:07:40",
-        "signal_price": 5680,
-        "dip_target": 5680,
-        "fill_minute": 908,
-        "fill_time": "09:08",
-        "fill_price": 5623,
-        "exit_minute": 910,
-        "exit_time": "09:10",
-        "exit_price": 5450,
-        "exit_type": "stop_loss",
-        "pnl_pct": -3.2995397480347743,
-        "pnl_gross_pct": -3.0766494753690203,
         "hold_minutes": 2
       },
       {
@@ -1172,26 +994,6 @@
       },
       {
         "date": "2026-03-19",
-        "code": "002780",
-        "name": "진흥기업",
-        "condition": "굿모닝",
-        "strat_name": "굿모닝",
-        "signal_time": "09:09:08",
-        "signal_price": 911,
-        "dip_target": 911,
-        "fill_minute": 912,
-        "fill_time": "09:12",
-        "fill_price": 904,
-        "exit_minute": 912,
-        "exit_time": "09:12",
-        "exit_price": 940,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 3.7431774614338886,
-        "pnl_gross_pct": 3.982300884955752,
-        "hold_minutes": 0
-      },
-      {
-        "date": "2026-03-19",
         "code": "033160",
         "name": "엠케이전자",
         "condition": "굿모닝",
@@ -1212,23 +1014,23 @@
       },
       {
         "date": "2026-03-20",
-        "code": "189860",
-        "name": "서전기전",
+        "code": "100130",
+        "name": "동국S&C",
         "condition": "굿모닝",
         "strat_name": "굿모닝",
-        "signal_time": "09:09:22",
-        "signal_price": 5550,
-        "dip_target": 5550,
-        "fill_minute": 910,
-        "fill_time": "09:10",
-        "fill_price": 5511,
-        "exit_minute": 915,
-        "exit_time": "09:15",
-        "exit_price": 5920,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 7.174488152670744,
-        "pnl_gross_pct": 7.421520595173289,
-        "hold_minutes": 5
+        "signal_time": "09:14:58",
+        "signal_price": 2600,
+        "dip_target": 2600,
+        "fill_minute": 915,
+        "fill_time": "09:15",
+        "fill_price": 2581,
+        "exit_minute": 917,
+        "exit_time": "09:17",
+        "exit_price": 2505,
+        "exit_type": "stop_loss",
+        "pnl_pct": -3.167789070306637,
+        "pnl_gross_pct": -2.9445951181712515,
+        "hold_minutes": 2
       },
       {
         "date": "2026-03-20",
@@ -1471,26 +1273,6 @@
         "hold_minutes": 2
       },
       {
-        "date": "2026-04-08",
-        "code": "039560",
-        "name": "다산네트웍스",
-        "condition": "골든10분",
-        "strat_name": "골든10분",
-        "signal_time": "10:20:19",
-        "signal_price": 5510,
-        "dip_target": 5510,
-        "fill_minute": 1021,
-        "fill_time": "10:21",
-        "fill_price": 5454,
-        "exit_minute": 1330,
-        "exit_time": "13:30",
-        "exit_price": 5310,
-        "exit_type": "stop_loss",
-        "pnl_pct": -2.8641578350706243,
-        "pnl_gross_pct": -2.6402640264026402,
-        "hold_minutes": 189
-      },
-      {
         "date": "2026-04-09",
         "code": "024740",
         "name": "한일단조",
@@ -1514,170 +1296,152 @@
     "equity_curve": [
       {
         "date": "2026-02-11",
-        "daily_pnl": -0.8324688178750206,
-        "cum_pnl": -0.8324688178750206,
-        "n_trades": 2
+        "daily_pnl": 3.6029196529241414,
+        "cum_pnl": 3.6029196529241414,
+        "n_trades": 1
       },
       {
         "date": "2026-02-12",
-        "daily_pnl": -6.159641264954674,
-        "cum_pnl": -6.9921100828296945,
-        "n_trades": 2
+        "daily_pnl": -2.9675201494679726,
+        "cum_pnl": 0.6353995034561688,
+        "n_trades": 1
       },
       {
         "date": "2026-02-13",
         "daily_pnl": -3.2400004483967293,
-        "cum_pnl": -10.232110531226423,
+        "cum_pnl": -2.6046009449405605,
         "n_trades": 5
       },
       {
-        "date": "2026-02-20",
-        "daily_pnl": 2.647202580342367,
-        "cum_pnl": -7.584907950884056,
+        "date": "2026-02-23",
+        "daily_pnl": 3.491061422371722,
+        "cum_pnl": 0.8864604774311613,
         "n_trades": 1
       },
       {
-        "date": "2026-02-23",
-        "daily_pnl": -0.08048418550002934,
-        "cum_pnl": -7.665392136384085,
-        "n_trades": 2
-      },
-      {
         "date": "2026-02-24",
-        "daily_pnl": -6.457562979439646,
-        "cum_pnl": -14.122955115823732,
-        "n_trades": 2
+        "daily_pnl": -2.8838553761598495,
+        "cum_pnl": -1.9973948987286883,
+        "n_trades": 1
       },
       {
         "date": "2026-02-25",
         "daily_pnl": -3.3376505085483066,
-        "cum_pnl": -17.46060562437204,
+        "cum_pnl": -5.335045407276995,
         "n_trades": 1
       },
       {
         "date": "2026-02-27",
         "daily_pnl": -3.1375591988499707,
-        "cum_pnl": -20.59816482322201,
-        "n_trades": 1
-      },
-      {
-        "date": "2026-03-03",
-        "daily_pnl": 2.4192798673957405,
-        "cum_pnl": -18.17888495582627,
+        "cum_pnl": -8.472604606126966,
         "n_trades": 1
       },
       {
         "date": "2026-03-04",
         "daily_pnl": -2.8090312823652597,
-        "cum_pnl": -20.98791623819153,
+        "cum_pnl": -11.281635888492225,
         "n_trades": 1
       },
       {
         "date": "2026-03-06",
-        "daily_pnl": 7.317142324243964,
-        "cum_pnl": -13.670773913947567,
-        "n_trades": 4
+        "daily_pnl": 4.6046324112292485,
+        "cum_pnl": -6.677003477262977,
+        "n_trades": 2
       },
       {
         "date": "2026-03-09",
         "daily_pnl": 8.029004400502338,
-        "cum_pnl": -5.6417695134452295,
+        "cum_pnl": 1.3520009232393608,
         "n_trades": 2
-      },
-      {
-        "date": "2026-03-13",
-        "daily_pnl": -2.939905466508186,
-        "cum_pnl": -8.581674979953416,
-        "n_trades": 1
       },
       {
         "date": "2026-03-16",
-        "daily_pnl": -6.026357002818827,
-        "cum_pnl": -14.608031982772243,
-        "n_trades": 2
+        "daily_pnl": -2.726817254784053,
+        "cum_pnl": -1.3748163315446922,
+        "n_trades": 1
       },
       {
         "date": "2026-03-17",
         "daily_pnl": 3.492423267177469,
-        "cum_pnl": -11.115608715594774,
+        "cum_pnl": 2.117606935632777,
         "n_trades": 1
       },
       {
         "date": "2026-03-18",
         "daily_pnl": -2.7375139730563602,
-        "cum_pnl": -13.853122688651135,
+        "cum_pnl": -0.6199070374235833,
         "n_trades": 1
       },
       {
         "date": "2026-03-19",
-        "daily_pnl": 6.996307835073101,
-        "cum_pnl": -6.856814853578034,
-        "n_trades": 2
+        "daily_pnl": 3.2531303736392125,
+        "cum_pnl": 2.633223336215629,
+        "n_trades": 1
       },
       {
         "date": "2026-03-20",
-        "daily_pnl": 10.587303025853156,
-        "cum_pnl": 3.7304881722751224,
+        "daily_pnl": 0.2450258028757757,
+        "cum_pnl": 2.878249139091405,
         "n_trades": 2
       },
       {
         "date": "2026-03-23",
         "daily_pnl": 5.564359311576794,
-        "cum_pnl": 9.294847483851918,
+        "cum_pnl": 8.4426084506682,
         "n_trades": 2
       },
       {
         "date": "2026-03-24",
         "daily_pnl": -2.8429558457274795,
-        "cum_pnl": 6.451891638124438,
+        "cum_pnl": 5.5996526049407205,
         "n_trades": 1
       },
       {
         "date": "2026-03-25",
         "daily_pnl": 2.5795377582688017,
-        "cum_pnl": 9.03142939639324,
+        "cum_pnl": 8.179190363209521,
         "n_trades": 1
       },
       {
         "date": "2026-03-26",
         "daily_pnl": 3.265163091778245,
-        "cum_pnl": 12.296592488171484,
+        "cum_pnl": 11.444353454987766,
         "n_trades": 1
       },
       {
         "date": "2026-03-27",
         "daily_pnl": -3.306019133773863,
-        "cum_pnl": 8.990573354397622,
+        "cum_pnl": 8.138334321213904,
         "n_trades": 1
       },
       {
         "date": "2026-04-01",
         "daily_pnl": 3.496257330701702,
-        "cum_pnl": 12.486830685099324,
+        "cum_pnl": 11.634591651915606,
         "n_trades": 2
       },
       {
         "date": "2026-04-02",
         "daily_pnl": 4.3153266929667256,
-        "cum_pnl": 16.80215737806605,
+        "cum_pnl": 15.949918344882331,
         "n_trades": 1
       },
       {
         "date": "2026-04-06",
         "daily_pnl": 3.62123003624244,
-        "cum_pnl": 20.42338741430849,
+        "cum_pnl": 19.57114838112477,
         "n_trades": 1
       },
       {
         "date": "2026-04-08",
-        "daily_pnl": -0.35033936864615756,
-        "cum_pnl": 20.073048045662333,
-        "n_trades": 2
+        "daily_pnl": 2.5138184664244667,
+        "cum_pnl": 22.08496684754924,
+        "n_trades": 1
       },
       {
         "date": "2026-04-09",
         "daily_pnl": 5.0793046231535355,
-        "cum_pnl": 25.15235266881587,
+        "cum_pnl": 27.164271470702776,
         "n_trades": 1
       }
     ]
@@ -1685,11 +1449,11 @@
   "robustness": {
     "train_feb_mar": {
       "baseline_pnl": 3.3561582075942957,
-      "final_pnl": 8.990573354397624
+      "final_pnl": 8.138334321213902
     },
     "test_apr": {
       "baseline_pnl": 12.6502663960953,
-      "final_pnl": 16.161779314418247
+      "final_pnl": 19.02593714948887
     },
     "worst5_baseline": [
       {
@@ -1715,24 +1479,24 @@
     ],
     "worst5_final": [
       {
-        "date": "2026-02-24",
-        "pnl": -6.457562979439646
-      },
-      {
-        "date": "2026-02-12",
-        "pnl": -6.159641264954674
-      },
-      {
-        "date": "2026-03-16",
-        "pnl": -6.026357002818827
-      },
-      {
         "date": "2026-02-25",
         "pnl": -3.3376505085483066
       },
       {
         "date": "2026-03-27",
         "pnl": -3.306019133773863
+      },
+      {
+        "date": "2026-02-13",
+        "pnl": -3.2400004483967293
+      },
+      {
+        "date": "2026-02-27",
+        "pnl": -3.1375591988499707
+      },
+      {
+        "date": "2026-02-12",
+        "pnl": -2.9675201494679726
       }
     ],
     "consec_loss_baseline": {
@@ -1742,10 +1506,9 @@
       "3": 1
     },
     "consec_loss_final": {
-      "1": 10,
-      "3": 2,
-      "4": 1,
-      "2": 1
+      "2": 1,
+      "1": 9,
+      "4": 1
     }
   }
 }
