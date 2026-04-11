@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated_at": "2026-04-12T00:01:23.148792+09:00",
+    "generated_at": "2026-04-12T00:10:50.136993+09:00",
     "n_days": 39,
     "baseline_filters": [
       "T1"
@@ -414,9 +414,9 @@
   "optimized": {
     "metrics": {
       "n_trades": 42,
-      "total_pnl_pct": 91.50762512087557,
+      "total_pnl_pct": 87.76994927026597,
       "winrate": 0.6904761904761905,
-      "expectancy": 2.178752979068466,
+      "expectancy": 2.0897606969110947,
       "mdd_pct": -15.775234907238268,
       "max_consec_loss": 4
     },
@@ -431,17 +431,17 @@
       },
       "굿모닝": {
         "n_trades": 29,
-        "total_pnl_pct": 50.624506456121956,
+        "total_pnl_pct": 47.825727513721155,
         "winrate": 0.6206896551724138,
-        "expectancy": 1.7456726364179984,
+        "expectancy": 1.6491630177145227,
         "mdd_pct": -15.775234907238268,
         "max_consec_loss": 4
       },
       "세력감지": {
         "n_trades": 8,
-        "total_pnl_pct": 17.184375535657672,
+        "total_pnl_pct": 16.24547862744886,
         "winrate": 0.75,
-        "expectancy": 2.148046941957209,
+        "expectancy": 2.0306848284311076,
         "mdd_pct": -2.8520991131812834,
         "max_consec_loss": 1
       }
@@ -449,188 +449,188 @@
     "equity_curve": [
       {
         "date": "2026-02-11",
-        "daily_pnl": 5.37135806104059,
-        "cum_pnl": 5.37135806104059,
+        "daily_pnl": 5.2871225443268655,
+        "cum_pnl": 5.2871225443268655,
         "n_trades": 1
       },
       {
         "date": "2026-02-12",
         "daily_pnl": -4.114476176070003,
-        "cum_pnl": 1.2568818849705874,
+        "cum_pnl": 1.1726463682568626,
         "n_trades": 1
       },
       {
         "date": "2026-02-13",
-        "daily_pnl": 13.719653363836459,
-        "cum_pnl": 14.976535248807046,
+        "daily_pnl": 12.967381421082061,
+        "cum_pnl": 14.140027789338923,
         "n_trades": 3
       },
       {
         "date": "2026-02-19",
         "daily_pnl": -2.8520991131812834,
-        "cum_pnl": 12.124436135625762,
+        "cum_pnl": 11.28792867615764,
         "n_trades": 1
       },
       {
         "date": "2026-02-20",
-        "daily_pnl": 7.475938430622033,
-        "cum_pnl": 19.600374566247794,
+        "daily_pnl": 6.728162754141014,
+        "cum_pnl": 18.01609143029865,
         "n_trades": 2
       },
       {
         "date": "2026-02-23",
         "daily_pnl": 3.491061422371722,
-        "cum_pnl": 23.091435988619516,
+        "cum_pnl": 21.507152852670373,
         "n_trades": 1
       },
       {
         "date": "2026-02-24",
         "daily_pnl": -3.8109784751941156,
-        "cum_pnl": 19.2804575134254,
+        "cum_pnl": 17.696174377476257,
         "n_trades": 1
       },
       {
         "date": "2026-02-25",
         "daily_pnl": -4.2909281169452695,
-        "cum_pnl": 14.98952939648013,
+        "cum_pnl": 13.405246260530987,
         "n_trades": 1
       },
       {
         "date": "2026-02-27",
         "daily_pnl": -3.8257470553412665,
-        "cum_pnl": 11.163782341138862,
+        "cum_pnl": 9.57949920518972,
         "n_trades": 1
       },
       {
         "date": "2026-03-04",
         "daily_pnl": -3.8475812597576153,
-        "cum_pnl": 7.316201081381247,
+        "cum_pnl": 5.731917945432104,
         "n_trades": 1
       },
       {
         "date": "2026-03-06",
-        "daily_pnl": 3.5673870883460754,
-        "cum_pnl": 10.883588169727322,
+        "daily_pnl": 3.5673870883460745,
+        "cum_pnl": 9.299305033778179,
         "n_trades": 2
       },
       {
         "date": "2026-03-09",
-        "daily_pnl": 9.920809057375001,
-        "cum_pnl": 20.80439722710232,
+        "daily_pnl": 9.54539814575889,
+        "cum_pnl": 18.84470317953707,
         "n_trades": 2
       },
       {
         "date": "2026-03-10",
         "daily_pnl": -3.893686835745258,
-        "cum_pnl": 16.910710391357064,
+        "cum_pnl": 14.951016343791812,
         "n_trades": 1
       },
       {
         "date": "2026-03-11",
         "daily_pnl": -0.4810466675218068,
-        "cum_pnl": 16.429663723835258,
+        "cum_pnl": 14.469969676270004,
         "n_trades": 2
       },
       {
         "date": "2026-03-12",
-        "daily_pnl": 3.1143279136525512,
-        "cum_pnl": 19.54399163748781,
+        "daily_pnl": 2.881507884495041,
+        "cum_pnl": 17.351477560765044,
         "n_trades": 1
       },
       {
         "date": "2026-03-16",
         "daily_pnl": 2.9298524017017793,
-        "cum_pnl": 22.47384403918959,
+        "cum_pnl": 20.281329962466824,
         "n_trades": 1
       },
       {
         "date": "2026-03-17",
-        "daily_pnl": 5.053155779351852,
-        "cum_pnl": 27.52699981854144,
+        "daily_pnl": 5.268486789052913,
+        "cum_pnl": 25.549816751519735,
         "n_trades": 1
       },
       {
         "date": "2026-03-18",
         "daily_pnl": -0.2679586637785114,
-        "cum_pnl": 27.25904115476293,
+        "cum_pnl": 25.281858087741224,
         "n_trades": 1
       },
       {
         "date": "2026-03-19",
-        "daily_pnl": 5.32586759915006,
-        "cum_pnl": 32.58490875391299,
+        "daily_pnl": 4.989247044895921,
+        "cum_pnl": 30.271105132637146,
         "n_trades": 1
       },
       {
         "date": "2026-03-20",
-        "daily_pnl": 0.23960772388869467,
-        "cum_pnl": 32.82451647780169,
+        "daily_pnl": -0.019300633581282423,
+        "cum_pnl": 30.251804499055865,
         "n_trades": 2
       },
       {
         "date": "2026-03-23",
         "daily_pnl": 2.9365393679613034,
-        "cum_pnl": 35.76105584576299,
+        "cum_pnl": 33.18834386701717,
         "n_trades": 1
       },
       {
         "date": "2026-03-24",
         "daily_pnl": 2.772807924853805,
-        "cum_pnl": 38.5338637706168,
+        "cum_pnl": 35.961151791870975,
         "n_trades": 1
       },
       {
         "date": "2026-03-25",
-        "daily_pnl": 5.239001058560362,
-        "cum_pnl": 43.77286482917716,
+        "daily_pnl": 5.0327207122819235,
+        "cum_pnl": 40.9938725041529,
         "n_trades": 2
       },
       {
         "date": "2026-03-26",
-        "daily_pnl": 5.459547807478531,
-        "cum_pnl": 49.23241263665569,
+        "daily_pnl": 5.203370768270081,
+        "cum_pnl": 46.19724327242298,
         "n_trades": 1
       },
       {
         "date": "2026-03-27",
-        "daily_pnl": 4.5757379506543625,
-        "cum_pnl": 53.80815058731005,
+        "daily_pnl": 4.4239523535710035,
+        "cum_pnl": 50.621195625993984,
         "n_trades": 1
       },
       {
         "date": "2026-03-30",
         "daily_pnl": 3.545457690952013,
-        "cum_pnl": 57.353608278262065,
+        "cum_pnl": 54.166653316946,
         "n_trades": 1
       },
       {
         "date": "2026-04-01",
         "daily_pnl": 6.963852002033395,
-        "cum_pnl": 64.31746028029546,
+        "cum_pnl": 61.13050531897939,
         "n_trades": 2
       },
       {
         "date": "2026-04-02",
-        "daily_pnl": 4.937039074091745,
-        "cum_pnl": 69.2544993543872,
+        "daily_pnl": 4.468926222421137,
+        "cum_pnl": 65.59943154140052,
         "n_trades": 1
       },
       {
         "date": "2026-04-06",
-        "daily_pnl": 5.176150236089432,
-        "cum_pnl": 74.43064959047663,
+        "daily_pnl": 5.188666621599037,
+        "cum_pnl": 70.78809816299956,
         "n_trades": 1
       },
       {
         "date": "2026-04-08",
         "daily_pnl": 14.959998413452707,
-        "cum_pnl": 89.39064800392934,
+        "cum_pnl": 85.74809657645227,
         "n_trades": 2
       },
       {
         "date": "2026-04-09",
-        "daily_pnl": 2.116977116946229,
-        "cum_pnl": 91.50762512087557,
+        "daily_pnl": 2.02185269381369,
+        "cum_pnl": 87.76994927026595,
         "n_trades": 2
       }
     ],
@@ -718,8 +718,8 @@
               "sell_ratio": 0.15
             },
             {
-              "profit": 0.05,
-              "sell_ratio": 0.5
+              "profit": 0.045,
+              "sell_ratio": 0.25
             },
             {
               "profit": 0.05,
@@ -772,7 +772,7 @@
         "take_profit": {
           "first_only": [
             {
-              "profit": 0.035,
+              "profit": 0.03,
               "sell_ratio": 0.35
             },
             {
@@ -878,30 +878,15 @@
         },
         {
           "pass": 1,
-          "param": "take_profit.first_only.1.profit",
-          "old": 0.049,
-          "new": 0.035,
-          "score": 19.389980407314646,
-          "metrics": {
-            "n_trades": 5,
-            "total_pnl_pct": 19.389980407314646,
-            "winrate": 1.0,
-            "expectancy": 3.8779960814629293,
-            "mdd_pct": 0.0,
-            "max_consec_loss": 0
-          }
-        },
-        {
-          "pass": 1,
           "param": "take_profit.first_only.1.sell_ratio",
           "old": 0.4,
           "new": 0.5,
-          "score": 19.695178541063278,
+          "score": 19.531175303527693,
           "metrics": {
             "n_trades": 5,
-            "total_pnl_pct": 19.695178541063278,
+            "total_pnl_pct": 19.531175303527693,
             "winrate": 1.0,
-            "expectancy": 3.9390357082126557,
+            "expectancy": 3.9062350607055385,
             "mdd_pct": 0.0,
             "max_consec_loss": 0
           }
@@ -911,12 +896,12 @@
           "param": "take_profit.first_only.2.profit",
           "old": 0.063,
           "new": 0.08,
-          "score": 21.31345830317747,
+          "score": 21.14945506564188,
           "metrics": {
             "n_trades": 5,
-            "total_pnl_pct": 21.31345830317747,
+            "total_pnl_pct": 21.14945506564188,
             "winrate": 1.0,
-            "expectancy": 4.262691660635494,
+            "expectancy": 4.229891013128376,
             "mdd_pct": 0.0,
             "max_consec_loss": 0
           }
@@ -926,12 +911,12 @@
           "param": "take_profit.trailing.trailing_drop",
           "old": 0.031,
           "new": 0.02,
-          "score": 22.443554916184087,
+          "score": 22.12003164532799,
           "metrics": {
             "n_trades": 5,
-            "total_pnl_pct": 22.443554916184087,
+            "total_pnl_pct": 22.12003164532799,
             "winrate": 1.0,
-            "expectancy": 4.4887109832368175,
+            "expectancy": 4.424006329065598,
             "mdd_pct": 0.0,
             "max_consec_loss": 0
           }
@@ -941,12 +926,12 @@
           "param": "take_profit.first_only.0.sell_ratio",
           "old": 0.35,
           "new": 0.15,
-          "score": 22.82161178041496,
+          "score": 22.39854288775699,
           "metrics": {
             "n_trades": 5,
-            "total_pnl_pct": 22.82161178041496,
+            "total_pnl_pct": 22.39854288775699,
             "winrate": 1.0,
-            "expectancy": 4.564322356082991,
+            "expectancy": 4.479708577551397,
             "mdd_pct": 0.0,
             "max_consec_loss": 0
           }
@@ -954,7 +939,7 @@
         {
           "pass": 2,
           "param": "take_profit.first_only.1.profit",
-          "old": 0.035,
+          "old": 0.049,
           "new": 0.045,
           "score": 22.965691246662228,
           "metrics": {
@@ -1114,14 +1099,14 @@
           "pass": 1,
           "param": "take_profit.first_only.1.profit",
           "old": 0.049,
-          "new": 0.035,
-          "score": 21.328062004619923,
+          "new": 0.04,
+          "score": 20.59150880571548,
           "metrics": {
             "n_trades": 30,
-            "total_pnl_pct": 21.71567945823906,
+            "total_pnl_pct": 21.07557946282481,
             "winrate": 0.6,
-            "expectancy": 0.723855981941302,
-            "mdd_pct": -15.775234907238268,
+            "expectancy": 0.7025193154274937,
+            "mdd_pct": -15.968141314218656,
             "max_consec_loss": 4
           }
         },
@@ -1130,12 +1115,12 @@
           "param": "take_profit.first_only.1.sell_ratio",
           "old": 0.4,
           "new": 0.5,
-          "score": 23.003793884923148,
+          "score": 22.203668890655337,
           "metrics": {
             "n_trades": 30,
-            "total_pnl_pct": 23.39141133854228,
+            "total_pnl_pct": 22.59128634427447,
             "winrate": 0.6,
-            "expectancy": 0.7797137112847426,
+            "expectancy": 0.7530428781424823,
             "mdd_pct": -15.775234907238268,
             "max_consec_loss": 4
           }
@@ -1145,13 +1130,13 @@
           "param": "take_profit.first_only.2.profit",
           "old": 0.063,
           "new": 0.05,
-          "score": 25.520042570281305,
+          "score": 24.402946324044628,
           "metrics": {
             "n_trades": 30,
-            "total_pnl_pct": 25.907660023900437,
+            "total_pnl_pct": 25.107535029632622,
             "winrate": 0.6,
-            "expectancy": 0.863588667463348,
-            "mdd_pct": -15.775234907238268,
+            "expectancy": 0.8369178343210874,
+            "mdd_pct": -16.409177411175985,
             "max_consec_loss": 4
           }
         },
@@ -1160,13 +1145,13 @@
           "param": "take_profit.first_only.2.sell_ratio",
           "old": 0.5,
           "new": 0.6,
-          "score": 26.182494403160987,
+          "score": 25.168129402488624,
           "metrics": {
             "n_trades": 30,
-            "total_pnl_pct": 26.57011185678012,
+            "total_pnl_pct": 25.769986862512308,
             "winrate": 0.6,
-            "expectancy": 0.885670395226004,
-            "mdd_pct": -15.775234907238268,
+            "expectancy": 0.8589995620837436,
+            "mdd_pct": -16.20371492004737,
             "max_consec_loss": 4
           }
         },
@@ -1175,12 +1160,12 @@
           "param": "take_profit.first_only.3.profit",
           "old": 0.085,
           "new": 0.07,
-          "score": 26.80498397105076,
+          "score": 26.00485897678294,
           "metrics": {
             "n_trades": 30,
-            "total_pnl_pct": 27.192601424669892,
+            "total_pnl_pct": 26.392476430402077,
             "winrate": 0.6,
-            "expectancy": 0.9064200474889964,
+            "expectancy": 0.8797492143467359,
             "mdd_pct": -15.775234907238268,
             "max_consec_loss": 4
           }
@@ -1190,12 +1175,12 @@
           "param": "take_profit.trailing.trigger_profit",
           "old": 0.035,
           "new": 0.05,
-          "score": 27.676981704345856,
+          "score": 26.876856710078044,
           "metrics": {
             "n_trades": 30,
-            "total_pnl_pct": 28.064599157964988,
+            "total_pnl_pct": 27.264474163697177,
             "winrate": 0.6,
-            "expectancy": 0.935486638598833,
+            "expectancy": 0.9088158054565726,
             "mdd_pct": -15.775234907238268,
             "max_consec_loss": 4
           }
@@ -1205,12 +1190,12 @@
           "param": "take_profit.trailing.trailing_drop",
           "old": 0.031,
           "new": 0.02,
-          "score": 27.831649705905683,
+          "score": 27.03152471163787,
           "metrics": {
             "n_trades": 30,
-            "total_pnl_pct": 28.219267159524815,
+            "total_pnl_pct": 27.419142165257004,
             "winrate": 0.6,
-            "expectancy": 0.9406422386508272,
+            "expectancy": 0.9139714055085668,
             "mdd_pct": -15.775234907238268,
             "max_consec_loss": 4
           }
@@ -1220,12 +1205,12 @@
           "param": "profit_floor.trigger",
           "old": 0.035,
           "new": 0.05,
-          "score": 40.005935480484894,
+          "score": 43.37539270634471,
           "metrics": {
             "n_trades": 29,
-            "total_pnl_pct": 40.39355293410403,
+            "total_pnl_pct": 43.76301015996385,
             "winrate": 0.6206896551724138,
-            "expectancy": 1.3928811356587596,
+            "expectancy": 1.5090693158608224,
             "mdd_pct": -15.775234907238268,
             "max_consec_loss": 4
           }
@@ -1235,12 +1220,12 @@
           "param": "take_profit.first_only.0.sell_ratio",
           "old": 0.35,
           "new": 0.15,
-          "score": 41.44862940604444,
+          "score": 45.85484270139959,
           "metrics": {
             "n_trades": 29,
-            "total_pnl_pct": 41.836246859663575,
+            "total_pnl_pct": 46.242460155018726,
             "winrate": 0.6206896551724138,
-            "expectancy": 1.4426292020573646,
+            "expectancy": 1.5945675915523698,
             "mdd_pct": -15.775234907238268,
             "max_consec_loss": 4
           }
@@ -1248,14 +1233,29 @@
         {
           "pass": 2,
           "param": "take_profit.first_only.1.profit",
-          "old": 0.035,
-          "new": 0.05,
-          "score": 50.23688900250282,
+          "old": 0.04,
+          "new": 0.045,
+          "score": 47.320536116833836,
           "metrics": {
             "n_trades": 29,
-            "total_pnl_pct": 50.624506456121956,
+            "total_pnl_pct": 47.70815357045297,
             "winrate": 0.6206896551724138,
-            "expectancy": 1.7456726364179984,
+            "expectancy": 1.645108743808723,
+            "mdd_pct": -15.775234907238268,
+            "max_consec_loss": 4
+          }
+        },
+        {
+          "pass": 2,
+          "param": "take_profit.first_only.1.sell_ratio",
+          "old": 0.5,
+          "new": 0.25,
+          "score": 47.43811006010202,
+          "metrics": {
+            "n_trades": 29,
+            "total_pnl_pct": 47.825727513721155,
+            "winrate": 0.6206896551724138,
+            "expectancy": 1.6491630177145227,
             "mdd_pct": -15.775234907238268,
             "max_consec_loss": 4
           }
@@ -1263,9 +1263,9 @@
       ],
       "final_metrics": {
         "n_trades": 29,
-        "total_pnl_pct": 50.624506456121956,
+        "total_pnl_pct": 47.825727513721155,
         "winrate": 0.6206896551724138,
-        "expectancy": 1.7456726364179984,
+        "expectancy": 1.6491630177145227,
         "mdd_pct": -15.775234907238268,
         "max_consec_loss": 4
       },
@@ -1294,8 +1294,8 @@
               "sell_ratio": 0.15
             },
             {
-              "profit": 0.05,
-              "sell_ratio": 0.5
+              "profit": 0.045,
+              "sell_ratio": 0.25
             },
             {
               "profit": 0.05,
@@ -1363,13 +1363,13 @@
           "pass": 1,
           "param": "take_profit.first_only.0.profit",
           "old": 0.014,
-          "new": 0.035,
-          "score": 16.51454581254056,
+          "new": 0.03,
+          "score": 15.508876718774438,
           "metrics": {
             "n_trades": 8,
-            "total_pnl_pct": 16.51454581254056,
+            "total_pnl_pct": 15.508876718774438,
             "winrate": 0.75,
-            "expectancy": 2.06431822656757,
+            "expectancy": 1.9386095898468048,
             "mdd_pct": -2.8520991131812834,
             "max_consec_loss": 1
           }
@@ -1379,12 +1379,12 @@
           "param": "take_profit.first_only.0.sell_ratio",
           "old": 0.25,
           "new": 0.35,
-          "score": 16.727511978613546,
+          "score": 15.68865576385016,
           "metrics": {
             "n_trades": 8,
-            "total_pnl_pct": 16.727511978613546,
+            "total_pnl_pct": 15.68865576385016,
             "winrate": 0.75,
-            "expectancy": 2.090938997326693,
+            "expectancy": 1.96108197048127,
             "mdd_pct": -2.8520991131812834,
             "max_consec_loss": 1
           }
@@ -1394,12 +1394,12 @@
           "param": "take_profit.first_only.1.sell_ratio",
           "old": 0.4,
           "new": 0.5,
-          "score": 16.957745430846792,
+          "score": 16.01884852263798,
           "metrics": {
             "n_trades": 8,
-            "total_pnl_pct": 16.957745430846792,
+            "total_pnl_pct": 16.01884852263798,
             "winrate": 0.75,
-            "expectancy": 2.119718178855849,
+            "expectancy": 2.0023560653297476,
             "mdd_pct": -2.8520991131812834,
             "max_consec_loss": 1
           }
@@ -1409,12 +1409,12 @@
           "param": "take_profit.first_only.2.profit",
           "old": 0.055,
           "new": 0.065,
-          "score": 17.15270250883392,
+          "score": 16.213805600625108,
           "metrics": {
             "n_trades": 8,
-            "total_pnl_pct": 17.15270250883392,
+            "total_pnl_pct": 16.213805600625108,
             "winrate": 0.75,
-            "expectancy": 2.14408781360424,
+            "expectancy": 2.0267257000781385,
             "mdd_pct": -2.8520991131812834,
             "max_consec_loss": 1
           }
@@ -1424,12 +1424,12 @@
           "param": "take_profit.first_only.2.sell_ratio",
           "old": 0.5,
           "new": 0.6,
-          "score": 17.184375535657672,
+          "score": 16.24547862744886,
           "metrics": {
             "n_trades": 8,
-            "total_pnl_pct": 17.184375535657672,
+            "total_pnl_pct": 16.24547862744886,
             "winrate": 0.75,
-            "expectancy": 2.148046941957209,
+            "expectancy": 2.0306848284311076,
             "mdd_pct": -2.8520991131812834,
             "max_consec_loss": 1
           }
@@ -1437,9 +1437,9 @@
       ],
       "final_metrics": {
         "n_trades": 8,
-        "total_pnl_pct": 17.184375535657672,
+        "total_pnl_pct": 16.24547862744886,
         "winrate": 0.75,
-        "expectancy": 2.148046941957209,
+        "expectancy": 2.0306848284311076,
         "mdd_pct": -2.8520991131812834,
         "max_consec_loss": 1
       },
@@ -1464,7 +1464,7 @@
         "take_profit": {
           "first_only": [
             {
-              "profit": 0.035,
+              "profit": 0.03,
               "sell_ratio": 0.35
             },
             {
@@ -1518,9 +1518,9 @@
       },
       "optimized": {
         "n_trades": 34,
-        "total_pnl_pct": 57.353608278262065,
+        "total_pnl_pct": 54.166653316946,
         "winrate": 0.6764705882352942,
-        "expectancy": 1.68687083171359,
+        "expectancy": 1.5931368622631175,
         "mdd_pct": -15.775234907238268,
         "max_consec_loss": 4
       }
@@ -1536,9 +1536,9 @@
       },
       "optimized": {
         "n_trades": 8,
-        "total_pnl_pct": 34.15401684261351,
+        "total_pnl_pct": 33.603295953319964,
         "winrate": 0.75,
-        "expectancy": 4.2692521053266885,
+        "expectancy": 4.2004119941649956,
         "mdd_pct": 0.0,
         "max_consec_loss": 1
       }
