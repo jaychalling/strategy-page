@@ -1,9 +1,9 @@
 {
   "baseline": {
-    "total_pnl_pct": 16.006424603689595,
-    "winrate": 0.5652173913043478,
-    "mdd_pct": -28.748630022949285,
-    "n_trades": 69
+    "total_pnl_pct": -1.7027561516851368,
+    "winrate": 0.5384615384615384,
+    "mdd_pct": -42.36834942216155,
+    "n_trades": 65
   },
   "variants": [
     {
@@ -17,15 +17,15 @@
       "filter_id": null,
       "status": "accepted",
       "result": {
-        "n_trades": 56,
-        "winrate": 0.5714285714285714,
-        "expectancy": 0.40009465909000924,
-        "total_pnl_pct": 22.405300909040516,
-        "mdd_pct": -23.748876267762196,
-        "max_consec_loss": 5,
-        "delta_pnl": 6.398876305350921,
-        "delta_winrate": 0.006211180124223614,
-        "delta_mdd": 4.99975375518709
+        "n_trades": 52,
+        "winrate": 0.5384615384615384,
+        "expectancy": 0.05858073014567706,
+        "total_pnl_pct": 3.046197967575207,
+        "mdd_pct": -30.322800621144616,
+        "max_consec_loss": 7,
+        "delta_pnl": 4.748954119260343,
+        "delta_winrate": 0.0,
+        "delta_mdd": 12.045548801016935
       },
       "rationale": ""
     },
@@ -40,15 +40,15 @@
       "filter_id": null,
       "status": "rejected",
       "result": {
-        "n_trades": 50,
-        "winrate": 0.56,
-        "expectancy": 0.2829823595193999,
-        "total_pnl_pct": 14.149117975969993,
-        "mdd_pct": -26.033319192480878,
-        "max_consec_loss": 5,
-        "delta_pnl": -1.857306627719602,
-        "delta_winrate": -0.005217391304347729,
-        "delta_mdd": 2.7153108304684075
+        "n_trades": 46,
+        "winrate": 0.5217391304347826,
+        "expectancy": -0.09175648896398848,
+        "total_pnl_pct": -4.22079849234347,
+        "mdd_pct": -33.457456619339716,
+        "max_consec_loss": 7,
+        "delta_pnl": -2.5180423406583334,
+        "delta_winrate": -0.01672240802675584,
+        "delta_mdd": 8.910892802821834
       },
       "rationale": ""
     },
@@ -63,15 +63,15 @@
       "filter_id": null,
       "status": "rejected",
       "result": {
-        "n_trades": 55,
-        "winrate": 0.5454545454545454,
-        "expectancy": 0.0873927609254173,
-        "total_pnl_pct": 4.806601850897952,
-        "mdd_pct": -31.36168383841173,
+        "n_trades": 51,
+        "winrate": 0.5490196078431373,
+        "expectancy": -0.12729754823242842,
+        "total_pnl_pct": -6.492174959853849,
+        "mdd_pct": -39.42777511930974,
         "max_consec_loss": 5,
-        "delta_pnl": -11.199822752791643,
-        "delta_winrate": -0.01976284584980237,
-        "delta_mdd": -2.613053815462443
+        "delta_pnl": -4.789418808168712,
+        "delta_winrate": 0.010558069381598867,
+        "delta_mdd": 2.9405743028518074
       },
       "rationale": ""
     },
@@ -88,15 +88,15 @@
       "filter_id": null,
       "status": "rejected",
       "result": {
-        "n_trades": 72,
-        "winrate": 0.4861111111111111,
-        "expectancy": 0.11881783148049843,
-        "total_pnl_pct": 8.554883866595887,
-        "mdd_pct": -27.769304712662645,
-        "max_consec_loss": 5,
-        "delta_pnl": -7.451540737093708,
-        "delta_winrate": -0.07910628019323668,
-        "delta_mdd": 0.9793253102866402
+        "n_trades": 69,
+        "winrate": 0.43478260869565216,
+        "expectancy": -0.21096171585958232,
+        "total_pnl_pct": -14.55635839431118,
+        "mdd_pct": -43.73773489800955,
+        "max_consec_loss": 7,
+        "delta_pnl": -12.853602242626044,
+        "delta_winrate": -0.10367892976588627,
+        "delta_mdd": -1.3693854758479986
       },
       "rationale": ""
     },
@@ -113,15 +113,15 @@
       "filter_id": null,
       "status": "accepted",
       "result": {
-        "n_trades": 70,
-        "winrate": 0.5428571428571428,
-        "expectancy": 0.33348662712775323,
-        "total_pnl_pct": 23.344063898942725,
-        "mdd_pct": -22.916254663665537,
-        "max_consec_loss": 5,
-        "delta_pnl": 7.33763929525313,
-        "delta_winrate": -0.022360248447204967,
-        "delta_mdd": 5.832375359283748
+        "n_trades": 66,
+        "winrate": 0.5151515151515151,
+        "expectancy": 0.08577369017903114,
+        "total_pnl_pct": 5.661063551816055,
+        "mdd_pct": -34.52297192575167,
+        "max_consec_loss": 7,
+        "delta_pnl": 7.363819703501191,
+        "delta_winrate": -0.023310023310023298,
+        "delta_mdd": 7.845377496409881
       },
       "rationale": ""
     },
@@ -136,15 +136,15 @@
       "filter_id": null,
       "status": "rejected",
       "result": {
-        "n_trades": 68,
-        "winrate": 0.5588235294117647,
-        "expectancy": 0.22787813294903203,
-        "total_pnl_pct": 15.495713040534177,
-        "mdd_pct": -24.765158693790934,
-        "max_consec_loss": 5,
-        "delta_pnl": -0.510711563155418,
-        "delta_winrate": -0.006393861892583064,
-        "delta_mdd": 3.983471329158352
+        "n_trades": 61,
+        "winrate": 0.5245901639344263,
+        "expectancy": -0.09187320267333109,
+        "total_pnl_pct": -5.604265363073196,
+        "mdd_pct": -35.74651244504014,
+        "max_consec_loss": 8,
+        "delta_pnl": -3.9015092113880594,
+        "delta_winrate": -0.013871374527112179,
+        "delta_mdd": 6.621836977121411
       },
       "rationale": ""
     },
@@ -159,15 +159,15 @@
       "filter_id": null,
       "status": "rejected",
       "result": {
-        "n_trades": 66,
-        "winrate": 0.5454545454545454,
-        "expectancy": 0.0962309327356786,
-        "total_pnl_pct": 6.351241560554788,
-        "mdd_pct": -31.74467619513425,
-        "max_consec_loss": 6,
-        "delta_pnl": -9.655183043134807,
-        "delta_winrate": -0.01976284584980237,
-        "delta_mdd": -2.9960461721849647
+        "n_trades": 62,
+        "winrate": 0.5161290322580645,
+        "expectancy": -0.16393103683371216,
+        "total_pnl_pct": -10.163724283690154,
+        "mdd_pct": -46.439254643690724,
+        "max_consec_loss": 8,
+        "delta_pnl": -8.460968132005018,
+        "delta_winrate": -0.022332506203473934,
+        "delta_mdd": -4.0709052215291734
       },
       "rationale": ""
     },
@@ -182,14 +182,14 @@
       "filter_id": null,
       "status": "rejected",
       "result": {
-        "n_trades": 70,
-        "winrate": 0.5571428571428572,
-        "expectancy": 0.11991452941601025,
-        "total_pnl_pct": 8.394017059120717,
-        "mdd_pct": -28.748630022949285,
-        "max_consec_loss": 5,
-        "delta_pnl": -7.612407544568878,
-        "delta_winrate": -0.00807453416149062,
+        "n_trades": 66,
+        "winrate": 0.5303030303030303,
+        "expectancy": -0.1555401164125223,
+        "total_pnl_pct": -10.265647683226472,
+        "mdd_pct": -42.36834942216155,
+        "max_consec_loss": 7,
+        "delta_pnl": -8.562891531541336,
+        "delta_winrate": -0.00815850815850816,
         "delta_mdd": 0.0
       },
       "rationale": ""
@@ -203,15 +203,15 @@
       "filter_id": "F1",
       "status": "rejected",
       "result": {
-        "n_trades": 61,
-        "winrate": 0.5737704918032787,
-        "expectancy": 0.19999185093189573,
-        "total_pnl_pct": 12.19950290684564,
-        "mdd_pct": -23.982678122039104,
+        "n_trades": 56,
+        "winrate": 0.5535714285714286,
+        "expectancy": -0.008825676783295378,
+        "total_pnl_pct": -0.49423789986454114,
+        "mdd_pct": -33.595946230171386,
         "max_consec_loss": 5,
-        "delta_pnl": -3.806921696843956,
-        "delta_winrate": 0.008553100498930877,
-        "delta_mdd": 4.765951900910181
+        "delta_pnl": 1.2085182518205957,
+        "delta_winrate": 0.015109890109890167,
+        "delta_mdd": 8.772403191990165
       },
       "rationale": ""
     },
@@ -224,15 +224,15 @@
       "filter_id": "F5",
       "status": "rejected",
       "result": {
-        "n_trades": 61,
-        "winrate": 0.5081967213114754,
-        "expectancy": -0.10587926954193756,
-        "total_pnl_pct": -6.458635442058191,
-        "mdd_pct": -34.86290042606068,
-        "max_consec_loss": 5,
-        "delta_pnl": -22.465060045747787,
-        "delta_winrate": -0.057020669992872364,
-        "delta_mdd": -6.114270403111398
+        "n_trades": 58,
+        "winrate": 0.46551724137931033,
+        "expectancy": -0.5644129327186548,
+        "total_pnl_pct": -32.73595009768198,
+        "mdd_pct": -51.687799698281516,
+        "max_consec_loss": 7,
+        "delta_pnl": -31.033193945996842,
+        "delta_winrate": -0.0729442970822281,
+        "delta_mdd": -9.319450276119966
       },
       "rationale": ""
     },
@@ -245,15 +245,15 @@
       "filter_id": "F6",
       "status": "accepted",
       "result": {
-        "n_trades": 68,
-        "winrate": 0.5735294117647058,
-        "expectancy": 0.31147543710722436,
-        "total_pnl_pct": 21.18032972329126,
-        "mdd_pct": -23.813746870409247,
-        "max_consec_loss": 4,
-        "delta_pnl": 5.173905119601663,
-        "delta_winrate": 0.00831202046035806,
-        "delta_mdd": 4.9348831525400385
+        "n_trades": 64,
+        "winrate": 0.546875,
+        "expectancy": 0.05423670262369571,
+        "total_pnl_pct": 3.4711489679165255,
+        "mdd_pct": -37.194444302559894,
+        "max_consec_loss": 6,
+        "delta_pnl": 5.173905119601662,
+        "delta_winrate": 0.008413461538461564,
+        "delta_mdd": 5.173905119601656
       },
       "rationale": ""
     },
@@ -264,17 +264,17 @@
       "description": "세력감지 조건 완전 배제",
       "config_diff": {},
       "filter_id": "S1_exclude_세력감지",
-      "status": "accepted",
+      "status": "rejected",
       "result": {
-        "n_trades": 57,
-        "winrate": 0.5263157894736842,
-        "expectancy": 0.31860219949932406,
-        "total_pnl_pct": 18.16032537146147,
-        "mdd_pct": -28.295307129730926,
-        "max_consec_loss": 5,
-        "delta_pnl": 2.1539007677718764,
-        "delta_winrate": -0.0389016018306636,
-        "delta_mdd": 0.4533228932183597
+        "n_trades": 54,
+        "winrate": 0.5,
+        "expectancy": -0.08977859694780664,
+        "total_pnl_pct": -4.8480442351815585,
+        "mdd_pct": -44.00140049993386,
+        "max_consec_loss": 7,
+        "delta_pnl": -3.1452880834964216,
+        "delta_winrate": -0.038461538461538436,
+        "delta_mdd": -1.6330510777723077
       },
       "rationale": ""
     },
@@ -287,15 +287,15 @@
       "filter_id": "S1_exclude_굿모닝",
       "status": "rejected",
       "result": {
-        "n_trades": 35,
-        "winrate": 0.6,
-        "expectancy": -0.20773467591969835,
-        "total_pnl_pct": -7.270713657189442,
-        "mdd_pct": -25.849900472069407,
-        "max_consec_loss": 2,
-        "delta_pnl": -23.27713826087904,
-        "delta_winrate": 0.034782608695652195,
-        "delta_mdd": 2.898729550879878
+        "n_trades": 34,
+        "winrate": 0.5294117647058824,
+        "expectancy": -0.2717727842435861,
+        "total_pnl_pct": -9.240274664281927,
+        "mdd_pct": -26.54079318244665,
+        "max_consec_loss": 4,
+        "delta_pnl": -7.53751851259679,
+        "delta_winrate": -0.009049773755656076,
+        "delta_mdd": 15.827556239714902
       },
       "rationale": ""
     },
@@ -315,15 +315,15 @@
       "filter_id": null,
       "status": "rejected",
       "result": {
-        "n_trades": 70,
-        "winrate": 0.5,
-        "expectancy": -0.1502713132542585,
-        "total_pnl_pct": -10.518991927798094,
-        "mdd_pct": -32.92139114018418,
+        "n_trades": 69,
+        "winrate": 0.4782608695652174,
+        "expectancy": -0.5064400715068066,
+        "total_pnl_pct": -34.94436493396965,
+        "mdd_pct": -47.069045110638186,
         "max_consec_loss": 5,
-        "delta_pnl": -26.52541653148769,
-        "delta_winrate": -0.06521739130434778,
-        "delta_mdd": -4.1727611172348915
+        "delta_pnl": -33.241608782284516,
+        "delta_winrate": -0.06020066889632103,
+        "delta_mdd": -4.700695688476635
       },
       "rationale": ""
     },
@@ -336,15 +336,15 @@
       "filter_id": "S6",
       "status": "accepted",
       "result": {
-        "n_trades": 66,
-        "winrate": 0.5757575757575758,
-        "expectancy": 0.2763385247009835,
-        "total_pnl_pct": 18.238342630264913,
-        "mdd_pct": -29.15179759259674,
-        "max_consec_loss": 5,
-        "delta_pnl": 2.2319180265753182,
-        "delta_winrate": 0.010540184453228019,
-        "delta_mdd": -0.40316756964745437
+        "n_trades": 62,
+        "winrate": 0.5483870967741935,
+        "expectancy": 0.1255755899496301,
+        "total_pnl_pct": 7.785686576877066,
+        "mdd_pct": -32.87990669359936,
+        "max_consec_loss": 7,
+        "delta_pnl": 9.488442728562203,
+        "delta_winrate": 0.00992555831265507,
+        "delta_mdd": 9.488442728562191
       },
       "rationale": ""
     },
@@ -357,15 +357,15 @@
       "filter_id": "S7",
       "status": "rejected",
       "result": {
-        "n_trades": 71,
-        "winrate": 0.5492957746478874,
-        "expectancy": 0.13043914150084363,
-        "total_pnl_pct": 9.261179046559898,
-        "mdd_pct": -35.43380130372242,
-        "max_consec_loss": 5,
-        "delta_pnl": -6.745245557129698,
-        "delta_winrate": -0.015921616656460413,
-        "delta_mdd": -6.685171280773133
+        "n_trades": 66,
+        "winrate": 0.5303030303030303,
+        "expectancy": -0.07314247740515425,
+        "total_pnl_pct": -4.827403508740181,
+        "mdd_pct": -45.49299677921659,
+        "max_consec_loss": 7,
+        "delta_pnl": -3.124647357055044,
+        "delta_winrate": -0.00815850815850816,
+        "delta_mdd": -3.1246473570550393
       },
       "rationale": ""
     },
@@ -379,14 +379,14 @@
       "status": "accepted",
       "result": {
         "n_trades": 45,
-        "winrate": 0.6222222222222222,
-        "expectancy": 0.8038016061348386,
-        "total_pnl_pct": 36.17107227606774,
-        "mdd_pct": -14.133769442350008,
+        "winrate": 0.6,
+        "expectancy": 0.5123144682163683,
+        "total_pnl_pct": 23.054151069736573,
+        "mdd_pct": -14.87614311869149,
         "max_consec_loss": 4,
-        "delta_pnl": 20.164647672378145,
-        "delta_winrate": 0.05700483091787445,
-        "delta_mdd": 14.614860580599277
+        "delta_pnl": 24.75690722142171,
+        "delta_winrate": 0.06153846153846154,
+        "delta_mdd": 27.492206303470063
       },
       "rationale": ""
     }
@@ -397,7 +397,6 @@
       "P1",
       "P3b",
       "F6",
-      "S1a",
       "S6",
       "T1"
     ],
@@ -604,11 +603,11 @@
       }
     },
     "result": {
-      "n_trades": 34,
-      "winrate": 0.5588235294117647,
-      "expectancy": 0.7989491609030227,
-      "total_pnl_pct": 27.164271470702772,
-      "mdd_pct": -14.884555541416367,
+      "n_trades": 37,
+      "winrate": 0.5405405405405406,
+      "expectancy": 0.48912632528450417,
+      "total_pnl_pct": 18.097674035526655,
+      "mdd_pct": -14.013190582817597,
       "max_consec_loss": 4
     },
     "trades": [
@@ -624,13 +623,51 @@
         "fill_minute": 1044,
         "fill_time": "10:44",
         "fill_price": 117968,
-        "exit_minute": 1138,
-        "exit_time": "11:38",
-        "exit_price": 122500,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 3.6029196529241414,
-        "pnl_gross_pct": 3.841719788417198,
-        "hold_minutes": 54
+        "exit_minute": 1430,
+        "exit_time": "14:30",
+        "exit_price": 128100,
+        "exit_type": "take_profit_4",
+        "pnl_pct": 5.740522750252853,
+        "pnl_gross_pct": 5.9842499660924995,
+        "hold_minutes": 226,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 122500,
+            "minute": 1138,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.9007299132310354,
+            "gross_contribution": 0.9604299471042995
+          },
+          {
+            "reason": "take_profit_2",
+            "price": 123800,
+            "minute": 1256,
+            "qty": 300,
+            "qty_ratio": 0.3,
+            "pnl_contribution": 1.4107137625273733,
+            "gross_contribution": 1.4831140648311405
+          },
+          {
+            "reason": "take_profit_3",
+            "price": 126400,
+            "minute": 1411,
+            "qty": 225,
+            "qty_ratio": 0.225,
+            "pnl_contribution": 1.5527921218707168,
+            "gross_contribution": 1.6082327410823276
+          },
+          {
+            "reason": "take_profit_4",
+            "price": 128100,
+            "minute": 1430,
+            "qty": 225,
+            "qty_ratio": 0.225,
+            "pnl_contribution": 1.8762869526237274,
+            "gross_contribution": 1.932473213074732
+          }
+        ]
       },
       {
         "date": "2026-02-12",
@@ -650,7 +687,18 @@
         "exit_type": "stop_loss",
         "pnl_pct": -2.9675201494679726,
         "pnl_gross_pct": -2.7438645863510325,
-        "hold_minutes": 104
+        "hold_minutes": 104,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 211500,
+            "minute": 1129,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -2.9675201494679726,
+            "gross_contribution": -2.7438645863510325
+          }
+        ]
       },
       {
         "date": "2026-02-13",
@@ -670,7 +718,18 @@
         "exit_type": "stop_loss",
         "pnl_pct": -2.9953227230688273,
         "pnl_gross_pct": -2.771731243651139,
-        "hold_minutes": 7
+        "hold_minutes": 7,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 6700,
+            "minute": 932,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -2.9953227230688273,
+            "gross_contribution": -2.771731243651139
+          }
+        ]
       },
       {
         "date": "2026-02-13",
@@ -684,13 +743,51 @@
         "fill_minute": 942,
         "fill_time": "09:42",
         "fill_price": 866,
-        "exit_minute": 946,
-        "exit_time": "09:46",
-        "exit_price": 892,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 2.765439687511062,
-        "pnl_gross_pct": 3.0023094688221708,
-        "hold_minutes": 4
+        "exit_minute": 956,
+        "exit_time": "09:56",
+        "exit_price": 916,
+        "exit_type": "retracement_3",
+        "pnl_pct": 5.098399501044806,
+        "pnl_gross_pct": 5.340646651270207,
+        "hold_minutes": 14,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 892,
+            "minute": 946,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.6913599218777655,
+            "gross_contribution": 0.7505773672055427
+          },
+          {
+            "reason": "take_profit_2",
+            "price": 910,
+            "minute": 950,
+            "qty": 300,
+            "qty_ratio": 0.3,
+            "pnl_contribution": 1.4517545231956495,
+            "gross_contribution": 1.5242494226327943
+          },
+          {
+            "reason": "take_profit_3",
+            "price": 934,
+            "minute": 955,
+            "qty": 225,
+            "qty_ratio": 0.225,
+            "pnl_contribution": 1.7109385093390699,
+            "gross_contribution": 1.766743648960739
+          },
+          {
+            "reason": "retracement_3",
+            "price": 916,
+            "minute": 956,
+            "qty": 225,
+            "qty_ratio": 0.225,
+            "pnl_contribution": 1.2443465466323218,
+            "gross_contribution": 1.2990762124711315
+          }
+        ]
       },
       {
         "date": "2026-02-13",
@@ -710,7 +807,18 @@
         "exit_type": "stop_loss",
         "pnl_pct": -3.278673251734432,
         "pnl_gross_pct": -3.0557348827200346,
-        "hold_minutes": 4
+        "hold_minutes": 4,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 4505,
+            "minute": 1017,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -3.278673251734432,
+            "gross_contribution": -3.0557348827200346
+          }
+        ]
       },
       {
         "date": "2026-02-13",
@@ -724,13 +832,42 @@
         "fill_minute": 1034,
         "fill_time": "10:34",
         "fill_price": 7139,
-        "exit_minute": 1037,
-        "exit_time": "10:37",
-        "exit_price": 7410,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 3.5573547565007635,
-        "pnl_gross_pct": 3.796049866928141,
-        "hold_minutes": 3
+        "exit_minute": 1043,
+        "exit_time": "10:43",
+        "exit_price": 7330,
+        "exit_type": "trailing_stop",
+        "pnl_pct": 3.3896505382716047,
+        "pnl_gross_pct": 3.6279590979128726,
+        "hold_minutes": 9,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 7410,
+            "minute": 1037,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.8893386891251909,
+            "gross_contribution": 0.9490124667320352
+          },
+          {
+            "reason": "take_profit_2",
+            "price": 7490,
+            "minute": 1040,
+            "qty": 300,
+            "qty_ratio": 0.3,
+            "pnl_contribution": 1.4026148634085267,
+            "gross_contribution": 1.4749964981089787
+          },
+          {
+            "reason": "trailing_stop",
+            "price": 7330,
+            "minute": 1043,
+            "qty": 450,
+            "qty_ratio": 0.45,
+            "pnl_contribution": 1.097696985737887,
+            "gross_contribution": 1.2039501330718587
+          }
+        ]
       },
       {
         "date": "2026-02-13",
@@ -750,7 +887,98 @@
         "exit_type": "stop_loss",
         "pnl_pct": -3.2887989176052956,
         "pnl_gross_pct": -3.0658838878016956,
-        "hold_minutes": 2
+        "hold_minutes": 2,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 7430,
+            "minute": 1050,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -3.2887989176052956,
+            "gross_contribution": -3.0658838878016956
+          }
+        ]
+      },
+      {
+        "date": "2026-02-19",
+        "code": "067290",
+        "name": "JW신약",
+        "condition": "세력감지",
+        "strat_name": "세력감지",
+        "signal_time": "10:37:18",
+        "signal_price": 2345,
+        "dip_target": 2345,
+        "fill_minute": 1042,
+        "fill_time": "10:42",
+        "fill_price": 2321,
+        "exit_minute": 1155,
+        "exit_time": "11:55",
+        "exit_price": 2250,
+        "exit_type": "stop_loss",
+        "pnl_pct": -3.281957081707043,
+        "pnl_gross_pct": -3.0590262817750973,
+        "hold_minutes": 73,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 2250,
+            "minute": 1155,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -3.281957081707043,
+            "gross_contribution": -3.0590262817750973
+          }
+        ]
+      },
+      {
+        "date": "2026-02-20",
+        "code": "082640",
+        "name": "동양생명",
+        "condition": "세력감지",
+        "strat_name": "세력감지",
+        "signal_time": "10:35:19",
+        "signal_price": 8520,
+        "dip_target": 8520,
+        "fill_minute": 1036,
+        "fill_time": "10:36",
+        "fill_price": 8434,
+        "exit_minute": 1041,
+        "exit_time": "10:41",
+        "exit_price": 8550,
+        "exit_type": "retracement_1",
+        "pnl_pct": 1.9880664450012273,
+        "pnl_gross_pct": 2.2231444154612285,
+        "hold_minutes": 5,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 8620,
+            "minute": 1039,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.4925805473499578,
+            "gross_contribution": 0.5513398150343846
+          },
+          {
+            "reason": "take_profit_2",
+            "price": 8730,
+            "minute": 1040,
+            "qty": 300,
+            "qty_ratio": 0.3,
+            "pnl_contribution": 0.9814702800508267,
+            "gross_contribution": 1.0528811951624377
+          },
+          {
+            "reason": "retracement_1",
+            "price": 8550,
+            "minute": 1041,
+            "qty": 450,
+            "qty_ratio": 0.45,
+            "pnl_contribution": 0.5140156176004429,
+            "gross_contribution": 0.618923405264406
+          }
+        ]
       },
       {
         "date": "2026-02-23",
@@ -764,13 +992,33 @@
         "fill_minute": 1011,
         "fill_time": "10:11",
         "fill_price": 3003,
-        "exit_minute": 1519,
-        "exit_time": "15:19",
+        "exit_minute": 1525,
+        "exit_time": "15:25",
         "exit_price": 3115,
-        "exit_type": "take_profit_1",
+        "exit_type": "market_close",
         "pnl_pct": 3.491061422371722,
         "pnl_gross_pct": 3.7296037296037294,
-        "hold_minutes": 308
+        "hold_minutes": 314,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 3115,
+            "minute": 1519,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.8727653555929304,
+            "gross_contribution": 0.9324009324009324
+          },
+          {
+            "reason": "market_close",
+            "price": 3115,
+            "minute": 1525,
+            "qty": 750,
+            "qty_ratio": 0.75,
+            "pnl_contribution": 2.6182960667787913,
+            "gross_contribution": 2.797202797202797
+          }
+        ]
       },
       {
         "date": "2026-02-24",
@@ -790,7 +1038,18 @@
         "exit_type": "stop_loss",
         "pnl_pct": -2.8838553761598495,
         "pnl_gross_pct": -2.660006969450575,
-        "hold_minutes": 0
+        "hold_minutes": 0,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 8380,
+            "minute": 918,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -2.8838553761598495,
+            "gross_contribution": -2.660006969450575
+          }
+        ]
       },
       {
         "date": "2026-02-25",
@@ -810,7 +1069,18 @@
         "exit_type": "stop_loss",
         "pnl_pct": -3.3376505085483066,
         "pnl_gross_pct": -3.1148480794955096,
-        "hold_minutes": 4
+        "hold_minutes": 4,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 5070,
+            "minute": 919,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -3.3376505085483066,
+            "gross_contribution": -3.1148480794955096
+          }
+        ]
       },
       {
         "date": "2026-02-27",
@@ -830,7 +1100,18 @@
         "exit_type": "stop_loss",
         "pnl_pct": -3.1375591988499707,
         "pnl_gross_pct": -2.914295568201414,
-        "hold_minutes": 7
+        "hold_minutes": 7,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 5630,
+            "minute": 1021,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -3.1375591988499707,
+            "gross_contribution": -2.914295568201414
+          }
+        ]
       },
       {
         "date": "2026-03-04",
@@ -850,7 +1131,18 @@
         "exit_type": "stop_loss",
         "pnl_pct": -2.8090312823652597,
         "pnl_gross_pct": -2.5850104094378903,
-        "hold_minutes": 8
+        "hold_minutes": 8,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 11230,
+            "minute": 1018,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -2.8090312823652597,
+            "gross_contribution": -2.5850104094378903
+          }
+        ]
       },
       {
         "date": "2026-03-06",
@@ -866,11 +1158,49 @@
         "fill_price": 657,
         "exit_minute": 913,
         "exit_time": "09:13",
-        "exit_price": 707,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 7.36288339093123,
-        "pnl_gross_pct": 7.610350076103501,
-        "hold_minutes": 0
+        "exit_price": 695,
+        "exit_type": "retracement_3",
+        "pnl_pct": 6.952869550541537,
+        "pnl_gross_pct": 7.199391171993911,
+        "hold_minutes": 0,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 707,
+            "minute": 913,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 1.8407208477328074,
+            "gross_contribution": 1.9025875190258752
+          },
+          {
+            "reason": "take_profit_2",
+            "price": 707,
+            "minute": 913,
+            "qty": 300,
+            "qty_ratio": 0.3,
+            "pnl_contribution": 2.208865017279369,
+            "gross_contribution": 2.28310502283105
+          },
+          {
+            "reason": "take_profit_3",
+            "price": 707,
+            "minute": 913,
+            "qty": 225,
+            "qty_ratio": 0.225,
+            "pnl_contribution": 1.6566487629595266,
+            "gross_contribution": 1.7123287671232876
+          },
+          {
+            "reason": "retracement_3",
+            "price": 695,
+            "minute": 913,
+            "qty": 225,
+            "qty_ratio": 0.225,
+            "pnl_contribution": 1.246634922569834,
+            "gross_contribution": 1.3013698630136987
+          }
+        ]
       },
       {
         "date": "2026-03-06",
@@ -890,7 +1220,18 @@
         "exit_type": "stop_loss",
         "pnl_pct": -2.7582509797019816,
         "pnl_gross_pct": -2.53411306042885,
-        "hold_minutes": 11
+        "hold_minutes": 11,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 7500,
+            "minute": 951,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -2.7582509797019816,
+            "gross_contribution": -2.53411306042885
+          }
+        ]
       },
       {
         "date": "2026-03-09",
@@ -904,13 +1245,33 @@
         "fill_minute": 927,
         "fill_time": "09:27",
         "fill_price": 11101,
-        "exit_minute": 929,
-        "exit_time": "09:29",
-        "exit_price": 11540,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 3.715538966785825,
-        "pnl_gross_pct": 3.9545986848031704,
-        "hold_minutes": 2
+        "exit_minute": 936,
+        "exit_time": "09:36",
+        "exit_price": 11150,
+        "exit_type": "profit_floor",
+        "pnl_pct": 1.0867005657646034,
+        "pnl_gross_pct": 1.3197009278443383,
+        "hold_minutes": 9,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 11540,
+            "minute": 929,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.9288847416964563,
+            "gross_contribution": 0.9886496712007926
+          },
+          {
+            "reason": "profit_floor",
+            "price": 11150,
+            "minute": 936,
+            "qty": 750,
+            "qty_ratio": 0.75,
+            "pnl_contribution": 0.1578158240681471,
+            "gross_contribution": 0.3310512566435457
+          }
+        ]
       },
       {
         "date": "2026-03-09",
@@ -924,13 +1285,73 @@
         "fill_minute": 1034,
         "fill_time": "10:34",
         "fill_price": 4304,
-        "exit_minute": 1036,
-        "exit_time": "10:36",
-        "exit_price": 4500,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 4.313465433716512,
-        "pnl_gross_pct": 4.553903345724907,
-        "hold_minutes": 2
+        "exit_minute": 1041,
+        "exit_time": "10:41",
+        "exit_price": 4355,
+        "exit_type": "trailing_stop",
+        "pnl_pct": 1.792556685735025,
+        "pnl_gross_pct": 2.0271840148698885,
+        "hold_minutes": 7,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 4500,
+            "minute": 1036,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 1.078366358429128,
+            "gross_contribution": 1.1384758364312269
+          },
+          {
+            "reason": "trailing_stop",
+            "price": 4355,
+            "minute": 1041,
+            "qty": 750,
+            "qty_ratio": 0.75,
+            "pnl_contribution": 0.7141903273058969,
+            "gross_contribution": 0.8887081784386617
+          }
+        ]
+      },
+      {
+        "date": "2026-03-12",
+        "code": "322310",
+        "name": "오로스테크놀로지",
+        "condition": "세력감지",
+        "strat_name": "세력감지",
+        "signal_time": "10:41:09",
+        "signal_price": 30300,
+        "dip_target": 30300,
+        "fill_minute": 1054,
+        "fill_time": "10:54",
+        "fill_price": 29997,
+        "exit_minute": 1317,
+        "exit_time": "13:17",
+        "exit_price": 30350,
+        "exit_type": "retracement_1",
+        "pnl_pct": 1.1519876678964036,
+        "pnl_gross_pct": 1.385138513851385,
+        "hold_minutes": 143,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 30600,
+            "minute": 1317,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.4439031864992171,
+            "gross_contribution": 0.5025502550255025
+          },
+          {
+            "reason": "retracement_1",
+            "price": 30350,
+            "minute": 1317,
+            "qty": 750,
+            "qty_ratio": 0.75,
+            "pnl_contribution": 0.7080844813971865,
+            "gross_contribution": 0.8825882588258825
+          }
+        ]
       },
       {
         "date": "2026-03-16",
@@ -950,7 +1371,18 @@
         "exit_type": "stop_loss",
         "pnl_pct": -2.726817254784053,
         "pnl_gross_pct": -2.502606882168926,
-        "hold_minutes": 18
+        "hold_minutes": 18,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 7480,
+            "minute": 958,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -2.726817254784053,
+            "gross_contribution": -2.502606882168926
+          }
+        ]
       },
       {
         "date": "2026-03-17",
@@ -966,11 +1398,31 @@
         "fill_price": 5977,
         "exit_minute": 1026,
         "exit_time": "10:26",
-        "exit_price": 6200,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 3.492423267177469,
-        "pnl_gross_pct": 3.7309687134013716,
-        "hold_minutes": 0
+        "exit_price": 5970,
+        "exit_type": "profit_floor",
+        "pnl_pct": 0.612996974663263,
+        "pnl_gross_pct": 0.8449054709720595,
+        "hold_minutes": 0,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 6200,
+            "minute": 1026,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.8731058167943673,
+            "gross_contribution": 0.9327421783503429
+          },
+          {
+            "reason": "profit_floor",
+            "price": 5970,
+            "minute": 1026,
+            "qty": 750,
+            "qty_ratio": 0.75,
+            "pnl_contribution": -0.2601088421311043,
+            "gross_contribution": -0.08783670737828342
+          }
+        ]
       },
       {
         "date": "2026-03-18",
@@ -990,7 +1442,18 @@
         "exit_type": "stop_loss",
         "pnl_pct": -2.7375139730563602,
         "pnl_gross_pct": -2.513328255902513,
-        "hold_minutes": 246
+        "hold_minutes": 246,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 5120,
+            "minute": 1436,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -2.7375139730563602,
+            "gross_contribution": -2.513328255902513
+          }
+        ]
       },
       {
         "date": "2026-03-19",
@@ -1004,13 +1467,42 @@
         "fill_minute": 1033,
         "fill_time": "10:33",
         "fill_price": 16900,
-        "exit_minute": 1053,
-        "exit_time": "10:53",
-        "exit_price": 17490,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 3.2531303736392125,
-        "pnl_gross_pct": 3.4911242603550297,
-        "hold_minutes": 20
+        "exit_minute": 1126,
+        "exit_time": "11:26",
+        "exit_price": 17370,
+        "exit_type": "trailing_stop",
+        "pnl_pct": 3.6604754848902843,
+        "pnl_gross_pct": 3.8994082840236683,
+        "hold_minutes": 53,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 17490,
+            "minute": 1053,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.8132825934098031,
+            "gross_contribution": 0.8727810650887574
+          },
+          {
+            "reason": "take_profit_2",
+            "price": 17900,
+            "minute": 1056,
+            "qty": 300,
+            "qty_ratio": 0.3,
+            "pnl_contribution": 1.7020760495393115,
+            "gross_contribution": 1.7751479289940826
+          },
+          {
+            "reason": "trailing_stop",
+            "price": 17370,
+            "minute": 1126,
+            "qty": 450,
+            "qty_ratio": 0.45,
+            "pnl_contribution": 1.1451168419411695,
+            "gross_contribution": 1.2514792899408285
+          }
+        ]
       },
       {
         "date": "2026-03-20",
@@ -1030,7 +1522,18 @@
         "exit_type": "stop_loss",
         "pnl_pct": -3.167789070306637,
         "pnl_gross_pct": -2.9445951181712515,
-        "hold_minutes": 2
+        "hold_minutes": 2,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 2505,
+            "minute": 917,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -3.167789070306637,
+            "gross_contribution": -2.9445951181712515
+          }
+        ]
       },
       {
         "date": "2026-03-20",
@@ -1044,13 +1547,42 @@
         "fill_minute": 951,
         "fill_time": "09:51",
         "fill_price": 13256,
-        "exit_minute": 1037,
-        "exit_time": "10:37",
-        "exit_price": 13740,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 3.4128148731824126,
-        "pnl_gross_pct": 3.6511768255884127,
-        "hold_minutes": 46
+        "exit_minute": 1100,
+        "exit_time": "11:00",
+        "exit_price": 13510,
+        "exit_type": "trailing_stop",
+        "pnl_pct": 3.0854162234747373,
+        "pnl_gross_pct": 3.3230235365117684,
+        "hold_minutes": 69,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 13740,
+            "minute": 1037,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.8532037182956032,
+            "gross_contribution": 0.9127942063971032
+          },
+          {
+            "reason": "take_profit_2",
+            "price": 13940,
+            "minute": 1054,
+            "qty": 300,
+            "qty_ratio": 0.3,
+            "pnl_contribution": 1.4754288063791021,
+            "gross_contribution": 1.5479782739891368
+          },
+          {
+            "reason": "trailing_stop",
+            "price": 13510,
+            "minute": 1100,
+            "qty": 450,
+            "qty_ratio": 0.45,
+            "pnl_contribution": 0.756783698800032,
+            "gross_contribution": 0.8622510561255282
+          }
+        ]
       },
       {
         "date": "2026-03-23",
@@ -1064,13 +1596,33 @@
         "fill_minute": 919,
         "fill_time": "09:19",
         "fill_price": 7543,
-        "exit_minute": 919,
-        "exit_time": "09:19",
-        "exit_price": 7790,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 3.037063332187828,
-        "pnl_gross_pct": 3.27455919395466,
-        "hold_minutes": 0
+        "exit_minute": 920,
+        "exit_time": "09:20",
+        "exit_price": 7320,
+        "exit_type": "stop_loss",
+        "pnl_pct": -1.6253968506871777,
+        "pnl_gross_pct": -1.398647752883468,
+        "hold_minutes": 1,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 7790,
+            "minute": 919,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.759265833046957,
+            "gross_contribution": 0.818639798488665
+          },
+          {
+            "reason": "stop_loss",
+            "price": 7320,
+            "minute": 920,
+            "qty": 750,
+            "qty_ratio": 0.75,
+            "pnl_contribution": -2.3846626837341347,
+            "gross_contribution": -2.217287551372133
+          }
+        ]
       },
       {
         "date": "2026-03-23",
@@ -1084,13 +1636,33 @@
         "fill_minute": 935,
         "fill_time": "09:35",
         "fill_price": 3727,
-        "exit_minute": 942,
-        "exit_time": "09:42",
-        "exit_price": 3830,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 2.527295979388966,
-        "pnl_gross_pct": 2.7636168500134155,
-        "hold_minutes": 7
+        "exit_minute": 945,
+        "exit_time": "09:45",
+        "exit_price": 3780,
+        "exit_type": "trailing_stop",
+        "pnl_pct": 1.5234386427761537,
+        "pnl_gross_pct": 1.7574456667561043,
+        "hold_minutes": 10,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 3830,
+            "minute": 942,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.6318239948472415,
+            "gross_contribution": 0.6909042125033539
+          },
+          {
+            "reason": "trailing_stop",
+            "price": 3780,
+            "minute": 945,
+            "qty": 750,
+            "qty_ratio": 0.75,
+            "pnl_contribution": 0.8916146479289122,
+            "gross_contribution": 1.0665414542527503
+          }
+        ]
       },
       {
         "date": "2026-03-24",
@@ -1110,7 +1682,18 @@
         "exit_type": "stop_loss",
         "pnl_pct": -2.8429558457274795,
         "pnl_gross_pct": -2.619013167414267,
-        "hold_minutes": 47
+        "hold_minutes": 47,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 6730,
+            "minute": 1054,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -2.8429558457274795,
+            "gross_contribution": -2.619013167414267
+          }
+        ]
       },
       {
         "date": "2026-03-25",
@@ -1124,13 +1707,33 @@
         "fill_minute": 925,
         "fill_time": "09:25",
         "fill_price": 6108,
-        "exit_minute": 926,
-        "exit_time": "09:26",
-        "exit_price": 6280,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 2.5795377582688017,
-        "pnl_gross_pct": 2.8159790438768826,
-        "hold_minutes": 1
+        "exit_minute": 940,
+        "exit_time": "09:40",
+        "exit_price": 6080,
+        "exit_type": "profit_floor",
+        "pnl_pct": 0.12938956340569074,
+        "pnl_gross_pct": 0.3601833660772756,
+        "hold_minutes": 15,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 6280,
+            "minute": 926,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.6448844395672004,
+            "gross_contribution": 0.7039947609692206
+          },
+          {
+            "reason": "profit_floor",
+            "price": 6080,
+            "minute": 940,
+            "qty": 750,
+            "qty_ratio": 0.75,
+            "pnl_contribution": -0.5154948761615097,
+            "gross_contribution": -0.34381139489194507
+          }
+        ]
       },
       {
         "date": "2026-03-26",
@@ -1144,13 +1747,51 @@
         "fill_minute": 957,
         "fill_time": "09:57",
         "fill_price": 2512,
-        "exit_minute": 1034,
-        "exit_time": "10:34",
-        "exit_price": 2600,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 3.265163091778245,
-        "pnl_gross_pct": 3.5031847133757963,
-        "hold_minutes": 37
+        "exit_minute": 1035,
+        "exit_time": "10:35",
+        "exit_price": 2645,
+        "exit_type": "retracement_3",
+        "pnl_pct": 5.3354310249163,
+        "pnl_gross_pct": 5.578224522292993,
+        "hold_minutes": 38,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 2600,
+            "minute": 1034,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.8162907729445612,
+            "gross_contribution": 0.8757961783439491
+          },
+          {
+            "reason": "take_profit_2",
+            "price": 2680,
+            "minute": 1035,
+            "qty": 300,
+            "qty_ratio": 0.3,
+            "pnl_contribution": 1.932765817611426,
+            "gross_contribution": 2.006369426751592
+          },
+          {
+            "reason": "take_profit_3",
+            "price": 2680,
+            "minute": 1035,
+            "qty": 225,
+            "qty_ratio": 0.225,
+            "pnl_contribution": 1.4495743632085696,
+            "gross_contribution": 1.5047770700636942
+          },
+          {
+            "reason": "retracement_3",
+            "price": 2645,
+            "minute": 1035,
+            "qty": 225,
+            "qty_ratio": 0.225,
+            "pnl_contribution": 1.136800071151743,
+            "gross_contribution": 1.191281847133758
+          }
+        ]
       },
       {
         "date": "2026-03-27",
@@ -1170,7 +1811,18 @@
         "exit_type": "stop_loss",
         "pnl_pct": -3.306019133773863,
         "pnl_gross_pct": -3.083143795804903,
-        "hold_minutes": 12
+        "hold_minutes": 12,
+        "partial_exits": [
+          {
+            "reason": "stop_loss",
+            "price": 3835,
+            "minute": 1004,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -3.306019133773863,
+            "gross_contribution": -3.083143795804903
+          }
+        ]
       },
       {
         "date": "2026-04-01",
@@ -1184,13 +1836,51 @@
         "fill_minute": 937,
         "fill_time": "09:37",
         "fill_price": 19027,
-        "exit_minute": 943,
-        "exit_time": "09:43",
-        "exit_price": 19760,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 3.613595502063238,
-        "pnl_gross_pct": 3.85242024491512,
-        "hold_minutes": 6
+        "exit_minute": 955,
+        "exit_time": "09:55",
+        "exit_price": 20000,
+        "exit_type": "retracement_3",
+        "pnl_pct": 5.147349382850364,
+        "pnl_gross_pct": 5.389709360382614,
+        "hold_minutes": 18,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 19760,
+            "minute": 943,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.9033988755158096,
+            "gross_contribution": 0.96310506122878
+          },
+          {
+            "reason": "take_profit_2",
+            "price": 20150,
+            "minute": 953,
+            "qty": 300,
+            "qty_ratio": 0.3,
+            "pnl_contribution": 1.6975802029338238,
+            "gross_contribution": 1.7706417196615338
+          },
+          {
+            "reason": "take_profit_3",
+            "price": 20300,
+            "minute": 954,
+            "qty": 225,
+            "qty_ratio": 0.225,
+            "pnl_contribution": 1.4501567538296483,
+            "gross_contribution": 1.5053608030693226
+          },
+          {
+            "reason": "retracement_3",
+            "price": 20000,
+            "minute": 955,
+            "qty": 225,
+            "qty_ratio": 0.225,
+            "pnl_contribution": 1.0962135505710824,
+            "gross_contribution": 1.150601776422978
+          }
+        ]
       },
       {
         "date": "2026-04-01",
@@ -1210,7 +1900,18 @@
         "exit_type": "market_close",
         "pnl_pct": -0.11733817136153624,
         "pnl_gross_pct": 0.1128869348226487,
-        "hold_minutes": 292
+        "hold_minutes": 292,
+        "partial_exits": [
+          {
+            "reason": "market_close",
+            "price": 33700,
+            "minute": 1525,
+            "qty": 1000,
+            "qty_ratio": 1.0,
+            "pnl_contribution": -0.11733817136153624,
+            "gross_contribution": 0.1128869348226487
+          }
+        ]
       },
       {
         "date": "2026-04-02",
@@ -1224,13 +1925,33 @@
         "fill_minute": 938,
         "fill_time": "09:38",
         "fill_price": 5729,
-        "exit_minute": 941,
-        "exit_time": "09:41",
-        "exit_price": 5990,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 4.3153266929667256,
-        "pnl_gross_pct": 4.55576889509513,
-        "hold_minutes": 3
+        "exit_minute": 945,
+        "exit_time": "09:45",
+        "exit_price": 5810,
+        "exit_type": "trailing_stop",
+        "pnl_pct": 1.9643134870317491,
+        "pnl_gross_pct": 2.1993367079769595,
+        "hold_minutes": 7,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 5990,
+            "minute": 941,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 1.0788316732416814,
+            "gross_contribution": 1.1389422237737825
+          },
+          {
+            "reason": "trailing_stop",
+            "price": 5810,
+            "minute": 945,
+            "qty": 750,
+            "qty_ratio": 0.75,
+            "pnl_contribution": 0.8854818137900677,
+            "gross_contribution": 1.0603944842031767
+          }
+        ]
       },
       {
         "date": "2026-04-06",
@@ -1246,11 +1967,31 @@
         "fill_price": 4145,
         "exit_minute": 927,
         "exit_time": "09:27",
-        "exit_price": 4305,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 3.62123003624244,
-        "pnl_gross_pct": 3.8600723763570564,
-        "hold_minutes": 0
+        "exit_price": 4165,
+        "exit_type": "profit_floor",
+        "pnl_pct": 1.0938829621877588,
+        "pnl_gross_pct": 1.3268998793727382,
+        "hold_minutes": 0,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 4305,
+            "minute": 927,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.90530750906061,
+            "gross_contribution": 0.9650180940892641
+          },
+          {
+            "reason": "profit_floor",
+            "price": 4165,
+            "minute": 927,
+            "qty": 750,
+            "qty_ratio": 0.75,
+            "pnl_contribution": 0.18857545312714885,
+            "gross_contribution": 0.36188178528347403
+          }
+        ]
       },
       {
         "date": "2026-04-08",
@@ -1264,13 +2005,51 @@
         "fill_minute": 940,
         "fill_time": "09:40",
         "fill_price": 4618,
-        "exit_minute": 942,
-        "exit_time": "09:42",
-        "exit_price": 4745,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 2.5138184664244667,
-        "pnl_gross_pct": 2.7501082719792116,
-        "hold_minutes": 2
+        "exit_minute": 951,
+        "exit_time": "09:51",
+        "exit_price": 5140,
+        "exit_type": "take_profit_4",
+        "pnl_pct": 6.4674599373108235,
+        "pnl_gross_pct": 6.712862711130359,
+        "hold_minutes": 11,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 4745,
+            "minute": 942,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 0.6284546166061167,
+            "gross_contribution": 0.6875270679948029
+          },
+          {
+            "reason": "take_profit_2",
+            "price": 4890,
+            "minute": 949,
+            "qty": 300,
+            "qty_ratio": 0.3,
+            "pnl_contribution": 1.693945561695409,
+            "gross_contribution": 1.7669987007362493
+          },
+          {
+            "reason": "take_profit_3",
+            "price": 4970,
+            "minute": 950,
+            "qty": 225,
+            "qty_ratio": 0.225,
+            "pnl_contribution": 1.6593419388997221,
+            "gross_contribution": 1.715028150714595
+          },
+          {
+            "reason": "take_profit_4",
+            "price": 5140,
+            "minute": 951,
+            "qty": 225,
+            "qty_ratio": 0.225,
+            "pnl_contribution": 2.4857178201095755,
+            "gross_contribution": 2.543308791684712
+          }
+        ]
       },
       {
         "date": "2026-04-09",
@@ -1284,185 +2063,237 @@
         "fill_minute": 1008,
         "fill_time": "10:08",
         "fill_price": 3157,
-        "exit_minute": 1011,
-        "exit_time": "10:11",
-        "exit_price": 3325,
-        "exit_type": "take_profit_1",
-        "pnl_pct": 5.0793046231535355,
-        "pnl_gross_pct": 5.321507760532151,
-        "hold_minutes": 3
+        "exit_minute": 1013,
+        "exit_time": "10:13",
+        "exit_price": 3330,
+        "exit_type": "retracement_3",
+        "pnl_pct": 5.648154994045792,
+        "pnl_gross_pct": 5.891669306303453,
+        "hold_minutes": 5,
+        "partial_exits": [
+          {
+            "reason": "take_profit_1",
+            "price": 3325,
+            "minute": 1011,
+            "qty": 250,
+            "qty_ratio": 0.25,
+            "pnl_contribution": 1.2698261557883839,
+            "gross_contribution": 1.3303769401330376
+          },
+          {
+            "reason": "take_profit_2",
+            "price": 3325,
+            "minute": 1011,
+            "qty": 300,
+            "qty_ratio": 0.3,
+            "pnl_contribution": 1.5237913869460606,
+            "gross_contribution": 1.5964523281596452
+          },
+          {
+            "reason": "take_profit_3",
+            "price": 3400,
+            "minute": 1012,
+            "qty": 225,
+            "qty_ratio": 0.225,
+            "pnl_contribution": 1.676140762921038,
+            "gross_contribution": 1.7318656952803297
+          },
+          {
+            "reason": "retracement_3",
+            "price": 3330,
+            "minute": 1013,
+            "qty": 225,
+            "qty_ratio": 0.225,
+            "pnl_contribution": 1.1783966883903096,
+            "gross_contribution": 1.2329743427304403
+          }
+        ]
       }
     ],
     "equity_curve": [
       {
         "date": "2026-02-11",
-        "daily_pnl": 3.6029196529241414,
-        "cum_pnl": 3.6029196529241414,
+        "daily_pnl": 5.740522750252853,
+        "cum_pnl": 5.740522750252853,
         "n_trades": 1
       },
       {
         "date": "2026-02-12",
         "daily_pnl": -2.9675201494679726,
-        "cum_pnl": 0.6353995034561688,
+        "cum_pnl": 2.7730026007848805,
         "n_trades": 1
       },
       {
         "date": "2026-02-13",
-        "daily_pnl": -3.2400004483967293,
-        "cum_pnl": -2.6046009449405605,
+        "daily_pnl": -1.074744853092144,
+        "cum_pnl": 1.6982577476927365,
         "n_trades": 5
+      },
+      {
+        "date": "2026-02-19",
+        "daily_pnl": -3.281957081707043,
+        "cum_pnl": -1.5836993340143066,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-20",
+        "daily_pnl": 1.9880664450012273,
+        "cum_pnl": 0.4043671109869207,
+        "n_trades": 1
       },
       {
         "date": "2026-02-23",
         "daily_pnl": 3.491061422371722,
-        "cum_pnl": 0.8864604774311613,
+        "cum_pnl": 3.8954285333586425,
         "n_trades": 1
       },
       {
         "date": "2026-02-24",
         "daily_pnl": -2.8838553761598495,
-        "cum_pnl": -1.9973948987286883,
+        "cum_pnl": 1.011573157198793,
         "n_trades": 1
       },
       {
         "date": "2026-02-25",
         "daily_pnl": -3.3376505085483066,
-        "cum_pnl": -5.335045407276995,
+        "cum_pnl": -2.3260773513495137,
         "n_trades": 1
       },
       {
         "date": "2026-02-27",
         "daily_pnl": -3.1375591988499707,
-        "cum_pnl": -8.472604606126966,
+        "cum_pnl": -5.463636550199484,
         "n_trades": 1
       },
       {
         "date": "2026-03-04",
         "daily_pnl": -2.8090312823652597,
-        "cum_pnl": -11.281635888492225,
+        "cum_pnl": -8.272667832564744,
         "n_trades": 1
       },
       {
         "date": "2026-03-06",
-        "daily_pnl": 4.6046324112292485,
-        "cum_pnl": -6.677003477262977,
+        "daily_pnl": 4.194618570839555,
+        "cum_pnl": -4.078049261725189,
         "n_trades": 2
       },
       {
         "date": "2026-03-09",
-        "daily_pnl": 8.029004400502338,
-        "cum_pnl": 1.3520009232393608,
+        "daily_pnl": 2.879257251499628,
+        "cum_pnl": -1.198792010225561,
         "n_trades": 2
+      },
+      {
+        "date": "2026-03-12",
+        "daily_pnl": 1.1519876678964036,
+        "cum_pnl": -0.04680434232915731,
+        "n_trades": 1
       },
       {
         "date": "2026-03-16",
         "daily_pnl": -2.726817254784053,
-        "cum_pnl": -1.3748163315446922,
+        "cum_pnl": -2.7736215971132103,
         "n_trades": 1
       },
       {
         "date": "2026-03-17",
-        "daily_pnl": 3.492423267177469,
-        "cum_pnl": 2.117606935632777,
+        "daily_pnl": 0.612996974663263,
+        "cum_pnl": -2.1606246224499475,
         "n_trades": 1
       },
       {
         "date": "2026-03-18",
         "daily_pnl": -2.7375139730563602,
-        "cum_pnl": -0.6199070374235833,
+        "cum_pnl": -4.898138595506308,
         "n_trades": 1
       },
       {
         "date": "2026-03-19",
-        "daily_pnl": 3.2531303736392125,
-        "cum_pnl": 2.633223336215629,
+        "daily_pnl": 3.6604754848902843,
+        "cum_pnl": -1.2376631106160234,
         "n_trades": 1
       },
       {
         "date": "2026-03-20",
-        "daily_pnl": 0.2450258028757757,
-        "cum_pnl": 2.878249139091405,
+        "daily_pnl": -0.0823728468318996,
+        "cum_pnl": -1.320035957447923,
         "n_trades": 2
       },
       {
         "date": "2026-03-23",
-        "daily_pnl": 5.564359311576794,
-        "cum_pnl": 8.4426084506682,
+        "daily_pnl": -0.10195820791102395,
+        "cum_pnl": -1.421994165358947,
         "n_trades": 2
       },
       {
         "date": "2026-03-24",
         "daily_pnl": -2.8429558457274795,
-        "cum_pnl": 5.5996526049407205,
+        "cum_pnl": -4.264950011086427,
         "n_trades": 1
       },
       {
         "date": "2026-03-25",
-        "daily_pnl": 2.5795377582688017,
-        "cum_pnl": 8.179190363209521,
+        "daily_pnl": 0.12938956340569074,
+        "cum_pnl": -4.135560447680736,
         "n_trades": 1
       },
       {
         "date": "2026-03-26",
-        "daily_pnl": 3.265163091778245,
-        "cum_pnl": 11.444353454987766,
+        "daily_pnl": 5.3354310249163,
+        "cum_pnl": 1.199870577235564,
         "n_trades": 1
       },
       {
         "date": "2026-03-27",
         "daily_pnl": -3.306019133773863,
-        "cum_pnl": 8.138334321213904,
+        "cum_pnl": -2.106148556538299,
         "n_trades": 1
       },
       {
         "date": "2026-04-01",
-        "daily_pnl": 3.496257330701702,
-        "cum_pnl": 11.634591651915606,
+        "daily_pnl": 5.030011211488828,
+        "cum_pnl": 2.923862654950529,
         "n_trades": 2
       },
       {
         "date": "2026-04-02",
-        "daily_pnl": 4.3153266929667256,
-        "cum_pnl": 15.949918344882331,
+        "daily_pnl": 1.9643134870317491,
+        "cum_pnl": 4.888176141982278,
         "n_trades": 1
       },
       {
         "date": "2026-04-06",
-        "daily_pnl": 3.62123003624244,
-        "cum_pnl": 19.57114838112477,
+        "daily_pnl": 1.0938829621877588,
+        "cum_pnl": 5.982059104170037,
         "n_trades": 1
       },
       {
         "date": "2026-04-08",
-        "daily_pnl": 2.5138184664244667,
-        "cum_pnl": 22.08496684754924,
+        "daily_pnl": 6.4674599373108235,
+        "cum_pnl": 12.44951904148086,
         "n_trades": 1
       },
       {
         "date": "2026-04-09",
-        "daily_pnl": 5.0793046231535355,
-        "cum_pnl": 27.164271470702776,
+        "daily_pnl": 5.648154994045792,
+        "cum_pnl": 18.09767403552665,
         "n_trades": 1
       }
     ]
   },
   "robustness": {
     "train_feb_mar": {
-      "baseline_pnl": 3.3561582075942957,
-      "final_pnl": 8.138334321213902
+      "baseline_pnl": -15.886048297585294,
+      "final_pnl": -2.106148556538298
     },
     "test_apr": {
-      "baseline_pnl": 12.6502663960953,
-      "final_pnl": 19.02593714948887
+      "baseline_pnl": 14.183292145900156,
+      "final_pnl": 20.203822592064952
     },
     "worst5_baseline": [
       {
         "date": "2026-03-03",
-        "pnl": -10.28834303592173
-      },
-      {
-        "date": "2026-03-18",
-        "pnl": -9.17703660280036
+        "pnl": -16.203236488269717
       },
       {
         "date": "2026-02-24",
@@ -1475,6 +2306,10 @@
       {
         "date": "2026-02-12",
         "pnl": -6.628054437336706
+      },
+      {
+        "date": "2026-03-10",
+        "pnl": -3.893686835745258
       }
     ],
     "worst5_final": [
@@ -1487,8 +2322,8 @@
         "pnl": -3.306019133773863
       },
       {
-        "date": "2026-02-13",
-        "pnl": -3.2400004483967293
+        "date": "2026-02-19",
+        "pnl": -3.281957081707043
       },
       {
         "date": "2026-02-27",
@@ -1500,13 +2335,13 @@
       }
     ],
     "consec_loss_baseline": {
-      "1": 10,
-      "2": 6,
-      "5": 1,
+      "1": 12,
+      "2": 4,
+      "7": 1,
       "3": 1
     },
     "consec_loss_final": {
-      "2": 1,
+      "2": 2,
       "1": 9,
       "4": 1
     }

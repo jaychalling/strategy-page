@@ -1,0 +1,1547 @@
+{
+  "meta": {
+    "generated_at": "2026-04-12T00:01:23.148792+09:00",
+    "n_days": 39,
+    "baseline_filters": [
+      "T1"
+    ],
+    "baseline_description": "T1: 골든10분 09:15~10:00 · 굿모닝 09:10~11:30 · 세력감지 10:30~12:00",
+    "optimization": "Coordinate descent per condition (2 passes)"
+  },
+  "baseline": {
+    "metrics": {
+      "n_trades": 45,
+      "total_pnl_pct": 23.054151069736573,
+      "winrate": 0.6,
+      "expectancy": 0.5123144682163683,
+      "mdd_pct": -14.87614311869149,
+      "max_consec_loss": 4
+    },
+    "by_condition": {
+      "골든10분": {
+        "n_trades": 6,
+        "total_pnl_pct": 14.630873128963033,
+        "winrate": 0.8333333333333334,
+        "expectancy": 2.438478854827172,
+        "mdd_pct": -0.10195820791102417,
+        "max_consec_loss": 1
+      },
+      "굿모닝": {
+        "n_trades": 31,
+        "total_pnl_pct": 4.196146084876861,
+        "winrate": 0.5161290322580645,
+        "expectancy": 0.13535955112506,
+        "mdd_pct": -18.63630672467353,
+        "max_consec_loss": 4
+      },
+      "세력감지": {
+        "n_trades": 8,
+        "total_pnl_pct": 4.227131855896681,
+        "winrate": 0.75,
+        "expectancy": 0.5283914819870851,
+        "mdd_pct": -3.6404441666902487,
+        "max_consec_loss": 1
+      }
+    },
+    "equity_curve": [
+      {
+        "date": "2026-02-11",
+        "daily_pnl": 5.740522750252853,
+        "cum_pnl": 5.740522750252853,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-12",
+        "daily_pnl": -3.1969113547883787,
+        "cum_pnl": 2.5436113954644743,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-13",
+        "daily_pnl": -2.010630217253706,
+        "cum_pnl": 0.5329811782107683,
+        "n_trades": 4
+      },
+      {
+        "date": "2026-02-19",
+        "daily_pnl": -3.281957081707043,
+        "cum_pnl": -2.748975903496275,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-20",
+        "daily_pnl": 5.023521150949929,
+        "cum_pnl": 2.274545247453654,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-02-23",
+        "daily_pnl": 3.491061422371722,
+        "cum_pnl": 5.765606669825376,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-24",
+        "daily_pnl": -3.8109784751941156,
+        "cum_pnl": 1.95462819463126,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-25",
+        "daily_pnl": -3.3376505085483066,
+        "cum_pnl": -1.3830223139170466,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-27",
+        "daily_pnl": -3.1375591988499707,
+        "cum_pnl": -4.520581512767017,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-04",
+        "daily_pnl": -3.8475812597576153,
+        "cum_pnl": -8.368162772524633,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-06",
+        "daily_pnl": 3.1573732479563823,
+        "cum_pnl": -5.21078952456825,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-09",
+        "daily_pnl": 2.879257251499628,
+        "cum_pnl": -2.331532273068622,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-10",
+        "daily_pnl": -3.893686835745258,
+        "cum_pnl": -6.22521910881388,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-11",
+        "daily_pnl": -2.885317340052235,
+        "cum_pnl": -9.110536448866114,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-12",
+        "daily_pnl": 1.1519876678964036,
+        "cum_pnl": -7.958548780969711,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-16",
+        "daily_pnl": 2.9886324533071784,
+        "cum_pnl": -4.969916327662532,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-17",
+        "daily_pnl": 0.612996974663263,
+        "cum_pnl": -4.356919352999269,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-18",
+        "daily_pnl": -3.307411352120493,
+        "cum_pnl": -7.664330705119762,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-19",
+        "daily_pnl": 3.6604754848902843,
+        "cum_pnl": -4.003855220229478,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-20",
+        "daily_pnl": -0.0823728468318996,
+        "cum_pnl": -4.086228067061377,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-23",
+        "daily_pnl": -0.10195820791102395,
+        "cum_pnl": -4.188186274972401,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-24",
+        "daily_pnl": 1.5764277019146133,
+        "cum_pnl": -2.611758573057788,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-25",
+        "daily_pnl": 3.269562702624645,
+        "cum_pnl": 0.6578041295668573,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-26",
+        "daily_pnl": 5.3354310249163,
+        "cum_pnl": 5.993235154483157,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-27",
+        "daily_pnl": -3.306019133773863,
+        "cum_pnl": 2.687216020709294,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-30",
+        "daily_pnl": 2.7258100364823914,
+        "cum_pnl": 5.4130260571916855,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-04-01",
+        "daily_pnl": 5.030011211488828,
+        "cum_pnl": 10.443037268680513,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-04-02",
+        "daily_pnl": 1.9643134870317491,
+        "cum_pnl": 12.407350755712262,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-04-06",
+        "daily_pnl": 1.0938829621877588,
+        "cum_pnl": 13.501233717900021,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-04-08",
+        "daily_pnl": 7.54520652448101,
+        "cum_pnl": 21.04644024238103,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-04-09",
+        "daily_pnl": 2.0077108273555435,
+        "cum_pnl": 23.054151069736577,
+        "n_trades": 2
+      }
+    ],
+    "params": {
+      "골든10분": {
+        "dip_entry_pct": -1.0,
+        "time_window": {
+          "start": "09:00",
+          "end": "09:10"
+        },
+        "price_range": {
+          "min": 1400,
+          "max": 135000
+        },
+        "buy_timeout": 70,
+        "sell_timeout": 10,
+        "below_price_rule": "prev_close",
+        "second_buy": null,
+        "stop_loss": {
+          "first_only": -0.029,
+          "after_second": null
+        },
+        "take_profit": {
+          "first_only": [
+            {
+              "profit": 0.025,
+              "sell_ratio": 0.25
+            },
+            {
+              "profit": 0.049,
+              "sell_ratio": 0.4
+            },
+            {
+              "profit": 0.063,
+              "sell_ratio": 0.5
+            },
+            {
+              "profit": 0.085,
+              "sell_ratio": 1.0
+            }
+          ],
+          "after_second": [],
+          "trailing": {
+            "trigger_profit": 0.035,
+            "trailing_drop": 0.031
+          }
+        },
+        "profit_floor": {
+          "trigger": 0.035,
+          "floor": 0.008
+        },
+        "retracement_rules": {
+          "first_only": {
+            "3": "all"
+          },
+          "after_second": {}
+        },
+        "intensity_floor": {
+          "threshold": 92,
+          "duration_seconds": 15
+        }
+      },
+      "굿모닝": {
+        "dip_entry_pct": -0.7,
+        "time_window": {
+          "start": "09:00",
+          "end": "09:15"
+        },
+        "price_range": {
+          "min": 1400,
+          "max": 135000
+        },
+        "buy_timeout": 180,
+        "sell_timeout": 30,
+        "below_price_rule": "prev_close",
+        "second_buy": null,
+        "stop_loss": {
+          "first_only": -0.029,
+          "after_second": null
+        },
+        "take_profit": {
+          "first_only": [
+            {
+              "profit": 0.034,
+              "sell_ratio": 0.25
+            },
+            {
+              "profit": 0.049,
+              "sell_ratio": 0.4
+            },
+            {
+              "profit": 0.063,
+              "sell_ratio": 0.5
+            },
+            {
+              "profit": 0.085,
+              "sell_ratio": 1.0
+            }
+          ],
+          "after_second": [],
+          "trailing": {
+            "trigger_profit": 0.035,
+            "trailing_drop": 0.031
+          }
+        },
+        "profit_floor": {
+          "trigger": 0.035,
+          "floor": 0.008
+        },
+        "retracement_rules": {
+          "first_only": {
+            "3": "all"
+          },
+          "after_second": {}
+        },
+        "intensity_floor": {
+          "threshold": 97,
+          "duration_seconds": 15
+        }
+      },
+      "세력감지": {
+        "dip_entry_pct": -1.0,
+        "time_window": {
+          "start": "09:14",
+          "end": "12:00"
+        },
+        "price_range": {
+          "min": 1800,
+          "max": 135000
+        },
+        "buy_timeout": 190,
+        "sell_timeout": 210,
+        "below_price_rule": "open_after_0930",
+        "second_buy": null,
+        "stop_loss": {
+          "first_only": -0.029,
+          "after_second": null
+        },
+        "take_profit": {
+          "first_only": [
+            {
+              "profit": 0.014,
+              "sell_ratio": 0.25
+            },
+            {
+              "profit": 0.034,
+              "sell_ratio": 0.4
+            },
+            {
+              "profit": 0.055,
+              "sell_ratio": 0.5
+            },
+            {
+              "profit": 0.074,
+              "sell_ratio": 1.0
+            }
+          ],
+          "after_second": [],
+          "trailing": {
+            "trigger_profit": 0.031,
+            "trailing_drop": 0.03
+          }
+        },
+        "profit_floor": {
+          "trigger": 0.07,
+          "floor": 0.04
+        },
+        "retracement_rules": {
+          "first_only": {
+            "1": "all",
+            "2": "all",
+            "3": "all",
+            "4": "all"
+          },
+          "after_second": {}
+        },
+        "intensity_floor": {
+          "threshold": 92,
+          "duration_seconds": 62
+        }
+      }
+    }
+  },
+  "optimized": {
+    "metrics": {
+      "n_trades": 42,
+      "total_pnl_pct": 91.50762512087557,
+      "winrate": 0.6904761904761905,
+      "expectancy": 2.178752979068466,
+      "mdd_pct": -15.775234907238268,
+      "max_consec_loss": 4
+    },
+    "by_condition": {
+      "골든10분": {
+        "n_trades": 5,
+        "total_pnl_pct": 23.698743129095945,
+        "winrate": 1.0,
+        "expectancy": 4.739748625819189,
+        "mdd_pct": 0.0,
+        "max_consec_loss": 0
+      },
+      "굿모닝": {
+        "n_trades": 29,
+        "total_pnl_pct": 50.624506456121956,
+        "winrate": 0.6206896551724138,
+        "expectancy": 1.7456726364179984,
+        "mdd_pct": -15.775234907238268,
+        "max_consec_loss": 4
+      },
+      "세력감지": {
+        "n_trades": 8,
+        "total_pnl_pct": 17.184375535657672,
+        "winrate": 0.75,
+        "expectancy": 2.148046941957209,
+        "mdd_pct": -2.8520991131812834,
+        "max_consec_loss": 1
+      }
+    },
+    "equity_curve": [
+      {
+        "date": "2026-02-11",
+        "daily_pnl": 5.37135806104059,
+        "cum_pnl": 5.37135806104059,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-12",
+        "daily_pnl": -4.114476176070003,
+        "cum_pnl": 1.2568818849705874,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-13",
+        "daily_pnl": 13.719653363836459,
+        "cum_pnl": 14.976535248807046,
+        "n_trades": 3
+      },
+      {
+        "date": "2026-02-19",
+        "daily_pnl": -2.8520991131812834,
+        "cum_pnl": 12.124436135625762,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-20",
+        "daily_pnl": 7.475938430622033,
+        "cum_pnl": 19.600374566247794,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-02-23",
+        "daily_pnl": 3.491061422371722,
+        "cum_pnl": 23.091435988619516,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-24",
+        "daily_pnl": -3.8109784751941156,
+        "cum_pnl": 19.2804575134254,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-25",
+        "daily_pnl": -4.2909281169452695,
+        "cum_pnl": 14.98952939648013,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-02-27",
+        "daily_pnl": -3.8257470553412665,
+        "cum_pnl": 11.163782341138862,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-04",
+        "daily_pnl": -3.8475812597576153,
+        "cum_pnl": 7.316201081381247,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-06",
+        "daily_pnl": 3.5673870883460754,
+        "cum_pnl": 10.883588169727322,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-09",
+        "daily_pnl": 9.920809057375001,
+        "cum_pnl": 20.80439722710232,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-10",
+        "daily_pnl": -3.893686835745258,
+        "cum_pnl": 16.910710391357064,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-11",
+        "daily_pnl": -0.4810466675218068,
+        "cum_pnl": 16.429663723835258,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-12",
+        "daily_pnl": 3.1143279136525512,
+        "cum_pnl": 19.54399163748781,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-16",
+        "daily_pnl": 2.9298524017017793,
+        "cum_pnl": 22.47384403918959,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-17",
+        "daily_pnl": 5.053155779351852,
+        "cum_pnl": 27.52699981854144,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-18",
+        "daily_pnl": -0.2679586637785114,
+        "cum_pnl": 27.25904115476293,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-19",
+        "daily_pnl": 5.32586759915006,
+        "cum_pnl": 32.58490875391299,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-20",
+        "daily_pnl": 0.23960772388869467,
+        "cum_pnl": 32.82451647780169,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-23",
+        "daily_pnl": 2.9365393679613034,
+        "cum_pnl": 35.76105584576299,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-24",
+        "daily_pnl": 2.772807924853805,
+        "cum_pnl": 38.5338637706168,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-25",
+        "daily_pnl": 5.239001058560362,
+        "cum_pnl": 43.77286482917716,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-03-26",
+        "daily_pnl": 5.459547807478531,
+        "cum_pnl": 49.23241263665569,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-27",
+        "daily_pnl": 4.5757379506543625,
+        "cum_pnl": 53.80815058731005,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-03-30",
+        "daily_pnl": 3.545457690952013,
+        "cum_pnl": 57.353608278262065,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-04-01",
+        "daily_pnl": 6.963852002033395,
+        "cum_pnl": 64.31746028029546,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-04-02",
+        "daily_pnl": 4.937039074091745,
+        "cum_pnl": 69.2544993543872,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-04-06",
+        "daily_pnl": 5.176150236089432,
+        "cum_pnl": 74.43064959047663,
+        "n_trades": 1
+      },
+      {
+        "date": "2026-04-08",
+        "daily_pnl": 14.959998413452707,
+        "cum_pnl": 89.39064800392934,
+        "n_trades": 2
+      },
+      {
+        "date": "2026-04-09",
+        "daily_pnl": 2.116977116946229,
+        "cum_pnl": 91.50762512087557,
+        "n_trades": 2
+      }
+    ],
+    "params": {
+      "골든10분": {
+        "dip_entry_pct": -1.0,
+        "time_window": {
+          "start": "09:00",
+          "end": "09:10"
+        },
+        "price_range": {
+          "min": 1400,
+          "max": 135000
+        },
+        "buy_timeout": 70,
+        "sell_timeout": 10,
+        "below_price_rule": "prev_close",
+        "second_buy": null,
+        "stop_loss": {
+          "first_only": -0.05,
+          "after_second": null
+        },
+        "take_profit": {
+          "first_only": [
+            {
+              "profit": 0.035,
+              "sell_ratio": 0.15
+            },
+            {
+              "profit": 0.045,
+              "sell_ratio": 0.25
+            },
+            {
+              "profit": 0.08,
+              "sell_ratio": 0.5
+            },
+            {
+              "profit": 0.085,
+              "sell_ratio": 1.0
+            }
+          ],
+          "after_second": [],
+          "trailing": {
+            "trigger_profit": 0.035,
+            "trailing_drop": 0.02
+          }
+        },
+        "profit_floor": {
+          "trigger": 0.035,
+          "floor": 0.008
+        },
+        "retracement_rules": {
+          "first_only": {
+            "3": "all"
+          },
+          "after_second": {}
+        },
+        "intensity_floor": {
+          "threshold": 92,
+          "duration_seconds": 15
+        }
+      },
+      "굿모닝": {
+        "dip_entry_pct": -0.7,
+        "time_window": {
+          "start": "09:00",
+          "end": "09:15"
+        },
+        "price_range": {
+          "min": 1400,
+          "max": 135000
+        },
+        "buy_timeout": 180,
+        "sell_timeout": 30,
+        "below_price_rule": "prev_close",
+        "second_buy": null,
+        "stop_loss": {
+          "first_only": -0.035,
+          "after_second": null
+        },
+        "take_profit": {
+          "first_only": [
+            {
+              "profit": 0.035,
+              "sell_ratio": 0.15
+            },
+            {
+              "profit": 0.05,
+              "sell_ratio": 0.5
+            },
+            {
+              "profit": 0.05,
+              "sell_ratio": 0.6
+            },
+            {
+              "profit": 0.07,
+              "sell_ratio": 1.0
+            }
+          ],
+          "after_second": [],
+          "trailing": {
+            "trigger_profit": 0.05,
+            "trailing_drop": 0.02
+          }
+        },
+        "profit_floor": {
+          "trigger": 0.05,
+          "floor": 0.008
+        },
+        "retracement_rules": {
+          "first_only": {
+            "3": "all"
+          },
+          "after_second": {}
+        },
+        "intensity_floor": {
+          "threshold": 97,
+          "duration_seconds": 15
+        }
+      },
+      "세력감지": {
+        "dip_entry_pct": -1.0,
+        "time_window": {
+          "start": "09:14",
+          "end": "12:00"
+        },
+        "price_range": {
+          "min": 1800,
+          "max": 135000
+        },
+        "buy_timeout": 190,
+        "sell_timeout": 210,
+        "below_price_rule": "open_after_0930",
+        "second_buy": null,
+        "stop_loss": {
+          "first_only": -0.05,
+          "after_second": null
+        },
+        "take_profit": {
+          "first_only": [
+            {
+              "profit": 0.035,
+              "sell_ratio": 0.35
+            },
+            {
+              "profit": 0.034,
+              "sell_ratio": 0.5
+            },
+            {
+              "profit": 0.065,
+              "sell_ratio": 0.6
+            },
+            {
+              "profit": 0.074,
+              "sell_ratio": 1.0
+            }
+          ],
+          "after_second": [],
+          "trailing": {
+            "trigger_profit": 0.031,
+            "trailing_drop": 0.03
+          }
+        },
+        "profit_floor": {
+          "trigger": 0.07,
+          "floor": 0.04
+        },
+        "retracement_rules": {
+          "first_only": {
+            "1": "all",
+            "2": "all",
+            "3": "all",
+            "4": "all"
+          },
+          "after_second": {}
+        },
+        "intensity_floor": {
+          "threshold": 92,
+          "duration_seconds": 62
+        }
+      }
+    }
+  },
+  "per_condition": {
+    "골든10분": {
+      "history": [
+        {
+          "pass": 0,
+          "param": "init",
+          "value": null,
+          "score": 14.630873128963033,
+          "metrics": {
+            "n_trades": 6,
+            "total_pnl_pct": 14.630873128963033,
+            "winrate": 0.8333333333333334,
+            "expectancy": 2.438478854827172,
+            "mdd_pct": -0.10195820791102417,
+            "max_consec_loss": 1
+          }
+        },
+        {
+          "pass": 1,
+          "param": "stop_loss.first_only",
+          "old": -0.029,
+          "new": -0.05,
+          "score": 17.273888266628365,
+          "metrics": {
+            "n_trades": 5,
+            "total_pnl_pct": 17.273888266628365,
+            "winrate": 1.0,
+            "expectancy": 3.454777653325673,
+            "mdd_pct": 0.0,
+            "max_consec_loss": 0
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.0.profit",
+          "old": 0.025,
+          "new": 0.035,
+          "score": 18.95784054187886,
+          "metrics": {
+            "n_trades": 5,
+            "total_pnl_pct": 18.95784054187886,
+            "winrate": 1.0,
+            "expectancy": 3.7915681083757717,
+            "mdd_pct": 0.0,
+            "max_consec_loss": 0
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.0.sell_ratio",
+          "old": 0.25,
+          "new": 0.35,
+          "score": 19.258777817286177,
+          "metrics": {
+            "n_trades": 5,
+            "total_pnl_pct": 19.258777817286177,
+            "winrate": 1.0,
+            "expectancy": 3.8517555634572354,
+            "mdd_pct": 0.0,
+            "max_consec_loss": 0
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.1.profit",
+          "old": 0.049,
+          "new": 0.035,
+          "score": 19.389980407314646,
+          "metrics": {
+            "n_trades": 5,
+            "total_pnl_pct": 19.389980407314646,
+            "winrate": 1.0,
+            "expectancy": 3.8779960814629293,
+            "mdd_pct": 0.0,
+            "max_consec_loss": 0
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.1.sell_ratio",
+          "old": 0.4,
+          "new": 0.5,
+          "score": 19.695178541063278,
+          "metrics": {
+            "n_trades": 5,
+            "total_pnl_pct": 19.695178541063278,
+            "winrate": 1.0,
+            "expectancy": 3.9390357082126557,
+            "mdd_pct": 0.0,
+            "max_consec_loss": 0
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.2.profit",
+          "old": 0.063,
+          "new": 0.08,
+          "score": 21.31345830317747,
+          "metrics": {
+            "n_trades": 5,
+            "total_pnl_pct": 21.31345830317747,
+            "winrate": 1.0,
+            "expectancy": 4.262691660635494,
+            "mdd_pct": 0.0,
+            "max_consec_loss": 0
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.trailing.trailing_drop",
+          "old": 0.031,
+          "new": 0.02,
+          "score": 22.443554916184087,
+          "metrics": {
+            "n_trades": 5,
+            "total_pnl_pct": 22.443554916184087,
+            "winrate": 1.0,
+            "expectancy": 4.4887109832368175,
+            "mdd_pct": 0.0,
+            "max_consec_loss": 0
+          }
+        },
+        {
+          "pass": 2,
+          "param": "take_profit.first_only.0.sell_ratio",
+          "old": 0.35,
+          "new": 0.15,
+          "score": 22.82161178041496,
+          "metrics": {
+            "n_trades": 5,
+            "total_pnl_pct": 22.82161178041496,
+            "winrate": 1.0,
+            "expectancy": 4.564322356082991,
+            "mdd_pct": 0.0,
+            "max_consec_loss": 0
+          }
+        },
+        {
+          "pass": 2,
+          "param": "take_profit.first_only.1.profit",
+          "old": 0.035,
+          "new": 0.045,
+          "score": 22.965691246662228,
+          "metrics": {
+            "n_trades": 5,
+            "total_pnl_pct": 22.965691246662228,
+            "winrate": 1.0,
+            "expectancy": 4.593138249332446,
+            "mdd_pct": 0.0,
+            "max_consec_loss": 0
+          }
+        },
+        {
+          "pass": 2,
+          "param": "take_profit.first_only.1.sell_ratio",
+          "old": 0.5,
+          "new": 0.25,
+          "score": 23.698743129095945,
+          "metrics": {
+            "n_trades": 5,
+            "total_pnl_pct": 23.698743129095945,
+            "winrate": 1.0,
+            "expectancy": 4.739748625819189,
+            "mdd_pct": 0.0,
+            "max_consec_loss": 0
+          }
+        }
+      ],
+      "final_metrics": {
+        "n_trades": 5,
+        "total_pnl_pct": 23.698743129095945,
+        "winrate": 1.0,
+        "expectancy": 4.739748625819189,
+        "mdd_pct": 0.0,
+        "max_consec_loss": 0
+      },
+      "final_params": {
+        "dip_entry_pct": -1.0,
+        "time_window": {
+          "start": "09:00",
+          "end": "09:10"
+        },
+        "price_range": {
+          "min": 1400,
+          "max": 135000
+        },
+        "buy_timeout": 70,
+        "sell_timeout": 10,
+        "below_price_rule": "prev_close",
+        "second_buy": null,
+        "stop_loss": {
+          "first_only": -0.05,
+          "after_second": null
+        },
+        "take_profit": {
+          "first_only": [
+            {
+              "profit": 0.035,
+              "sell_ratio": 0.15
+            },
+            {
+              "profit": 0.045,
+              "sell_ratio": 0.25
+            },
+            {
+              "profit": 0.08,
+              "sell_ratio": 0.5
+            },
+            {
+              "profit": 0.085,
+              "sell_ratio": 1.0
+            }
+          ],
+          "after_second": [],
+          "trailing": {
+            "trigger_profit": 0.035,
+            "trailing_drop": 0.02
+          }
+        },
+        "profit_floor": {
+          "trigger": 0.035,
+          "floor": 0.008
+        },
+        "retracement_rules": {
+          "first_only": {
+            "3": "all"
+          },
+          "after_second": {}
+        },
+        "intensity_floor": {
+          "threshold": 92,
+          "duration_seconds": 15
+        }
+      }
+    },
+    "굿모닝": {
+      "history": [
+        {
+          "pass": 0,
+          "param": "init",
+          "value": null,
+          "score": 2.377992722540095,
+          "metrics": {
+            "n_trades": 31,
+            "total_pnl_pct": 4.196146084876861,
+            "winrate": 0.5161290322580645,
+            "expectancy": 0.13535955112506,
+            "mdd_pct": -18.63630672467353,
+            "max_consec_loss": 4
+          }
+        },
+        {
+          "pass": 1,
+          "param": "stop_loss.first_only",
+          "old": -0.029,
+          "new": -0.035,
+          "score": 15.678518324561757,
+          "metrics": {
+            "n_trades": 30,
+            "total_pnl_pct": 16.970197230614037,
+            "winrate": 0.6,
+            "expectancy": 0.5656732410204679,
+            "mdd_pct": -17.58335781210456,
+            "max_consec_loss": 4
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.0.profit",
+          "old": 0.034,
+          "new": 0.035,
+          "score": 16.060636875859224,
+          "metrics": {
+            "n_trades": 30,
+            "total_pnl_pct": 17.352315781911503,
+            "winrate": 0.6,
+            "expectancy": 0.5784105260637168,
+            "mdd_pct": -17.58335781210456,
+            "max_consec_loss": 4
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.0.sell_ratio",
+          "old": 0.25,
+          "new": 0.35,
+          "score": 18.35524966935159,
+          "metrics": {
+            "n_trades": 30,
+            "total_pnl_pct": 19.27627784277771,
+            "winrate": 0.6,
+            "expectancy": 0.642542594759257,
+            "mdd_pct": -16.84205634685224,
+            "max_consec_loss": 4
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.1.profit",
+          "old": 0.049,
+          "new": 0.035,
+          "score": 21.328062004619923,
+          "metrics": {
+            "n_trades": 30,
+            "total_pnl_pct": 21.71567945823906,
+            "winrate": 0.6,
+            "expectancy": 0.723855981941302,
+            "mdd_pct": -15.775234907238268,
+            "max_consec_loss": 4
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.1.sell_ratio",
+          "old": 0.4,
+          "new": 0.5,
+          "score": 23.003793884923148,
+          "metrics": {
+            "n_trades": 30,
+            "total_pnl_pct": 23.39141133854228,
+            "winrate": 0.6,
+            "expectancy": 0.7797137112847426,
+            "mdd_pct": -15.775234907238268,
+            "max_consec_loss": 4
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.2.profit",
+          "old": 0.063,
+          "new": 0.05,
+          "score": 25.520042570281305,
+          "metrics": {
+            "n_trades": 30,
+            "total_pnl_pct": 25.907660023900437,
+            "winrate": 0.6,
+            "expectancy": 0.863588667463348,
+            "mdd_pct": -15.775234907238268,
+            "max_consec_loss": 4
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.2.sell_ratio",
+          "old": 0.5,
+          "new": 0.6,
+          "score": 26.182494403160987,
+          "metrics": {
+            "n_trades": 30,
+            "total_pnl_pct": 26.57011185678012,
+            "winrate": 0.6,
+            "expectancy": 0.885670395226004,
+            "mdd_pct": -15.775234907238268,
+            "max_consec_loss": 4
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.3.profit",
+          "old": 0.085,
+          "new": 0.07,
+          "score": 26.80498397105076,
+          "metrics": {
+            "n_trades": 30,
+            "total_pnl_pct": 27.192601424669892,
+            "winrate": 0.6,
+            "expectancy": 0.9064200474889964,
+            "mdd_pct": -15.775234907238268,
+            "max_consec_loss": 4
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.trailing.trigger_profit",
+          "old": 0.035,
+          "new": 0.05,
+          "score": 27.676981704345856,
+          "metrics": {
+            "n_trades": 30,
+            "total_pnl_pct": 28.064599157964988,
+            "winrate": 0.6,
+            "expectancy": 0.935486638598833,
+            "mdd_pct": -15.775234907238268,
+            "max_consec_loss": 4
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.trailing.trailing_drop",
+          "old": 0.031,
+          "new": 0.02,
+          "score": 27.831649705905683,
+          "metrics": {
+            "n_trades": 30,
+            "total_pnl_pct": 28.219267159524815,
+            "winrate": 0.6,
+            "expectancy": 0.9406422386508272,
+            "mdd_pct": -15.775234907238268,
+            "max_consec_loss": 4
+          }
+        },
+        {
+          "pass": 1,
+          "param": "profit_floor.trigger",
+          "old": 0.035,
+          "new": 0.05,
+          "score": 40.005935480484894,
+          "metrics": {
+            "n_trades": 29,
+            "total_pnl_pct": 40.39355293410403,
+            "winrate": 0.6206896551724138,
+            "expectancy": 1.3928811356587596,
+            "mdd_pct": -15.775234907238268,
+            "max_consec_loss": 4
+          }
+        },
+        {
+          "pass": 2,
+          "param": "take_profit.first_only.0.sell_ratio",
+          "old": 0.35,
+          "new": 0.15,
+          "score": 41.44862940604444,
+          "metrics": {
+            "n_trades": 29,
+            "total_pnl_pct": 41.836246859663575,
+            "winrate": 0.6206896551724138,
+            "expectancy": 1.4426292020573646,
+            "mdd_pct": -15.775234907238268,
+            "max_consec_loss": 4
+          }
+        },
+        {
+          "pass": 2,
+          "param": "take_profit.first_only.1.profit",
+          "old": 0.035,
+          "new": 0.05,
+          "score": 50.23688900250282,
+          "metrics": {
+            "n_trades": 29,
+            "total_pnl_pct": 50.624506456121956,
+            "winrate": 0.6206896551724138,
+            "expectancy": 1.7456726364179984,
+            "mdd_pct": -15.775234907238268,
+            "max_consec_loss": 4
+          }
+        }
+      ],
+      "final_metrics": {
+        "n_trades": 29,
+        "total_pnl_pct": 50.624506456121956,
+        "winrate": 0.6206896551724138,
+        "expectancy": 1.7456726364179984,
+        "mdd_pct": -15.775234907238268,
+        "max_consec_loss": 4
+      },
+      "final_params": {
+        "dip_entry_pct": -0.7,
+        "time_window": {
+          "start": "09:00",
+          "end": "09:15"
+        },
+        "price_range": {
+          "min": 1400,
+          "max": 135000
+        },
+        "buy_timeout": 180,
+        "sell_timeout": 30,
+        "below_price_rule": "prev_close",
+        "second_buy": null,
+        "stop_loss": {
+          "first_only": -0.035,
+          "after_second": null
+        },
+        "take_profit": {
+          "first_only": [
+            {
+              "profit": 0.035,
+              "sell_ratio": 0.15
+            },
+            {
+              "profit": 0.05,
+              "sell_ratio": 0.5
+            },
+            {
+              "profit": 0.05,
+              "sell_ratio": 0.6
+            },
+            {
+              "profit": 0.07,
+              "sell_ratio": 1.0
+            }
+          ],
+          "after_second": [],
+          "trailing": {
+            "trigger_profit": 0.05,
+            "trailing_drop": 0.02
+          }
+        },
+        "profit_floor": {
+          "trigger": 0.05,
+          "floor": 0.008
+        },
+        "retracement_rules": {
+          "first_only": {
+            "3": "all"
+          },
+          "after_second": {}
+        },
+        "intensity_floor": {
+          "threshold": 97,
+          "duration_seconds": 15
+        }
+      }
+    },
+    "세력감지": {
+      "history": [
+        {
+          "pass": 0,
+          "param": "init",
+          "value": null,
+          "score": 4.227131855896681,
+          "metrics": {
+            "n_trades": 8,
+            "total_pnl_pct": 4.227131855896681,
+            "winrate": 0.75,
+            "expectancy": 0.5283914819870851,
+            "mdd_pct": -3.6404441666902487,
+            "max_consec_loss": 1
+          }
+        },
+        {
+          "pass": 1,
+          "param": "stop_loss.first_only",
+          "old": -0.029,
+          "new": -0.05,
+          "score": 5.523143135283657,
+          "metrics": {
+            "n_trades": 8,
+            "total_pnl_pct": 5.523143135283657,
+            "winrate": 0.75,
+            "expectancy": 0.6903928919104572,
+            "mdd_pct": -2.8520991131812834,
+            "max_consec_loss": 1
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.0.profit",
+          "old": 0.014,
+          "new": 0.035,
+          "score": 16.51454581254056,
+          "metrics": {
+            "n_trades": 8,
+            "total_pnl_pct": 16.51454581254056,
+            "winrate": 0.75,
+            "expectancy": 2.06431822656757,
+            "mdd_pct": -2.8520991131812834,
+            "max_consec_loss": 1
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.0.sell_ratio",
+          "old": 0.25,
+          "new": 0.35,
+          "score": 16.727511978613546,
+          "metrics": {
+            "n_trades": 8,
+            "total_pnl_pct": 16.727511978613546,
+            "winrate": 0.75,
+            "expectancy": 2.090938997326693,
+            "mdd_pct": -2.8520991131812834,
+            "max_consec_loss": 1
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.1.sell_ratio",
+          "old": 0.4,
+          "new": 0.5,
+          "score": 16.957745430846792,
+          "metrics": {
+            "n_trades": 8,
+            "total_pnl_pct": 16.957745430846792,
+            "winrate": 0.75,
+            "expectancy": 2.119718178855849,
+            "mdd_pct": -2.8520991131812834,
+            "max_consec_loss": 1
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.2.profit",
+          "old": 0.055,
+          "new": 0.065,
+          "score": 17.15270250883392,
+          "metrics": {
+            "n_trades": 8,
+            "total_pnl_pct": 17.15270250883392,
+            "winrate": 0.75,
+            "expectancy": 2.14408781360424,
+            "mdd_pct": -2.8520991131812834,
+            "max_consec_loss": 1
+          }
+        },
+        {
+          "pass": 1,
+          "param": "take_profit.first_only.2.sell_ratio",
+          "old": 0.5,
+          "new": 0.6,
+          "score": 17.184375535657672,
+          "metrics": {
+            "n_trades": 8,
+            "total_pnl_pct": 17.184375535657672,
+            "winrate": 0.75,
+            "expectancy": 2.148046941957209,
+            "mdd_pct": -2.8520991131812834,
+            "max_consec_loss": 1
+          }
+        }
+      ],
+      "final_metrics": {
+        "n_trades": 8,
+        "total_pnl_pct": 17.184375535657672,
+        "winrate": 0.75,
+        "expectancy": 2.148046941957209,
+        "mdd_pct": -2.8520991131812834,
+        "max_consec_loss": 1
+      },
+      "final_params": {
+        "dip_entry_pct": -1.0,
+        "time_window": {
+          "start": "09:14",
+          "end": "12:00"
+        },
+        "price_range": {
+          "min": 1800,
+          "max": 135000
+        },
+        "buy_timeout": 190,
+        "sell_timeout": 210,
+        "below_price_rule": "open_after_0930",
+        "second_buy": null,
+        "stop_loss": {
+          "first_only": -0.05,
+          "after_second": null
+        },
+        "take_profit": {
+          "first_only": [
+            {
+              "profit": 0.035,
+              "sell_ratio": 0.35
+            },
+            {
+              "profit": 0.034,
+              "sell_ratio": 0.5
+            },
+            {
+              "profit": 0.065,
+              "sell_ratio": 0.6
+            },
+            {
+              "profit": 0.074,
+              "sell_ratio": 1.0
+            }
+          ],
+          "after_second": [],
+          "trailing": {
+            "trigger_profit": 0.031,
+            "trailing_drop": 0.03
+          }
+        },
+        "profit_floor": {
+          "trigger": 0.07,
+          "floor": 0.04
+        },
+        "retracement_rules": {
+          "first_only": {
+            "1": "all",
+            "2": "all",
+            "3": "all",
+            "4": "all"
+          },
+          "after_second": {}
+        },
+        "intensity_floor": {
+          "threshold": 92,
+          "duration_seconds": 62
+        }
+      }
+    }
+  },
+  "robustness": {
+    "train_feb_mar": {
+      "baseline": {
+        "n_trades": 37,
+        "total_pnl_pct": 5.413026057191685,
+        "winrate": 0.5675675675675675,
+        "expectancy": 0.1462980015457212,
+        "mdd_pct": -14.87614311869149,
+        "max_consec_loss": 4
+      },
+      "optimized": {
+        "n_trades": 34,
+        "total_pnl_pct": 57.353608278262065,
+        "winrate": 0.6764705882352942,
+        "expectancy": 1.68687083171359,
+        "mdd_pct": -15.775234907238268,
+        "max_consec_loss": 4
+      }
+    },
+    "test_apr": {
+      "baseline": {
+        "n_trades": 8,
+        "total_pnl_pct": 17.64112501254489,
+        "winrate": 0.75,
+        "expectancy": 2.2051406265681113,
+        "mdd_pct": 0.0,
+        "max_consec_loss": 1
+      },
+      "optimized": {
+        "n_trades": 8,
+        "total_pnl_pct": 34.15401684261351,
+        "winrate": 0.75,
+        "expectancy": 4.2692521053266885,
+        "mdd_pct": 0.0,
+        "max_consec_loss": 1
+      }
+    }
+  }
+}

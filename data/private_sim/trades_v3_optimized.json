@@ -1,0 +1,1970 @@
+[
+  {
+    "date": "2026-02-11",
+    "code": "066570",
+    "name": "LG전자",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "10:40:53",
+    "signal_price": 118800,
+    "dip_target": 118800,
+    "fill_minute": 1044,
+    "fill_time": "10:44",
+    "fill_price": 117968,
+    "exit_minute": 1411,
+    "exit_time": "14:11",
+    "exit_price": 126400,
+    "exit_type": "take_profit_4",
+    "pnl_pct": 5.37135806104059,
+    "pnl_gross_pct": 5.614234368642344,
+    "hold_minutes": 207,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 122500,
+        "minute": 1138,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.5404379479386212,
+        "gross_contribution": 0.5762579682625797
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 124600,
+        "minute": 1402,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.286062124249781,
+        "gross_contribution": 2.38929201139292
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 124600,
+        "minute": 1402,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.3716372745498684,
+        "gross_contribution": 1.4335752068357521
+      },
+      {
+        "reason": "take_profit_4",
+        "price": 126400,
+        "minute": 1411,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 1.1732207143023194,
+        "gross_contribution": 1.215109182151092
+      }
+    ]
+  },
+  {
+    "date": "2026-02-12",
+    "code": "042700",
+    "name": "한미반도체",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "09:38:49",
+    "signal_price": 219000,
+    "dip_target": 219000,
+    "fill_minute": 945,
+    "fill_time": "09:45",
+    "fill_price": 217467,
+    "exit_minute": 1200,
+    "exit_time": "12:00",
+    "exit_price": 209000,
+    "exit_type": "stop_loss",
+    "pnl_pct": -4.114476176070003,
+    "pnl_gross_pct": -3.893464295732226,
+    "hold_minutes": 135,
+    "partial_exits": [
+      {
+        "reason": "stop_loss",
+        "price": 209000,
+        "minute": 1200,
+        "qty": 1000,
+        "qty_ratio": 1.0,
+        "pnl_contribution": -4.114476176070003,
+        "gross_contribution": -3.893464295732226
+      }
+    ]
+  },
+  {
+    "date": "2026-02-13",
+    "code": "011690",
+    "name": "와이투솔루션",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "09:24:16",
+    "signal_price": 6940,
+    "dip_target": 6940,
+    "fill_minute": 925,
+    "fill_time": "09:25",
+    "fill_price": 6891,
+    "exit_minute": 1013,
+    "exit_time": "10:13",
+    "exit_price": 7170,
+    "exit_type": "retracement_3",
+    "pnl_pct": 4.640537992730204,
+    "pnl_gross_pct": 4.881729792482949,
+    "hold_minutes": 48,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 7190,
+        "minute": 948,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.6148573795776502,
+        "gross_contribution": 0.6508489333913802
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 7250,
+        "minute": 1013,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.111292814857342,
+        "gross_contribution": 2.2141198664925263
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 7250,
+        "minute": 1013,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.2667756889144055,
+        "gross_contribution": 1.328471919895516
+      },
+      {
+        "reason": "retracement_3",
+        "price": 7170,
+        "minute": 1013,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 0.647612109380806,
+        "gross_contribution": 0.6882890727035264
+      }
+    ]
+  },
+  {
+    "date": "2026-02-13",
+    "code": "003530",
+    "name": "한화투자증권",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "10:28:04",
+    "signal_price": 7190,
+    "dip_target": 7190,
+    "fill_minute": 1034,
+    "fill_time": "10:34",
+    "fill_price": 7139,
+    "exit_minute": 1042,
+    "exit_time": "10:42",
+    "exit_price": 7320,
+    "exit_type": "retracement_3",
+    "pnl_pct": 4.578952952546664,
+    "pnl_gross_pct": 4.820002801512817,
+    "hold_minutes": 8,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 7410,
+        "minute": 1037,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.5336032134751145,
+        "gross_contribution": 0.5694074800392211
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 7540,
+        "minute": 1041,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.284013942942867,
+        "gross_contribution": 2.387239109118924
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 7540,
+        "minute": 1041,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.3704083657657204,
+        "gross_contribution": 1.4323434654713545
+      },
+      {
+        "reason": "retracement_3",
+        "price": 7320,
+        "minute": 1042,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 0.3909274303629618,
+        "gross_contribution": 0.43101274688331703
+      }
+    ]
+  },
+  {
+    "date": "2026-02-13",
+    "code": "078020",
+    "name": "LS증권",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "10:46:20",
+    "signal_price": 7720,
+    "dip_target": 7720,
+    "fill_minute": 1048,
+    "fill_time": "10:48",
+    "fill_price": 7665,
+    "exit_minute": 1358,
+    "exit_time": "13:58",
+    "exit_price": 8020,
+    "exit_type": "retracement_3",
+    "pnl_pct": 4.500162418559592,
+    "pnl_gross_pct": 4.741030658838877,
+    "hold_minutes": 190,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 7940,
+        "minute": 1219,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.5024280604484654,
+        "gross_contribution": 0.538160469667319
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 8050,
+        "minute": 1356,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.0320587756585384,
+        "gross_contribution": 2.1347031963470315
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 8050,
+        "minute": 1356,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.219235265395123,
+        "gross_contribution": 1.280821917808219
+      },
+      {
+        "reason": "retracement_3",
+        "price": 8020,
+        "minute": 1358,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 0.7464403170574652,
+        "gross_contribution": 0.787345075016308
+      }
+    ]
+  },
+  {
+    "date": "2026-02-19",
+    "code": "067290",
+    "name": "JW신약",
+    "condition": "세력감지",
+    "strat_name": "세력감지",
+    "signal_time": "10:37:18",
+    "signal_price": 2345,
+    "dip_target": 2345,
+    "fill_minute": 1042,
+    "fill_time": "10:42",
+    "fill_price": 2321,
+    "exit_minute": 1525,
+    "exit_time": "15:25",
+    "exit_price": 2260,
+    "exit_type": "market_close",
+    "pnl_pct": -2.8520991131812834,
+    "pnl_gross_pct": -2.628177509694097,
+    "hold_minutes": 283,
+    "partial_exits": [
+      {
+        "reason": "market_close",
+        "price": 2260,
+        "minute": 1525,
+        "qty": 1000,
+        "qty_ratio": 1.0,
+        "pnl_contribution": -2.8520991131812834,
+        "gross_contribution": -2.628177509694097
+      }
+    ]
+  },
+  {
+    "date": "2026-02-20",
+    "code": "082640",
+    "name": "동양생명",
+    "condition": "세력감지",
+    "strat_name": "세력감지",
+    "signal_time": "10:35:19",
+    "signal_price": 8520,
+    "dip_target": 8520,
+    "fill_minute": 1036,
+    "fill_time": "10:36",
+    "fill_price": 8434,
+    "exit_minute": 1043,
+    "exit_time": "10:43",
+    "exit_price": 8720,
+    "exit_type": "retracement_1",
+    "pnl_pct": 3.23312171303305,
+    "pnl_gross_pct": 3.4710694806734645,
+    "hold_minutes": 7,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 8730,
+        "minute": 1040,
+        "qty": 350,
+        "qty_ratio": 0.35,
+        "pnl_contribution": 1.145048660059298,
+        "gross_contribution": 1.2283613943561775
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 8730,
+        "minute": 1040,
+        "qty": 325,
+        "qty_ratio": 0.325,
+        "pnl_contribution": 1.0632594700550624,
+        "gross_contribution": 1.1406212947593077
+      },
+      {
+        "reason": "retracement_1",
+        "price": 8720,
+        "minute": 1043,
+        "qty": 325,
+        "qty_ratio": 0.325,
+        "pnl_contribution": 1.0248135829186895,
+        "gross_contribution": 1.1020867915579795
+      }
+    ]
+  },
+  {
+    "date": "2026-02-20",
+    "code": "010170",
+    "name": "대한광통신",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "11:10:51",
+    "signal_price": 4170,
+    "dip_target": 4170,
+    "fill_minute": 1116,
+    "fill_time": "11:16",
+    "fill_price": 4140,
+    "exit_minute": 1209,
+    "exit_time": "12:09",
+    "exit_price": 4255,
+    "exit_type": "trailing_stop",
+    "pnl_pct": 4.242816717588983,
+    "pnl_gross_pct": 4.483091787439614,
+    "hold_minutes": 53,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 4295,
+        "minute": 1205,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.5258079041766939,
+        "gross_contribution": 0.5615942028985508
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 4350,
+        "minute": 1208,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.053104172055354,
+        "gross_contribution": 2.1557971014492754
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 4350,
+        "minute": 1208,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.2318625032332122,
+        "gross_contribution": 1.2934782608695654
+      },
+      {
+        "reason": "trailing_stop",
+        "price": 4255,
+        "minute": 1209,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 0.432042138123723,
+        "gross_contribution": 0.4722222222222222
+      }
+    ]
+  },
+  {
+    "date": "2026-02-23",
+    "code": "306620",
+    "name": "지아이에스",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "09:55:37",
+    "signal_price": 3025,
+    "dip_target": 3025,
+    "fill_minute": 1011,
+    "fill_time": "10:11",
+    "fill_price": 3003,
+    "exit_minute": 1525,
+    "exit_time": "15:25",
+    "exit_price": 3115,
+    "exit_type": "market_close",
+    "pnl_pct": 3.491061422371722,
+    "pnl_gross_pct": 3.7296037296037294,
+    "hold_minutes": 314,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 3115,
+        "minute": 1519,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.5236592133557583,
+        "gross_contribution": 0.5594405594405595
+      },
+      {
+        "reason": "market_close",
+        "price": 3115,
+        "minute": 1525,
+        "qty": 850,
+        "qty_ratio": 0.85,
+        "pnl_contribution": 2.9674022090159635,
+        "gross_contribution": 3.17016317016317
+      }
+    ]
+  },
+  {
+    "date": "2026-02-24",
+    "code": "035810",
+    "name": "이지홀딩스",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "09:17:57",
+    "signal_price": 8670,
+    "dip_target": 8670,
+    "fill_minute": 918,
+    "fill_time": "09:18",
+    "fill_price": 8609,
+    "exit_minute": 920,
+    "exit_time": "09:20",
+    "exit_price": 8300,
+    "exit_type": "stop_loss",
+    "pnl_pct": -3.8109784751941156,
+    "pnl_gross_pct": -3.5892670461145313,
+    "hold_minutes": 2,
+    "partial_exits": [
+      {
+        "reason": "stop_loss",
+        "price": 8300,
+        "minute": 920,
+        "qty": 1000,
+        "qty_ratio": 1.0,
+        "pnl_contribution": -3.8109784751941156,
+        "gross_contribution": -3.5892670461145313
+      }
+    ]
+  },
+  {
+    "date": "2026-02-25",
+    "code": "413630",
+    "name": "씨피시스템",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "09:14:52",
+    "signal_price": 5270,
+    "dip_target": 5270,
+    "fill_minute": 915,
+    "fill_time": "09:15",
+    "fill_price": 5233,
+    "exit_minute": 940,
+    "exit_time": "09:40",
+    "exit_price": 5020,
+    "exit_type": "stop_loss",
+    "pnl_pct": -4.2909281169452695,
+    "pnl_gross_pct": -4.070322950506402,
+    "hold_minutes": 25,
+    "partial_exits": [
+      {
+        "reason": "stop_loss",
+        "price": 5020,
+        "minute": 940,
+        "qty": 1000,
+        "qty_ratio": 1.0,
+        "pnl_contribution": -4.2909281169452695,
+        "gross_contribution": -4.070322950506402
+      }
+    ]
+  },
+  {
+    "date": "2026-02-27",
+    "code": "047770",
+    "name": "코데즈컴바인",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "10:13:47",
+    "signal_price": 5840,
+    "dip_target": 5840,
+    "fill_minute": 1014,
+    "fill_time": "10:14",
+    "fill_price": 5799,
+    "exit_minute": 1040,
+    "exit_time": "10:40",
+    "exit_price": 5590,
+    "exit_type": "stop_loss",
+    "pnl_pct": -3.8257470553412665,
+    "pnl_gross_pct": -3.604069667183997,
+    "hold_minutes": 26,
+    "partial_exits": [
+      {
+        "reason": "stop_loss",
+        "price": 5590,
+        "minute": 1040,
+        "qty": 1000,
+        "qty_ratio": 1.0,
+        "pnl_contribution": -3.8257470553412665,
+        "gross_contribution": -3.604069667183997
+      }
+    ]
+  },
+  {
+    "date": "2026-03-04",
+    "code": "402490",
+    "name": "그린리소스",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "10:06:56",
+    "signal_price": 11610,
+    "dip_target": 11610,
+    "fill_minute": 1010,
+    "fill_time": "10:10",
+    "fill_price": 11528,
+    "exit_minute": 1020,
+    "exit_time": "10:20",
+    "exit_price": 11110,
+    "exit_type": "stop_loss",
+    "pnl_pct": -3.8475812597576153,
+    "pnl_gross_pct": -3.6259541984732824,
+    "hold_minutes": 10,
+    "partial_exits": [
+      {
+        "reason": "stop_loss",
+        "price": 11110,
+        "minute": 1020,
+        "qty": 1000,
+        "qty_ratio": 1.0,
+        "pnl_contribution": -3.8475812597576153,
+        "gross_contribution": -3.6259541984732824
+      }
+    ]
+  },
+  {
+    "date": "2026-03-06",
+    "code": "015260",
+    "name": "에이엔피",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "09:12:11",
+    "signal_price": 662,
+    "dip_target": 662,
+    "fill_minute": 913,
+    "fill_time": "09:13",
+    "fill_price": 657,
+    "exit_minute": 913,
+    "exit_time": "09:13",
+    "exit_price": 707,
+    "exit_type": "take_profit_4",
+    "pnl_pct": 7.362883390931231,
+    "pnl_gross_pct": 7.6103500761035,
+    "hold_minutes": 0,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 707,
+        "minute": 913,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 1.1044325086396845,
+        "gross_contribution": 1.141552511415525
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 707,
+        "minute": 913,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 3.1292254411457727,
+        "gross_contribution": 3.2343987823439875
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 707,
+        "minute": 913,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.8775352646874637,
+        "gross_contribution": 1.9406392694063925
+      },
+      {
+        "reason": "take_profit_4",
+        "price": 707,
+        "minute": 913,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 1.2516901764583093,
+        "gross_contribution": 1.2937595129375952
+      }
+    ]
+  },
+  {
+    "date": "2026-03-06",
+    "code": "474610",
+    "name": "RF시스템즈",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "09:38:21",
+    "signal_price": 7750,
+    "dip_target": 7750,
+    "fill_minute": 940,
+    "fill_time": "09:40",
+    "fill_price": 7695,
+    "exit_minute": 1009,
+    "exit_time": "10:09",
+    "exit_price": 7420,
+    "exit_type": "stop_loss",
+    "pnl_pct": -3.795496302585155,
+    "pnl_gross_pct": -3.5737491877842755,
+    "hold_minutes": 29,
+    "partial_exits": [
+      {
+        "reason": "stop_loss",
+        "price": 7420,
+        "minute": 1009,
+        "qty": 1000,
+        "qty_ratio": 1.0,
+        "pnl_contribution": -3.795496302585155,
+        "gross_contribution": -3.5737491877842755
+      }
+    ]
+  },
+  {
+    "date": "2026-03-09",
+    "code": "002100",
+    "name": "경농",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "09:05:43",
+    "signal_price": 10260,
+    "dip_target": 10260,
+    "fill_minute": 927,
+    "fill_time": "09:27",
+    "fill_price": 11101,
+    "exit_minute": 942,
+    "exit_time": "09:42",
+    "exit_price": 11590,
+    "exit_type": "retracement_3",
+    "pnl_pct": 5.075344949946528,
+    "pnl_gross_pct": 5.317538960454013,
+    "hold_minutes": 15,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 11540,
+        "minute": 929,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.5573308450178738,
+        "gross_contribution": 0.5931898027204755
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 11750,
+        "minute": 941,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.3812368037596707,
+        "gross_contribution": 2.48468606431853
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 11750,
+        "minute": 941,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.4287420822558026,
+        "gross_contribution": 1.4908116385911179
+      },
+      {
+        "reason": "retracement_3",
+        "price": 11590,
+        "minute": 942,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 0.7080352189131808,
+        "gross_contribution": 0.7488514548238898
+      }
+    ]
+  },
+  {
+    "date": "2026-03-09",
+    "code": "137950",
+    "name": "제이씨케미칼",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "10:32:38",
+    "signal_price": 4335,
+    "dip_target": 4335,
+    "fill_minute": 1034,
+    "fill_time": "10:34",
+    "fill_price": 4304,
+    "exit_minute": 1052,
+    "exit_time": "10:52",
+    "exit_price": 4495,
+    "exit_type": "retracement_3",
+    "pnl_pct": 4.845464107428473,
+    "pnl_gross_pct": 5.087128252788104,
+    "hold_minutes": 18,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 4500,
+        "minute": 1036,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.6470198150574769,
+        "gross_contribution": 0.6830855018587361
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 4535,
+        "minute": 1052,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.1780367645131955,
+        "gross_contribution": 2.281017657992565
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 4535,
+        "minute": 1052,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.3068220587079171,
+        "gross_contribution": 1.368610594795539
+      },
+      {
+        "reason": "retracement_3",
+        "price": 4495,
+        "minute": 1052,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 0.7135854691498837,
+        "gross_contribution": 0.7544144981412639
+      }
+    ]
+  },
+  {
+    "date": "2026-03-10",
+    "code": "289080",
+    "name": "SV인베스트먼트",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "11:23:05",
+    "signal_price": 3785,
+    "dip_target": 3785,
+    "fill_minute": 1124,
+    "fill_time": "11:24",
+    "fill_price": 3758,
+    "exit_minute": 1131,
+    "exit_time": "11:31",
+    "exit_price": 3620,
+    "exit_type": "stop_loss",
+    "pnl_pct": -3.893686835745258,
+    "pnl_gross_pct": -3.6721660457690266,
+    "hold_minutes": 7,
+    "partial_exits": [
+      {
+        "reason": "stop_loss",
+        "price": 3620,
+        "minute": 1131,
+        "qty": 1000,
+        "qty_ratio": 1.0,
+        "pnl_contribution": -3.893686835745258,
+        "gross_contribution": -3.6721660457690266
+      }
+    ]
+  },
+  {
+    "date": "2026-03-11",
+    "code": "306620",
+    "name": "지아이에스",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "11:16:39",
+    "signal_price": 3160,
+    "dip_target": 3160,
+    "fill_minute": 1117,
+    "fill_time": "11:17",
+    "fill_price": 3137,
+    "exit_minute": 1120,
+    "exit_time": "11:20",
+    "exit_price": 3020,
+    "exit_type": "stop_loss",
+    "pnl_pct": -3.951066568577044,
+    "pnl_gross_pct": -3.7296780363404523,
+    "hold_minutes": 3,
+    "partial_exits": [
+      {
+        "reason": "stop_loss",
+        "price": 3020,
+        "minute": 1120,
+        "qty": 1000,
+        "qty_ratio": 1.0,
+        "pnl_contribution": -3.951066568577044,
+        "gross_contribution": -3.7296780363404523
+      }
+    ]
+  },
+  {
+    "date": "2026-03-11",
+    "code": "389020",
+    "name": "자람테크놀로지",
+    "condition": "세력감지",
+    "strat_name": "세력감지",
+    "signal_time": "11:21:02",
+    "signal_price": 52500,
+    "dip_target": 52500,
+    "fill_minute": 1124,
+    "fill_time": "11:24",
+    "fill_price": 51975,
+    "exit_minute": 1133,
+    "exit_time": "11:33",
+    "exit_price": 53700,
+    "exit_type": "retracement_1",
+    "pnl_pct": 3.4700199010552373,
+    "pnl_gross_pct": 3.708513708513709,
+    "hold_minutes": 9,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 54000,
+        "minute": 1133,
+        "qty": 350,
+        "qty_ratio": 0.35,
+        "pnl_contribution": 1.2800125435730079,
+        "gross_contribution": 1.3636363636363635
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 54000,
+        "minute": 1133,
+        "qty": 325,
+        "qty_ratio": 0.325,
+        "pnl_contribution": 1.188583076174936,
+        "gross_contribution": 1.2662337662337664
+      },
+      {
+        "reason": "retracement_1",
+        "price": 53700,
+        "minute": 1133,
+        "qty": 325,
+        "qty_ratio": 0.325,
+        "pnl_contribution": 1.0014242813072933,
+        "gross_contribution": 1.0786435786435788
+      }
+    ]
+  },
+  {
+    "date": "2026-03-12",
+    "code": "322310",
+    "name": "오로스테크놀로지",
+    "condition": "세력감지",
+    "strat_name": "세력감지",
+    "signal_time": "10:41:09",
+    "signal_price": 30300,
+    "dip_target": 30300,
+    "fill_minute": 1054,
+    "fill_time": "10:54",
+    "fill_price": 29997,
+    "exit_minute": 1327,
+    "exit_time": "13:27",
+    "exit_price": 30800,
+    "exit_type": "retracement_2",
+    "pnl_pct": 3.1143279136525512,
+    "pnl_gross_pct": 3.3520018668533518,
+    "hold_minutes": 153,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 31100,
+        "minute": 1327,
+        "qty": 350,
+        "qty_ratio": 0.35,
+        "pnl_contribution": 1.203514533992679,
+        "gross_contribution": 1.2869620295362867
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 31100,
+        "minute": 1327,
+        "qty": 325,
+        "qty_ratio": 0.325,
+        "pnl_contribution": 1.1175492101360591,
+        "gross_contribution": 1.195036170283695
+      },
+      {
+        "reason": "retracement_2",
+        "price": 30800,
+        "minute": 1327,
+        "qty": 325,
+        "qty_ratio": 0.325,
+        "pnl_contribution": 0.793264169523813,
+        "gross_contribution": 0.8700036670333702
+      }
+    ]
+  },
+  {
+    "date": "2026-03-16",
+    "code": "465770",
+    "name": "STX그린로지스",
+    "condition": "골든10분",
+    "strat_name": "골든10분",
+    "signal_time": "09:39:29",
+    "signal_price": 7750,
+    "dip_target": 7750,
+    "fill_minute": 940,
+    "fill_time": "09:40",
+    "fill_price": 7672,
+    "exit_minute": 1020,
+    "exit_time": "10:20",
+    "exit_price": 7810,
+    "exit_type": "trailing_stop",
+    "pnl_pct": 2.9298524017017793,
+    "pnl_gross_pct": 3.167101147028154,
+    "hold_minutes": 40,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 8100,
+        "minute": 1018,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.8003899779996481,
+        "gross_contribution": 0.8368091762252345
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 8100,
+        "minute": 1018,
+        "qty": 212,
+        "qty_ratio": 0.212,
+        "pnl_contribution": 1.1312178355728362,
+        "gross_contribution": 1.1826903023983315
+      },
+      {
+        "reason": "trailing_stop",
+        "price": 7810,
+        "minute": 1020,
+        "qty": 638,
+        "qty_ratio": 0.638,
+        "pnl_contribution": 0.9982445881292952,
+        "gross_contribution": 1.147601668404588
+      }
+    ]
+  },
+  {
+    "date": "2026-03-17",
+    "code": "412350",
+    "name": "레이저쎌",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "10:25:52",
+    "signal_price": 6020,
+    "dip_target": 6020,
+    "fill_minute": 1026,
+    "fill_time": "10:26",
+    "fill_price": 5977,
+    "exit_minute": 1031,
+    "exit_time": "10:31",
+    "exit_price": 6430,
+    "exit_type": "take_profit_4",
+    "pnl_pct": 5.053155779351852,
+    "pnl_gross_pct": 5.2952986448050865,
+    "hold_minutes": 5,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 6200,
+        "minute": 1026,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.5238634900766204,
+        "gross_contribution": 0.5596453070102058
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 6280,
+        "minute": 1030,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.0518189838865664,
+        "gross_contribution": 2.1545089509787516
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 6280,
+        "minute": 1030,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.2310913903319398,
+        "gross_contribution": 1.2927053705872513
+      },
+      {
+        "reason": "take_profit_4",
+        "price": 6430,
+        "minute": 1031,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 1.246381915056725,
+        "gross_contribution": 1.2884390162288775
+      }
+    ]
+  },
+  {
+    "date": "2026-03-18",
+    "code": "088350",
+    "name": "한화생명",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "10:29:06",
+    "signal_price": 5290,
+    "dip_target": 5290,
+    "fill_minute": 1030,
+    "fill_time": "10:30",
+    "fill_price": 5252,
+    "exit_minute": 1525,
+    "exit_time": "15:25",
+    "exit_price": 5250,
+    "exit_type": "market_close",
+    "pnl_pct": -0.2679586637785114,
+    "pnl_gross_pct": -0.03808073115003808,
+    "hold_minutes": 295,
+    "partial_exits": [
+      {
+        "reason": "market_close",
+        "price": 5250,
+        "minute": 1525,
+        "qty": 1000,
+        "qty_ratio": 1.0,
+        "pnl_contribution": -0.2679586637785114,
+        "gross_contribution": -0.03808073115003808
+      }
+    ]
+  },
+  {
+    "date": "2026-03-19",
+    "code": "033160",
+    "name": "엠케이전자",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "10:29:21",
+    "signal_price": 17020,
+    "dip_target": 17020,
+    "fill_minute": 1033,
+    "fill_time": "10:33",
+    "fill_price": 16900,
+    "exit_minute": 1057,
+    "exit_time": "10:57",
+    "exit_price": 17730,
+    "exit_type": "retracement_3",
+    "pnl_pct": 5.32586759915006,
+    "pnl_gross_pct": 5.568639053254437,
+    "hold_minutes": 24,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 17700,
+        "minute": 1054,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.673931454660498,
+        "gross_contribution": 0.7100591715976331
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 17900,
+        "minute": 1056,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.4112744035140246,
+        "gross_contribution": 2.5147928994082838
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 17900,
+        "minute": 1056,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.4467646421084148,
+        "gross_contribution": 1.5088757396449703
+      },
+      {
+        "reason": "retracement_3",
+        "price": 17730,
+        "minute": 1057,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 0.7938970988671225,
+        "gross_contribution": 0.8349112426035502
+      }
+    ]
+  },
+  {
+    "date": "2026-03-20",
+    "code": "100130",
+    "name": "동국S&C",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "09:14:58",
+    "signal_price": 2600,
+    "dip_target": 2600,
+    "fill_minute": 915,
+    "fill_time": "09:15",
+    "fill_price": 2581,
+    "exit_minute": 918,
+    "exit_time": "09:18",
+    "exit_price": 2485,
+    "exit_type": "stop_loss",
+    "pnl_pct": -3.9409005348151616,
+    "pnl_gross_pct": -3.7194885703215808,
+    "hold_minutes": 3,
+    "partial_exits": [
+      {
+        "reason": "stop_loss",
+        "price": 2485,
+        "minute": 918,
+        "qty": 1000,
+        "qty_ratio": 1.0,
+        "pnl_contribution": -3.9409005348151616,
+        "gross_contribution": -3.7194885703215808
+      }
+    ]
+  },
+  {
+    "date": "2026-03-20",
+    "code": "388050",
+    "name": "지투파워",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "09:17:24",
+    "signal_price": 12810,
+    "dip_target": 12810,
+    "fill_minute": 951,
+    "fill_time": "09:51",
+    "fill_price": 13256,
+    "exit_minute": 1059,
+    "exit_time": "10:59",
+    "exit_price": 13540,
+    "exit_type": "trailing_stop",
+    "pnl_pct": 4.180508258703856,
+    "pnl_gross_pct": 4.420639710319855,
+    "hold_minutes": 68,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 13740,
+        "minute": 1037,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.5119222309773619,
+        "gross_contribution": 0.5476765238382619
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 13940,
+        "minute": 1054,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.0901908090370616,
+        "gross_contribution": 2.192969221484611
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 13940,
+        "minute": 1054,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.2541144854222368,
+        "gross_contribution": 1.3157815328907665
+      },
+      {
+        "reason": "trailing_stop",
+        "price": 13540,
+        "minute": 1059,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 0.32428073326719575,
+        "gross_contribution": 0.36421243210621607
+      }
+    ]
+  },
+  {
+    "date": "2026-03-23",
+    "code": "014970",
+    "name": "삼륭물산",
+    "condition": "골든10분",
+    "strat_name": "골든10분",
+    "signal_time": "09:18:59",
+    "signal_price": 7620,
+    "dip_target": 7620,
+    "fill_minute": 919,
+    "fill_time": "09:19",
+    "fill_price": 7543,
+    "exit_minute": 951,
+    "exit_time": "09:51",
+    "exit_price": 7710,
+    "exit_type": "trailing_stop",
+    "pnl_pct": 2.9365393679613034,
+    "pnl_gross_pct": 3.1738035264483626,
+    "hold_minutes": 32,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 7910,
+        "minute": 950,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.6936425729962592,
+        "gross_contribution": 0.7298157231870608
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 7910,
+        "minute": 950,
+        "qty": 212,
+        "qty_ratio": 0.212,
+        "pnl_contribution": 0.980348169834713,
+        "gross_contribution": 1.031472888771046
+      },
+      {
+        "reason": "trailing_stop",
+        "price": 7710,
+        "minute": 951,
+        "qty": 638,
+        "qty_ratio": 0.638,
+        "pnl_contribution": 1.2625486251303313,
+        "gross_contribution": 1.4125149144902558
+      }
+    ]
+  },
+  {
+    "date": "2026-03-24",
+    "code": "003000",
+    "name": "부광약품",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "10:06:46",
+    "signal_price": 6960,
+    "dip_target": 6960,
+    "fill_minute": 1007,
+    "fill_time": "10:07",
+    "fill_price": 6911,
+    "exit_minute": 1525,
+    "exit_time": "15:25",
+    "exit_price": 7110,
+    "exit_type": "market_close",
+    "pnl_pct": 2.772807924853805,
+    "pnl_gross_pct": 3.009694689625235,
+    "hold_minutes": 318,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 7170,
+        "minute": 1453,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.5263597307459267,
+        "gross_contribution": 0.5621473014035595
+      },
+      {
+        "reason": "market_close",
+        "price": 7110,
+        "minute": 1525,
+        "qty": 850,
+        "qty_ratio": 0.85,
+        "pnl_contribution": 2.246448194107878,
+        "gross_contribution": 2.4475473882216754
+      }
+    ]
+  },
+  {
+    "date": "2026-03-25",
+    "code": "072130",
+    "name": "유엔젤",
+    "condition": "골든10분",
+    "strat_name": "골든10분",
+    "signal_time": "09:05:07",
+    "signal_price": 5900,
+    "dip_target": 5900,
+    "fill_minute": 925,
+    "fill_time": "09:25",
+    "fill_price": 6108,
+    "exit_minute": 939,
+    "exit_time": "09:39",
+    "exit_price": 6220,
+    "exit_type": "trailing_stop",
+    "pnl_pct": 1.9179977456557618,
+    "pnl_gross_pct": 2.152914210870989,
+    "hold_minutes": 14,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 6350,
+        "minute": 939,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.558441037380738,
+        "gross_contribution": 0.5943025540275049
+      },
+      {
+        "reason": "trailing_stop",
+        "price": 6220,
+        "minute": 939,
+        "qty": 850,
+        "qty_ratio": 0.85,
+        "pnl_contribution": 1.3595567082750237,
+        "gross_contribution": 1.558611656843484
+      }
+    ]
+  },
+  {
+    "date": "2026-03-25",
+    "code": "083500",
+    "name": "에프엔에스테크",
+    "condition": "세력감지",
+    "strat_name": "세력감지",
+    "signal_time": "11:09:10",
+    "signal_price": 18810,
+    "dip_target": 18810,
+    "fill_minute": 1112,
+    "fill_time": "11:12",
+    "fill_price": 18621,
+    "exit_minute": 1121,
+    "exit_time": "11:21",
+    "exit_price": 19250,
+    "exit_type": "retracement_2",
+    "pnl_pct": 3.3210033129045997,
+    "pnl_gross_pct": 3.5591536437355664,
+    "hold_minutes": 9,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 19300,
+        "minute": 1121,
+        "qty": 350,
+        "qty_ratio": 0.35,
+        "pnl_contribution": 1.192824392489562,
+        "gross_contribution": 1.276247247731056
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 19300,
+        "minute": 1121,
+        "qty": 325,
+        "qty_ratio": 0.325,
+        "pnl_contribution": 1.107622650168879,
+        "gross_contribution": 1.1850867300359806
+      },
+      {
+        "reason": "retracement_2",
+        "price": 19250,
+        "minute": 1121,
+        "qty": 325,
+        "qty_ratio": 0.325,
+        "pnl_contribution": 1.0205562702461586,
+        "gross_contribution": 1.09781966596853
+      }
+    ]
+  },
+  {
+    "date": "2026-03-26",
+    "code": "104480",
+    "name": "티케이케미칼",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "09:51:23",
+    "signal_price": 2530,
+    "dip_target": 2530,
+    "fill_minute": 957,
+    "fill_time": "09:57",
+    "fill_price": 2512,
+    "exit_minute": 1036,
+    "exit_time": "10:36",
+    "exit_price": 2605,
+    "exit_type": "retracement_3",
+    "pnl_pct": 5.459547807478531,
+    "pnl_gross_pct": 5.702627388535031,
+    "hold_minutes": 39,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 2600,
+        "minute": 1034,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.48977446376673667,
+        "gross_contribution": 0.5254777070063694
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 2680,
+        "minute": 1035,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.7380849082828536,
+        "gross_contribution": 2.842356687898089
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 2680,
+        "minute": 1035,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.642850944969712,
+        "gross_contribution": 1.7054140127388535
+      },
+      {
+        "reason": "retracement_3",
+        "price": 2605,
+        "minute": 1036,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 0.5888374904592285,
+        "gross_contribution": 0.6293789808917197
+      }
+    ]
+  },
+  {
+    "date": "2026-03-27",
+    "code": "289080",
+    "name": "SV인베스트먼트",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "09:45:54",
+    "signal_price": 3985,
+    "dip_target": 3985,
+    "fill_minute": 952,
+    "fill_time": "09:52",
+    "fill_price": 3957,
+    "exit_minute": 1020,
+    "exit_time": "10:20",
+    "exit_price": 4100,
+    "exit_type": "retracement_3",
+    "pnl_pct": 4.5757379506543625,
+    "pnl_gross_pct": 4.816780389183725,
+    "hold_minutes": 28,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 4100,
+        "minute": 1019,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.5063359146620772,
+        "gross_contribution": 0.5420773313115997
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 4170,
+        "minute": 1019,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.1847216662762072,
+        "gross_contribution": 2.287717968157695
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 4170,
+        "minute": 1019,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.3108329997657242,
+        "gross_contribution": 1.3726307808946172
+      },
+      {
+        "reason": "retracement_3",
+        "price": 4100,
+        "minute": 1020,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 0.5738473699503542,
+        "gross_contribution": 0.6143543088198131
+      }
+    ]
+  },
+  {
+    "date": "2026-03-30",
+    "code": "053950",
+    "name": "경남제약",
+    "condition": "세력감지",
+    "strat_name": "세력감지",
+    "signal_time": "11:36:46",
+    "signal_price": 999,
+    "dip_target": 999,
+    "fill_minute": 1139,
+    "fill_time": "11:39",
+    "fill_price": 989,
+    "exit_minute": 1206,
+    "exit_time": "12:06",
+    "exit_price": 1019,
+    "exit_type": "retracement_1",
+    "pnl_pct": 3.545457690952013,
+    "pnl_gross_pct": 3.7841253791708795,
+    "hold_minutes": 27,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 1030,
+        "minute": 1206,
+        "qty": 350,
+        "qty_ratio": 0.35,
+        "pnl_contribution": 1.3671359306215247,
+        "gross_contribution": 1.4509605662285137
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 1030,
+        "minute": 1206,
+        "qty": 325,
+        "qty_ratio": 0.325,
+        "pnl_contribution": 1.2694833641485588,
+        "gross_contribution": 1.3473205257836198
+      },
+      {
+        "reason": "retracement_1",
+        "price": 1019,
+        "minute": 1206,
+        "qty": 325,
+        "qty_ratio": 0.325,
+        "pnl_contribution": 0.9088383961819291,
+        "gross_contribution": 0.9858442871587462
+      }
+    ]
+  },
+  {
+    "date": "2026-04-01",
+    "code": "064290",
+    "name": "인텍플러스",
+    "condition": "골든10분",
+    "strat_name": "골든10분",
+    "signal_time": "09:36:08",
+    "signal_price": 19220,
+    "dip_target": 19220,
+    "fill_minute": 937,
+    "fill_time": "09:37",
+    "fill_price": 19027,
+    "exit_minute": 1005,
+    "exit_time": "10:05",
+    "exit_price": 20750,
+    "exit_type": "take_profit_4",
+    "pnl_pct": 7.081190173394932,
+    "pnl_gross_pct": 7.328007568192568,
+    "hold_minutes": 28,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 19760,
+        "minute": 943,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.5420393253094857,
+        "gross_contribution": 0.577863036737268
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 19900,
+        "minute": 950,
+        "qty": 212,
+        "qty_ratio": 0.212,
+        "pnl_contribution": 0.9217123838109486,
+        "gross_contribution": 0.9727019498607242
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 20750,
+        "minute": 1005,
+        "qty": 319,
+        "qty_ratio": 0.319,
+        "pnl_contribution": 2.8087192321372485,
+        "gross_contribution": 2.888721290797288
+      },
+      {
+        "reason": "take_profit_4",
+        "price": 20750,
+        "minute": 1005,
+        "qty": 319,
+        "qty_ratio": 0.319,
+        "pnl_contribution": 2.8087192321372485,
+        "gross_contribution": 2.888721290797288
+      }
+    ]
+  },
+  {
+    "date": "2026-04-01",
+    "code": "230240",
+    "name": "에치에프알",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "10:30:12",
+    "signal_price": 33900,
+    "dip_target": 33900,
+    "fill_minute": 1033,
+    "fill_time": "10:33",
+    "fill_price": 33662,
+    "exit_minute": 1525,
+    "exit_time": "15:25",
+    "exit_price": 33700,
+    "exit_type": "market_close",
+    "pnl_pct": -0.11733817136153624,
+    "pnl_gross_pct": 0.1128869348226487,
+    "hold_minutes": 292,
+    "partial_exits": [
+      {
+        "reason": "market_close",
+        "price": 33700,
+        "minute": 1525,
+        "qty": 1000,
+        "qty_ratio": 1.0,
+        "pnl_contribution": -0.11733817136153624,
+        "gross_contribution": 0.1128869348226487
+      }
+    ]
+  },
+  {
+    "date": "2026-04-02",
+    "code": "065450",
+    "name": "빅텍",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "09:37:06",
+    "signal_price": 5770,
+    "dip_target": 5770,
+    "fill_minute": 938,
+    "fill_time": "09:38",
+    "fill_price": 5729,
+    "exit_minute": 948,
+    "exit_time": "09:48",
+    "exit_price": 5920,
+    "exit_type": "retracement_3",
+    "pnl_pct": 4.937039074091745,
+    "pnl_gross_pct": 5.178914295688601,
+    "hold_minutes": 10,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 5990,
+        "minute": 941,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.6472990039450088,
+        "gross_contribution": 0.6833653342642695
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 6060,
+        "minute": 947,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.352107495448377,
+        "gross_contribution": 2.4554896142433233
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 6060,
+        "minute": 947,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.4112644972690265,
+        "gross_contribution": 1.473293768545994
+      },
+      {
+        "reason": "retracement_3",
+        "price": 5920,
+        "minute": 948,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 0.526368077429332,
+        "gross_contribution": 0.5667655786350149
+      }
+    ]
+  },
+  {
+    "date": "2026-04-06",
+    "code": "062970",
+    "name": "한국첨단소재",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "09:12:03",
+    "signal_price": 4175,
+    "dip_target": 4175,
+    "fill_minute": 927,
+    "fill_time": "09:27",
+    "fill_price": 4145,
+    "exit_minute": 954,
+    "exit_time": "09:54",
+    "exit_price": 4445,
+    "exit_type": "take_profit_4",
+    "pnl_pct": 5.176150236089432,
+    "pnl_gross_pct": 5.418576598311218,
+    "hold_minutes": 27,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 4305,
+        "minute": 927,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.543184505436366,
+        "gross_contribution": 0.5790108564535584
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 4365,
+        "minute": 953,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.152807054816325,
+        "gross_contribution": 2.255729794933655
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 4365,
+        "minute": 953,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.2916842328897948,
+        "gross_contribution": 1.3534378769601931
+      },
+      {
+        "reason": "take_profit_4",
+        "price": 4445,
+        "minute": 954,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 1.1884744429469463,
+        "gross_contribution": 1.230398069963812
+      }
+    ]
+  },
+  {
+    "date": "2026-04-08",
+    "code": "037440",
+    "name": "희림",
+    "condition": "골든10분",
+    "strat_name": "골든10분",
+    "signal_time": "09:38:11",
+    "signal_price": 4665,
+    "dip_target": 4665,
+    "fill_minute": 940,
+    "fill_time": "09:40",
+    "fill_price": 4618,
+    "exit_minute": 951,
+    "exit_time": "09:51",
+    "exit_price": 5140,
+    "exit_type": "take_profit_4",
+    "pnl_pct": 8.83316344038217,
+    "pnl_gross_pct": 9.084019055868342,
+    "hold_minutes": 11,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 4810,
+        "minute": 948,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.587717602428931,
+        "gross_contribution": 0.6236466002598527
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 4890,
+        "minute": 949,
+        "qty": 212,
+        "qty_ratio": 0.212,
+        "pnl_contribution": 1.197054863598089,
+        "gross_contribution": 1.2486790818536162
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 5140,
+        "minute": 951,
+        "qty": 319,
+        "qty_ratio": 0.319,
+        "pnl_contribution": 3.5241954871775754,
+        "gross_contribution": 3.6058466868774364
+      },
+      {
+        "reason": "take_profit_4",
+        "price": 5140,
+        "minute": 951,
+        "qty": 319,
+        "qty_ratio": 0.319,
+        "pnl_contribution": 3.5241954871775754,
+        "gross_contribution": 3.6058466868774364
+      }
+    ]
+  },
+  {
+    "date": "2026-04-08",
+    "code": "307930",
+    "name": "컴퍼니케이",
+    "condition": "세력감지",
+    "strat_name": "세력감지",
+    "signal_time": "10:51:29",
+    "signal_price": 8270,
+    "dip_target": 8270,
+    "fill_minute": 1118,
+    "fill_time": "11:18",
+    "fill_price": 8316,
+    "exit_minute": 1240,
+    "exit_time": "12:40",
+    "exit_price": 8810,
+    "exit_type": "retracement_3",
+    "pnl_pct": 6.126834973070537,
+    "pnl_gross_pct": 6.371452621452622,
+    "hold_minutes": 82,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 8840,
+        "minute": 1239,
+        "qty": 350,
+        "qty_ratio": 0.35,
+        "pnl_contribution": 2.119827648748309,
+        "gross_contribution": 2.2053872053872055
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 8840,
+        "minute": 1239,
+        "qty": 325,
+        "qty_ratio": 0.325,
+        "pnl_contribution": 1.96841138812343,
+        "gross_contribution": 2.0478595478595483
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 8890,
+        "minute": 1240,
+        "qty": 195,
+        "qty_ratio": 0.195,
+        "pnl_contribution": 1.298021079666332,
+        "gross_contribution": 1.345959595959596
+      },
+      {
+        "reason": "retracement_3",
+        "price": 8810,
+        "minute": 1240,
+        "qty": 130,
+        "qty_ratio": 0.13,
+        "pnl_contribution": 0.7405748565324652,
+        "gross_contribution": 0.7722462722462723
+      }
+    ]
+  },
+  {
+    "date": "2026-04-09",
+    "code": "024740",
+    "name": "한일단조",
+    "condition": "굿모닝",
+    "strat_name": "굿모닝",
+    "signal_time": "10:03:18",
+    "signal_price": 3180,
+    "dip_target": 3180,
+    "fill_minute": 1008,
+    "fill_time": "10:08",
+    "fill_price": 3157,
+    "exit_minute": 1012,
+    "exit_time": "10:12",
+    "exit_price": 3290,
+    "exit_type": "retracement_3",
+    "pnl_pct": 4.89126797277526,
+    "pnl_gross_pct": 5.1330376940133045,
+    "hold_minutes": 4,
+    "partial_exits": [
+      {
+        "reason": "take_profit_1",
+        "price": 3325,
+        "minute": 1011,
+        "qty": 150,
+        "qty_ratio": 0.15,
+        "pnl_contribution": 0.7618956934730303,
+        "gross_contribution": 0.7982261640798226
+      },
+      {
+        "reason": "take_profit_2",
+        "price": 3325,
+        "minute": 1011,
+        "qty": 425,
+        "qty_ratio": 0.425,
+        "pnl_contribution": 2.1587044648402527,
+        "gross_contribution": 2.261640798226164
+      },
+      {
+        "reason": "take_profit_3",
+        "price": 3325,
+        "minute": 1011,
+        "qty": 255,
+        "qty_ratio": 0.255,
+        "pnl_contribution": 1.2952226789041514,
+        "gross_contribution": 1.3569844789356986
+      },
+      {
+        "reason": "retracement_3",
+        "price": 3290,
+        "minute": 1012,
+        "qty": 170,
+        "qty_ratio": 0.17,
+        "pnl_contribution": 0.6754451355578259,
+        "gross_contribution": 0.7161862527716187
+      }
+    ]
+  },
+  {
+    "date": "2026-04-09",
+    "code": "310870",
+    "name": "디와이씨",
+    "condition": "세력감지",
+    "strat_name": "세력감지",
+    "signal_time": "11:44:05",
+    "signal_price": 1862,
+    "dip_target": 1862,
+    "fill_minute": 1145,
+    "fill_time": "11:45",
+    "fill_price": 1843,
+    "exit_minute": 1525,
+    "exit_time": "15:25",
+    "exit_price": 1796,
+    "exit_type": "market_close",
+    "pnl_pct": -2.7742908558290313,
+    "pnl_gross_pct": -2.5501899077590884,
+    "hold_minutes": 220,
+    "partial_exits": [
+      {
+        "reason": "market_close",
+        "price": 1796,
+        "minute": 1525,
+        "qty": 1000,
+        "qty_ratio": 1.0,
+        "pnl_contribution": -2.7742908558290313,
+        "gross_contribution": -2.5501899077590884
+      }
+    ]
+  }
+]
