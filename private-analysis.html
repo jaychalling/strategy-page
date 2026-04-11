@@ -118,7 +118,9 @@ function render() {
   renderMeta();
   renderSummary();
   renderBaselineDiagnostic();
-  // renderVariantCatalog, renderFinal, renderRobustness will be added in Task 15
+  renderVariantCatalog();
+  renderFinal();
+  renderRobustness();
 }
 
 function renderMeta() {
@@ -287,6 +289,154 @@ function renderHeatmap(containerId, crossData) {
   });
   html += `</div>`;
   el.innerHTML = html;
+}
+
+function renderVariantCatalog() {
+  const variants = STATE.variants.variants;
+  const container = document.getElementById('variant-cards');
+  let currentFilter = 'all';
+
+  function draw() {
+    const filtered = currentFilter === 'all'
+      ? variants
+      : variants.filter(v => v.category === currentFilter);
+    const sorted = [...filtered].sort(
+      (a, b) => b.result.delta_pnl - a.result.delta_pnl
+    );
+    container.innerHTML = sorted.map(v => {
+      const r = v.result;
+      return `
+        <div class="variant-card ${v.status}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <strong>${v.id}: ${v.title}</strong>
+            <span class="badge ${v.category}">${v.category}</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px">${v.description}</div>
+          <div style="font-size:13px">
+            <div>Δ PnL: <span class="${r.delta_pnl >= 0 ? 'pos' : 'neg'}">${r.delta_pnl >= 0 ? '+' : ''}${fmt(r.delta_pnl)}%</span></div>
+            <div>Δ 승률: <span class="${r.delta_winrate >= 0 ? 'pos' : 'neg'}">${r.delta_winrate >= 0 ? '+' : ''}${fmt(r.delta_winrate * 100)}%p</span></div>
+            <div>Δ MDD: <span class="${r.delta_mdd >= 0 ? 'pos' : 'neg'}">${r.delta_mdd >= 0 ? '+' : ''}${fmt(r.delta_mdd)}%</span></div>
+            <div style="margin-top:8px">거래 ${r.n_trades} · 상태 <strong>${v.status === 'accepted' ? '✅ 채택' : '❌ 기각'}</strong></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.querySelectorAll('[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentFilter = btn.dataset.filter;
+      draw();
+    });
+  });
+
+  draw();
+}
+
+function renderFinal() {
+  const body = document.getElementById('final-body');
+  const f = STATE.variants.final;
+  if (!f) {
+    body.innerHTML = '<p style="color:var(--muted)">채택된 variant 없음 — Final 조합 미생성</p>';
+    return;
+  }
+
+  body.innerHTML = `
+    <p>조합: ${f.combined_ids.join(' + ')}</p>
+    <div class="summary-grid">
+      <div class="kpi"><div class="label">거래</div><div class="value">${f.result.n_trades}</div></div>
+      <div class="kpi"><div class="label">승률</div><div class="value">${fmt(f.result.winrate * 100)}%</div></div>
+      <div class="kpi"><div class="label">총 PnL</div><div class="value pos">${fmt(f.result.total_pnl_pct)}%</div></div>
+      <div class="kpi"><div class="label">MDD</div><div class="value neg">${fmt(f.result.mdd_pct)}%</div></div>
+    </div>
+
+    <h3 style="margin-top:24px">Equity Curve 오버레이</h3>
+    <canvas id="finalCurveChart" height="80"></canvas>
+
+    <h3 style="margin-top:24px">거래 상세 (최종안)</h3>
+    <div style="max-height:400px;overflow:auto">
+      <table><thead><tr>
+        <th>날짜</th><th>종목</th><th>조건</th><th>진입</th><th>청산</th><th>유형</th><th>PnL</th>
+      </tr></thead><tbody id="finalTradesBody"></tbody></table>
+    </div>
+  `;
+
+  // Overlay chart
+  const baseEc = STATE.baseline.equity_curve;
+  const finalEc = f.equity_curve || [];
+  new Chart(document.getElementById('finalCurveChart'), {
+    type: 'line',
+    data: {
+      labels: baseEc.map(r => r.date),
+      datasets: [
+        { label: '베이스라인', data: baseEc.map(r => r.cum_pnl), borderColor: '#8a8f98', fill: false },
+        { label: '최종', data: finalEc.map(r => r.cum_pnl), borderColor: '#4fd1c5', fill: false },
+      ]
+    },
+    options: { responsive: true }
+  });
+
+  const tradesBody = document.getElementById('finalTradesBody');
+  tradesBody.innerHTML = (f.trades || []).map(t => `
+    <tr>
+      <td>${t.date}</td>
+      <td>${t.name || t.code}</td>
+      <td>${t.condition}</td>
+      <td>${t.fill_time} ${t.fill_price}</td>
+      <td>${t.exit_time} ${t.exit_price}</td>
+      <td>${t.exit_type}</td>
+      <td class="${t.pnl_pct >= 0 ? 'pos' : 'neg'}">${fmt(t.pnl_pct)}%</td>
+    </tr>
+  `).join('');
+}
+
+function renderRobustness() {
+  const r = STATE.variants.robustness;
+  const body = document.getElementById('robustness-body');
+  if (!r) {
+    body.innerHTML = '<p style="color:var(--muted)">견고성 데이터 없음</p>';
+    return;
+  }
+  body.innerHTML = `
+    <h3>R1: Train(Feb~Mar) vs Test(Apr)</h3>
+    <table>
+      <thead><tr><th>기간</th><th>베이스라인</th><th>최종</th></tr></thead>
+      <tbody>
+        <tr><td>Feb~Mar</td><td>${fmt(r.train_feb_mar.baseline_pnl)}%</td><td>${r.train_feb_mar.final_pnl !== null ? fmt(r.train_feb_mar.final_pnl) + '%' : '-'}</td></tr>
+        <tr><td>Apr</td><td>${fmt(r.test_apr.baseline_pnl)}%</td><td>${r.test_apr.final_pnl !== null ? fmt(r.test_apr.final_pnl) + '%' : '-'}</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:24px">R2: 최악 5거래일</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <h4>베이스라인</h4>
+        <table><tbody>${r.worst5_baseline.map(d => `<tr><td>${d.date}</td><td class="neg">${fmt(d.pnl)}%</td></tr>`).join('')}</tbody></table>
+      </div>
+      <div>
+        <h4>최종</h4>
+        <table><tbody>${r.worst5_final.map(d => `<tr><td>${d.date}</td><td class="neg">${fmt(d.pnl)}%</td></tr>`).join('')}</tbody></table>
+      </div>
+    </div>
+
+    <h3 style="margin-top:24px">R3: 연속손실 분포</h3>
+    <table>
+      <thead><tr><th>연속손실 길이</th><th>베이스라인</th><th>최종</th></tr></thead>
+      <tbody id="consecBody"></tbody>
+    </table>
+  `;
+  const allLens = new Set([
+    ...Object.keys(r.consec_loss_baseline || {}),
+    ...Object.keys(r.consec_loss_final || {}),
+  ]);
+  const consecBody = document.getElementById('consecBody');
+  consecBody.innerHTML = [...allLens].sort((a,b) => +a - +b).map(len => `
+    <tr>
+      <td>${len}연속</td>
+      <td>${(r.consec_loss_baseline || {})[len] || 0}회</td>
+      <td>${(r.consec_loss_final || {})[len] || 0}회</td>
+    </tr>
+  `).join('');
 }
 
 loadData().catch(err => {
