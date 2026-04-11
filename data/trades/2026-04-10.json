@@ -1,0 +1,1 @@
+[{"stock_code": "004100", "trade_type": "buy_1", "price": 3355, "quantity": 149, "trade_time": "09:57:55"}, {"stock_code": "004100", "trade_type": "take_profit_1", "price": 3410, "quantity": 37, "trade_time": "10:23:59"}, {"stock_code": "004100", "trade_type": "retracement_1", "price": 3405, "quantity": 112, "trade_time": "10:37:26"}]
