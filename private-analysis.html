@@ -49,6 +49,19 @@
   .badge.structure { background: #6b4b3b; color: #d9b39c; }
   .heatmap { display: grid; gap: 2px; margin-top: 12px; }
   .heatmap-cell { padding: 8px; text-align: center; font-size: 11px; border-radius: 2px; }
+  .variant-detail-list { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+  .variant-detail { background: var(--bg); border: 1px solid var(--border); border-left: 3px solid var(--pos); border-radius: 6px; padding: 16px; }
+  .variant-detail-header { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .variant-detail-id { font-weight: 700; color: var(--accent); font-size: 14px; background: rgba(79, 209, 197, 0.1); padding: 2px 8px; border-radius: 4px; }
+  .variant-detail-delta { margin-left: auto; font-size: 12px; }
+  .variant-detail-row { display: grid; grid-template-columns: 90px 1fr; gap: 12px; padding: 6px 0; font-size: 13px; line-height: 1.6; }
+  .variant-detail-row.caution { color: #f0b050; }
+  .variant-detail-label { color: var(--muted); font-size: 11px; font-weight: 500; padding-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+  @media (max-width: 640px) {
+    .variant-detail-header { font-size: 13px; }
+    .variant-detail-delta { margin-left: 0; width: 100%; }
+    .variant-detail-row { grid-template-columns: 1fr; gap: 2px; }
+  }
   button { background: var(--border); color: var(--text); border: 1px solid var(--muted);
             padding: 6px 12px; border-radius: 4px; margin-right: 6px; cursor: pointer; }
   button:hover { background: var(--muted); color: var(--bg); }
@@ -291,6 +304,39 @@ function renderHeatmap(containerId, crossData) {
   el.innerHTML = html;
 }
 
+const VARIANT_EXPLANATIONS = {
+  "P1": {
+    change: "신호 수신 cutoff 시각 12:00 → 11:00",
+    why: "11~12시 구간에 잡히는 신호는 이미 장초반 모멘텀이 소진된 후라 진입 후 상승 여력이 낮음. 11시 이후 신호를 차단하면 평균 거래 품질이 올라가고 슬롯을 헛되이 소모하는 일이 줄어듦.",
+    real: "오전 11시 이후 도착하는 모든 조건진입 신호는 무시됨. 슬롯은 11시까지만 활성.",
+    caution: "11시 이후 터지는 급등 케이스는 포기. 데이터상 빈도가 낮고 평균 기대값에는 악영향 미미."
+  },
+  "P3b": {
+    change: "손절선 -2.9% → -2.5% (전 조건 공통)",
+    why: "기존 -2.9%는 손실이 너무 깊어 다음 거래로 회복하기 힘들었음. 0.4%p 앞당겨 끊으면 개별 손실 크기가 줄고, 연속손실 누적 타격이 크게 감소. R3 견고성 체크에서 5연속 손실 사라지고 2연속 6→1회로 급감.",
+    real: "매수가 대비 -2.5% 터치 시 즉시 전량 시장가 매도.",
+    caution: "과거 -2.5~-2.9% 사이에서 반등해 살아나던 케이스는 손실 확정됨. 전체 기대값 개선이 이 손실분을 상쇄."
+  },
+  "F6": {
+    change: "개장 직후 2분(09:00~09:02) 신호 제외",
+    why: "개장 직후 2분은 호가 휘발성이 극도로 높고 동시호가 잔영·자동주문 폭증으로 가격 왜곡이 많음. 이 구간에서 잡힌 신호는 딥 체결돼도 이후 정상화 과정에서 불리한 포지션이 되기 쉬움.",
+    real: "09:00:00~09:02:59 사이에 도착하는 조건진입 신호는 무시. 슬롯은 09:03부터 활성.",
+    caution: "드물게 장 시작과 동시에 진짜 강한 모멘텀이 붙는 종목은 놓침. 통계적으로 가짜 신호가 훨씬 많음."
+  },
+  "S1a": {
+    change: "세력감지 조건 완전 배제 (굿모닝·골든10분만 사용)",
+    why: "세력감지 단독 승률은 79%로 높지만 거래 수가 14건(38일)으로 적고 평균수익이 크지 않음. 반면 이 조건이 슬롯을 선점하는 사이 더 큰 기대값의 굿모닝/골든10분 신호가 드롭됨. 1포지션 올인 구조에서는 '승률'보다 '슬롯 기회비용'이 핵심 — 세력감지는 좋지만 비싸게 슬롯을 먹는 조건이라는 결론.",
+    real: "세력감지 조건진입 신호는 전부 무시. 슬롯은 굿모닝·골든10분에만 열림.",
+    caution: "⚠️ 가장 직관과 어긋나는 개선안. 세력감지로만 잡히는 좋은 종목(14건 중 11건 수익)을 전부 포기. 수동 적용 전 1~2주 페이퍼 트레이딩으로 검증 권장."
+  },
+  "S6": {
+    change: "일일 손실 한도 -5% circuit breaker 추가",
+    why: "손실 나는 날은 연속으로 맞는 경향(장 자체가 약하거나 세력 페이크가 많은 세션). 당일 -5% 도달 시 신호 차단하면 '나쁜 날 밑 빠진 독' 현상을 끊고 심리적 안정도 얻음. 최악 5거래일 평균 손실이 -8.07% → -5.06%로 완화.",
+    real: "당일 누적 실현 PnL이 -5% 이하로 내려가면 그날 새로 오는 조건진입 신호 전부 차단. 다음날 장 시작 시 리셋.",
+    caution: "-5% 찍고 장 후반 반등하는 날의 기회는 포기. MDD 방어 관점에서 가치 있는 트레이드오프."
+  }
+};
+
 function renderVariantCatalog() {
   const variants = STATE.variants.variants;
   const container = document.getElementById('variant-cards');
@@ -341,6 +387,30 @@ function renderFinal() {
     return;
   }
 
+  // 채택된 variants 상세
+  const acceptedVariants = STATE.variants.variants.filter(v => v.status === 'accepted');
+  const acceptedDetail = acceptedVariants.map(v => {
+    const exp = VARIANT_EXPLANATIONS[v.id] || {};
+    const r = v.result;
+    return `
+      <div class="variant-detail">
+        <div class="variant-detail-header">
+          <span class="variant-detail-id">${v.id}</span>
+          <strong>${v.title}</strong>
+          <span class="badge ${v.category}">${v.category}</span>
+          <span class="variant-detail-delta">
+            <span class="${r.delta_pnl >= 0 ? 'pos' : 'neg'}">ΔPnL ${r.delta_pnl >= 0 ? '+' : ''}${fmt(r.delta_pnl)}%</span> ·
+            <span class="${r.delta_mdd >= 0 ? 'pos' : 'neg'}">ΔMDD ${r.delta_mdd >= 0 ? '+' : ''}${fmt(r.delta_mdd)}%</span>
+          </span>
+        </div>
+        ${exp.change ? `<div class="variant-detail-row"><span class="variant-detail-label">변경</span><span>${exp.change}</span></div>` : ''}
+        ${exp.why ? `<div class="variant-detail-row"><span class="variant-detail-label">왜</span><span>${exp.why}</span></div>` : ''}
+        ${exp.real ? `<div class="variant-detail-row"><span class="variant-detail-label">실전 의미</span><span>${exp.real}</span></div>` : ''}
+        ${exp.caution ? `<div class="variant-detail-row caution"><span class="variant-detail-label">주의</span><span>${exp.caution}</span></div>` : ''}
+      </div>
+    `;
+  }).join('');
+
   body.innerHTML = `
     <p>조합: ${f.combined_ids.join(' + ')}</p>
     <div class="summary-grid">
@@ -349,6 +419,9 @@ function renderFinal() {
       <div class="kpi"><div class="label">총 PnL</div><div class="value pos">${fmt(f.result.total_pnl_pct)}%</div></div>
       <div class="kpi"><div class="label">MDD</div><div class="value neg">${fmt(f.result.mdd_pct)}%</div></div>
     </div>
+
+    <h3 style="margin-top:24px">채택 사유 상세 (${acceptedVariants.length}건)</h3>
+    <div class="variant-detail-list">${acceptedDetail}</div>
 
     <h3 style="margin-top:24px">Equity Curve 오버레이</h3>
     <canvas id="finalCurveChart" height="80"></canvas>
