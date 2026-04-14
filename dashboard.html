@@ -53,6 +53,7 @@ tailwind.config = {
 <div class="flex gap-6 border-b border-border mb-6">
   <button class="tab-btn active pb-2 text-sm font-semibold" onclick="switchTab('chart')">신호 차트</button>
   <button class="tab-btn pb-2 text-sm font-semibold text-muted" onclick="switchTab('list')">신호 리스트</button>
+  <button class="tab-btn pb-2 text-sm font-semibold text-muted" onclick="switchTab('swing')">스윙 모음</button>
   <button class="tab-btn pb-2 text-sm font-semibold text-muted" onclick="switchTab('portfolio')">포트폴리오</button>
 </div>
 
@@ -144,7 +145,55 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ========== TAB 3: 포트폴리오 ========== -->
+<!-- ========== TAB 3: 스윙 모음 (날짜 구분 없이) ========== -->
+<div id="tab-swing" class="hidden">
+  <div class="bg-card border border-border rounded-xl overflow-hidden">
+    <div class="px-4 py-3 bg-gray-50 border-b border-border flex items-center justify-between gap-4 flex-wrap">
+      <div>
+        <span class="text-xs font-semibold text-muted uppercase">스윙 전용 신호 (날짜 구분 없음)</span>
+        <span class="ml-2 text-xs text-muted" id="swingCount"></span>
+      </div>
+      <div class="flex gap-2 items-center">
+        <select id="swingCondFilter" class="border border-border rounded-lg px-2 py-1 text-xs bg-white" onchange="renderSwingList()">
+          <option value="">전체 스윙 조건</option>
+          <option value="스윙검토">스윙검토</option>
+          <option value="매집봉 검색기">매집봉 검색기</option>
+          <option value="문득만든 좋은거">문득만든 좋은거</option>
+        </select>
+        <select id="swingSort" class="border border-border rounded-lg px-2 py-1 text-xs bg-white" onchange="renderSwingList()">
+          <option value="date_desc">최신순</option>
+          <option value="date_asc">오래된순</option>
+          <option value="pct_desc">수익률 높은순</option>
+          <option value="pct_asc">수익률 낮은순</option>
+          <option value="name">종목명</option>
+        </select>
+      </div>
+    </div>
+    <div class="p-3 text-xs text-muted bg-blue-50/50 border-b border-border">
+      <span class="font-semibold text-blue-700">팁:</span> 클릭하면 신호 차트 탭으로 이동하여 일봉 차트를 볼 수 있습니다.
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-gray-50 text-left text-xs text-muted uppercase">
+            <th class="px-4 py-2">포착일</th>
+            <th class="px-4 py-2">종목</th>
+            <th class="px-4 py-2">조건</th>
+            <th class="px-4 py-2 text-right">신호가</th>
+            <th class="px-4 py-2 text-right">종가수익률</th>
+            <th class="px-4 py-2 text-right">경과</th>
+            <th class="px-4 py-2">상태</th>
+          </tr>
+        </thead>
+        <tbody id="swingTable">
+          <tr><td colspan="7" class="px-4 py-6 text-center text-muted text-sm">로딩 중...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ========== TAB 4: 포트폴리오 ========== -->
 <div id="tab-portfolio" class="hidden">
   <!-- 요약 카드 -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="portfolioCards"></div>
@@ -193,6 +242,11 @@ let portfolioData = null;
 let strategyData = null;
 let mainChart = null;
 let volumeChart = null;
+let allSignalsData = [];   // 날짜 구분 없이 전 신호 캐시 (스윙 모음용)
+let swingListLoaded = false;
+
+// 스윙 조건 (날짜 구분 없이 모을 대상)
+const SWING_CONDITIONS = new Set(['스윙검토', '매집봉 검색기', '문득만든 좋은거']);
 
 // ── 초기화 ──
 async function init() {
@@ -244,14 +298,29 @@ function switchTab(name) {
     btn.classList.remove('active');
     btn.classList.add('text-muted');
   });
-  event.target.classList.add('active');
-  event.target.classList.remove('text-muted');
+  // event가 있을 때만 (프로그래매틱 호출 대비)
+  if (typeof event !== 'undefined' && event && event.target) {
+    event.target.classList.add('active');
+    event.target.classList.remove('text-muted');
+  } else {
+    // 프로그래매틱 전환: 해당 탭 버튼 찾아서 활성화
+    const btns = document.querySelectorAll('.tab-btn');
+    const idx = {chart: 0, list: 1, swing: 2, portfolio: 3}[name];
+    if (idx != null && btns[idx]) {
+      btns[idx].classList.add('active');
+      btns[idx].classList.remove('text-muted');
+    }
+  }
   // 포트폴리오 탭 전환 시 차트 다시 그리기 (hidden→visible 크기 문제)
   if (name === 'portfolio' && portfolioData) {
     document.getElementById('pnlChart').innerHTML = '';
     document.getElementById('cumulativeChart').innerHTML = '';
     renderPnlChart(portfolioData.daily || []);
     renderCumulativeChart(portfolioData.daily || []);
+  }
+  // 스윙 탭 첫 진입 시 로드
+  if (name === 'swing' && !swingListLoaded) {
+    loadSwingList();
   }
 }
 
@@ -837,6 +906,147 @@ async function loadSignalList() {
       </tr>
     `;
   }).join('');
+}
+
+// ── 스윙 모음 (날짜 구분 없이 전 스윙 신호) ──
+async function loadSwingList() {
+  if (!indexData) return;
+  const tbody = document.getElementById('swingTable');
+  tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-6 text-center text-muted text-sm">날짜별 데이터 로딩 중...</td></tr>';
+
+  // allSignalsData가 비어 있으면 전 날짜 fetch (병렬)
+  if (allSignalsData.length === 0) {
+    const promises = indexData.dates.map(async d => {
+      try {
+        const resp = await fetch(`data/signals/${d.date}.json`);
+        const sigs = await resp.json();
+        return sigs.map(s => ({ ...s, _date: d.date }));
+      } catch (e) { return []; }
+    });
+    const chunks = await Promise.all(promises);
+    allSignalsData = chunks.flat();
+  }
+
+  swingListLoaded = true;
+  renderSwingList();
+}
+
+function renderSwingList() {
+  const tbody = document.getElementById('swingTable');
+  const condFilter = document.getElementById('swingCondFilter').value;
+  const sort = document.getElementById('swingSort').value;
+
+  // 스윙 조건만 필터
+  let list = allSignalsData.filter(s => SWING_CONDITIONS.has(s.condition));
+  if (condFilter) list = list.filter(s => s.condition === condFilter);
+
+  // 정렬
+  const sortFns = {
+    date_desc: (a, b) => b._date.localeCompare(a._date) || (b.time || '').localeCompare(a.time || ''),
+    date_asc:  (a, b) => a._date.localeCompare(b._date) || (a.time || '').localeCompare(b.time || ''),
+    pct_desc:  (a, b) => (b.close_pct || 0) - (a.close_pct || 0),
+    pct_asc:   (a, b) => (a.close_pct || 0) - (b.close_pct || 0),
+    name:      (a, b) => (a.name || '').localeCompare(b.name || ''),
+  };
+  list.sort(sortFns[sort] || sortFns.date_desc);
+
+  document.getElementById('swingCount').textContent = `${list.length}건`;
+
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-6 text-center text-muted text-sm">스윙 신호 없음</td></tr>';
+    return;
+  }
+
+  // 오늘 기준 경과일 계산용
+  const todayStr = new Date().toISOString().substring(0, 10);
+
+  tbody.innerHTML = list.map((s, i) => {
+    const pct = s.close_pct != null ? s.close_pct : 0;
+    const pctColor = pct > 0 ? 'text-profit' : pct < 0 ? 'text-loss' : 'text-muted';
+
+    // 경과일
+    const d1 = new Date(s._date);
+    const d2 = new Date(todayStr);
+    const days = Math.max(0, Math.floor((d2 - d1) / (1000 * 60 * 60 * 24)));
+
+    // 상태 (Graduate/Out/Active — 임시 기준 +10% / -5%)
+    let statusBadge;
+    if (pct >= 10) {
+      statusBadge = '<span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-semibold">졸업</span>';
+    } else if (pct <= -5) {
+      statusBadge = '<span class="px-1.5 py-0.5 bg-red-100 text-red-700 rounded text-[10px] font-semibold">아웃</span>';
+    } else {
+      statusBadge = '<span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px]">관찰</span>';
+    }
+
+    // 조건별 컬러 뱃지
+    const condColor = {
+      '스윙검토': 'bg-violet-100 text-violet-700',
+      '매집봉 검색기': 'bg-amber-100 text-amber-700',
+      '문득만든 좋은거': 'bg-teal-100 text-teal-700',
+    }[s.condition] || 'bg-gray-100 text-gray-700';
+
+    return `
+      <tr class="signal-row border-t border-gray-50" onclick='selectSwingSignal(${JSON.stringify(s.id || s._date + "_" + s.code)})'>
+        <td class="px-4 py-2 mono text-xs">${s._date}</td>
+        <td class="px-4 py-2"><span class="font-medium text-gray-900">${s.name}</span> <span class="text-xs text-muted mono">${s.code}</span></td>
+        <td class="px-4 py-2"><span class="px-1.5 py-0.5 rounded text-[10px] font-medium ${condColor}">${s.condition}</span></td>
+        <td class="px-4 py-2 text-right mono text-xs">${s.signal_price?.toLocaleString() || '-'}</td>
+        <td class="px-4 py-2 text-right mono text-xs font-semibold ${pctColor}">${pct > 0 ? '+' : ''}${pct?.toFixed(2) || '0'}%</td>
+        <td class="px-4 py-2 text-right mono text-xs text-muted">${days}일</td>
+        <td class="px-4 py-2">${statusBadge}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// 스윙 리스트에서 신호 클릭 → 차트 탭으로 이동 + 렌더
+async function selectSwingSignal(sigKey) {
+  // sigKey 는 id (숫자) 또는 "date_code" 문자열
+  let target = null;
+  for (const s of allSignalsData) {
+    if (s.id === sigKey || `${s._date}_${s.code}` === sigKey) {
+      target = s;
+      break;
+    }
+  }
+  if (!target) {
+    // fallback: code만 매칭
+    target = allSignalsData.find(s => s.code === sigKey);
+  }
+  if (!target) return;
+
+  // 날짜 드롭다운 세팅 + 로드
+  const sel = document.getElementById('dateSelect');
+  sel.value = target._date;
+  await loadDateSignals();
+
+  // 차트 탭으로 전환
+  switchTab('chart');
+
+  // 해당 신호 찾아서 선택
+  const cond = document.getElementById('condFilter').value;
+  const filtered = cond ? currentSignals.filter(x => x.condition === cond) : currentSignals;
+  const idx = filtered.findIndex(s => s.code === target.code && s.time === target.time);
+  if (idx >= 0) {
+    // 약간 딜레이 (DOM 업데이트 후)
+    setTimeout(() => {
+      const row = document.querySelector(`.signal-row[data-idx="${idx}"]`);
+      if (row) row.scrollIntoView({ block: 'nearest' });
+      selectSignal(idx, row);
+    }, 100);
+  } else {
+    // 필터 클리어하고 재시도
+    document.getElementById('condFilter').value = '';
+    filterSignals();
+    const idx2 = currentSignals.findIndex(s => s.code === target.code && s.time === target.time);
+    if (idx2 >= 0) {
+      setTimeout(() => {
+        const row = document.querySelector(`.signal-row[data-idx="${idx2}"]`);
+        selectSignal(idx2, row);
+      }, 100);
+    }
+  }
 }
 
 // ── 포트폴리오 ──
