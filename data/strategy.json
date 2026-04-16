@@ -45,7 +45,7 @@
         "first_only": { "3": "all" },
         "after_second": { "1": "all" }
       },
-      "intensity_floor": { "threshold": 97, "duration_seconds": 15 }
+      "intensity_floor": { "threshold": 81, "duration_seconds": 30 }
     },
     "골든10분": {
       "time_window": { "start": "09:00", "end": "09:10" },
