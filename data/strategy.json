@@ -4,6 +4,7 @@
   },
   "condition_map": {
     "골든10분": ["골든10분"],
+    "골든11분": ["골든11분"],
     "굿모닝": ["굿모닝"],
     "세력감지": ["세력감지"]
   },
@@ -46,6 +47,42 @@
         "after_second": { "1": "all" }
       },
       "intensity_floor": { "threshold": 81, "duration_seconds": 30 }
+    },
+    "골든11분": {
+      "time_window": { "start": "09:10", "end": "11:00" },
+      "price_range": { "min": 1400, "max": 135000 },
+      "buy_amount_1": 600000,
+      "buy_amount_2": 1200000,
+      "buy_timeout": 70,
+      "sell_timeout": 10,
+      "below_price_rule": "prev_close",
+      "second_buy": {
+        "type": "zone",
+        "zone_enter": -0.025,
+        "bounce": 0.010,
+        "amount": 1200000
+      },
+      "stop_loss": {
+        "first_only": -0.033,
+        "after_second": -0.018
+      },
+      "take_profit": {
+        "first_only": [
+          { "profit": 0.030, "sell_ratio": 0.20 },
+          { "profit": 0.050, "sell_ratio": 0.30 }
+        ],
+        "after_second": [
+          { "profit": 0.020, "sell_ratio": 0.40 },
+          { "profit": 0.040, "sell_ratio": 0.30 }
+        ],
+        "trailing": { "trigger_profit": 0.030, "trailing_drop": 0.020 }
+      },
+      "profit_floor": { "trigger": 0.050, "floor": 0.015 },
+      "retracement_rules": {
+        "first_only": { "2": "all" },
+        "after_second": { "2": "all" }
+      },
+      "intensity_floor": { "threshold": 92, "duration_seconds": 15 }
     },
     "골든10분": {
       "time_window": { "start": "09:00", "end": "09:10" },
