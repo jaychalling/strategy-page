@@ -10,7 +10,7 @@
   },
   "strategies": {
     "굿모닝": {
-      "time_window": { "start": "09:00", "end": "09:15" },
+      "time_window": { "start": "09:00", "end": "13:49" },
       "price_range": { "min": 1400, "max": 135000 },
       "buy_amount_1": 700000,
       "buy_amount_2": 1400000,
@@ -85,7 +85,7 @@
       "intensity_floor": { "threshold": 92, "duration_seconds": 15 }
     },
     "골든10분": {
-      "time_window": { "start": "09:00", "end": "09:10" },
+      "time_window": { "start": "09:00", "end": "13:29" },
       "price_range": { "min": 1400, "max": 135000 },
       "buy_amount_1": 600000,
       "buy_amount_2": 1200000,
@@ -124,7 +124,7 @@
       "intensity_floor": { "threshold": 92, "duration_seconds": 15 }
     },
     "세력감지": {
-      "time_window": { "start": "09:14", "end": "14:20" },
+      "time_window": { "start": "09:20", "end": "12:29" },
       "price_range": { "min": 1800, "max": 135000 },
       "buy_amount_1": 500000,
       "buy_amount_2": 1000000,
