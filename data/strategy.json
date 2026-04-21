@@ -12,19 +12,21 @@
     "굿모닝": {
       "time_window": { "start": "09:00", "end": "13:49" },
       "price_range": { "min": 1400, "max": 135000 },
-      "buy_amount_1": 2100000,
-      "buy_amount_2": 4200000,
+      "buy_amount_1": 5000000,
+      "buy_amount_2": null,
       "buy_timeout": 180,
       "sell_timeout": 30,
       "below_price_rule": "prev_close",
-      "second_buy": {
-        "type": "direct",
-        "trigger_drop": -0.029,
-        "amount": 4200000
+      "entry_watch": {
+        "timeout_minutes": 15,
+        "conditions": [
+          { "type": "dip_from_signal", "op": "<=", "value": -0.4 }
+        ]
       },
+      "second_buy": null,
       "stop_loss": {
-        "first_only": { "after_tp": true, "value": -0.01 },
-        "after_second": -0.02
+        "first_only": -0.046,
+        "after_second": null
       },
       "take_profit": {
         "first_only": [
@@ -33,18 +35,12 @@
           { "profit": 0.063, "sell_ratio": 0.50 },
           { "profit": 0.085, "sell_ratio": 0.50 }
         ],
-        "after_second": [
-          { "profit": 0.008, "sell_ratio": 0.50 },
-          { "profit": 0.019, "sell_ratio": 0.25 },
-          { "profit": 0.032, "sell_ratio": 0.40 },
-          { "profit": 0.065, "sell_ratio": 0.50 }
-        ],
+        "after_second": null,
         "trailing": { "trigger_profit": 0.035, "trailing_drop": 0.031 }
       },
       "profit_floor": { "trigger": 0.035, "floor": 0.008 },
       "retracement_rules": {
-        "first_only": { "3": "all" },
-        "after_second": { "1": "all" }
+        "first_only": { "3": "all" }
       },
       "intensity_floor": { "threshold": 81, "duration_seconds": 30 }
     },
