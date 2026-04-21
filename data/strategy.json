@@ -4,7 +4,7 @@
   },
   "condition_map": {
     "골든10분": ["골든10분"],
-    "골든11분": ["골든11분"],
+    "골든11": ["골든11"],
     "굿모닝": ["굿모닝"],
     "세력감지": ["세력감지"]
   },
@@ -12,15 +12,15 @@
     "굿모닝": {
       "time_window": { "start": "09:00", "end": "13:49" },
       "price_range": { "min": 1400, "max": 135000 },
-      "buy_amount_1": 700000,
-      "buy_amount_2": 1400000,
+      "buy_amount_1": 2100000,
+      "buy_amount_2": 4200000,
       "buy_timeout": 180,
       "sell_timeout": 30,
       "below_price_rule": "prev_close",
       "second_buy": {
         "type": "direct",
         "trigger_drop": -0.029,
-        "amount": 1400000
+        "amount": 4200000
       },
       "stop_loss": {
         "first_only": { "after_tp": true, "value": -0.01 },
@@ -48,11 +48,11 @@
       },
       "intensity_floor": { "threshold": 81, "duration_seconds": 30 }
     },
-    "골든11분": {
+    "골든11": {
       "time_window": { "start": "09:10", "end": "11:00" },
       "price_range": { "min": 1400, "max": 135000 },
-      "buy_amount_1": 600000,
-      "buy_amount_2": 1200000,
+      "buy_amount_1": 1800000,
+      "buy_amount_2": 3600000,
       "buy_timeout": 70,
       "sell_timeout": 10,
       "below_price_rule": "prev_close",
@@ -60,7 +60,7 @@
         "type": "zone",
         "zone_enter": -0.025,
         "bounce": 0.010,
-        "amount": 1200000
+        "amount": 3600000
       },
       "stop_loss": {
         "first_only": -0.033,
@@ -87,15 +87,15 @@
     "골든10분": {
       "time_window": { "start": "09:00", "end": "13:29" },
       "price_range": { "min": 1400, "max": 135000 },
-      "buy_amount_1": 600000,
-      "buy_amount_2": 1200000,
+      "buy_amount_1": 1800000,
+      "buy_amount_2": 3600000,
       "buy_timeout": 70,
       "sell_timeout": 10,
       "below_price_rule": "prev_close",
       "second_buy": {
         "type": "direct",
         "trigger_drop": -0.028,
-        "amount": 1200000
+        "amount": 3600000
       },
       "stop_loss": {
         "first_only": { "after_tp": true, "value": -0.017 },
@@ -126,8 +126,8 @@
     "세력감지": {
       "time_window": { "start": "09:20", "end": "12:29" },
       "price_range": { "min": 1800, "max": 135000 },
-      "buy_amount_1": 500000,
-      "buy_amount_2": 1000000,
+      "buy_amount_1": 1500000,
+      "buy_amount_2": 3000000,
       "buy_timeout": 190,
       "sell_timeout": 210,
       "below_price_rule": "open_after_0930",
@@ -135,7 +135,7 @@
         "type": "zone",
         "zone_enter": -0.024,
         "bounce": 0.008,
-        "amount": 1000000
+        "amount": 3000000
       },
       "stop_loss": {
         "first_only": -0.029,
