@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Private 전략 백테스트 분석 v3 (파라미터 최적화)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1419;
+    --panel: #1a1f2e;
+    --text: #e4e6eb;
+    --muted: #8a8f98;
+    --accent: #4fd1c5;
+    --pos: #10b981;
+    --neg: #ef4444;
+    --border: #2a2f3e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  h1, h2, h3, h4 { margin: 0 0 12px 0; }
+  .container { max-width: 1400px; margin: 0 auto; }
+  .section { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+  .kpi { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+  .kpi .label { color: var(--muted); font-size: 12px; }
+  .kpi .value { font-size: 24px; font-weight: 600; margin-top: 4px; }
+  .kpi .delta { font-size: 13px; margin-top: 2px; }
+  .delta.pos, .pos { color: var(--pos); }
+  .delta.neg, .neg { color: var(--neg); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; }
+  canvas { max-width: 100%; }
+  .v3-banner { background: linear-gradient(135deg, rgba(79, 209, 197, 0.15), rgba(16, 185, 129, 0.05)); border: 2px solid var(--accent); border-radius: 10px; padding: 18px 22px; margin-bottom: 24px; }
+  .v3-banner-title { font-size: 17px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+  .v3-banner-body { font-size: 13px; line-height: 1.7; color: var(--text); }
+  .big-kpi { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(79, 209, 197, 0.05)); border: 2px solid var(--pos); border-radius: 8px; padding: 18px; }
+  .big-kpi .label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .big-kpi .value { font-size: 32px; font-weight: 700; color: var(--pos); margin-top: 4px; }
+  .param-change-list { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; }
+  .param-change { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+  .param-change-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .param-change-cond { font-size: 15px; font-weight: 700; color: var(--accent); }
+  .param-change-delta { font-size: 13px; }
+  .param-change-row { display: grid; grid-template-columns: 200px 1fr 1fr; gap: 12px; font-size: 13px; padding: 4px 0; }
+  .param-change-row.header { color: var(--muted); font-size: 11px; text-transform: uppercase; border-bottom: 1px dashed var(--border); padding-bottom: 4px; }
+  .param-name { color: var(--muted); }
+  .param-old { color: var(--muted); font-family: "Consolas", monospace; }
+  .param-new { color: var(--accent); font-family: "Consolas", monospace; font-weight: 600; }
+  .unchanged { color: #555; font-style: italic; }
+  .warning { background: rgba(240, 176, 80, 0.08); border: 1px solid #f0b050; border-radius: 6px; padding: 14px 18px; margin: 12px 0; color: #f0b050; }
+  a { color: var(--accent); }
+  @media (max-width: 768px) {
+    .param-change-row { grid-template-columns: 1fr; gap: 2px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Private 전략 백테스트 분석 <span style="color:var(--accent);font-size:0.6em">v3</span></h1>
+  <p id="meta-line" style="color: var(--muted)">로딩 중...</p>
+
+  <div class="v3-banner">
+    <div class="v3-banner-title">🎯 v3: T1 기준 파라미터 Coordinate Descent 최적화 (SL / TP1~4 / sell_ratio / trailing / profit_floor)</div>
+    <div class="v3-banner-body">
+      v2 의 결론대로 <b>T1 (time_window 최적화)</b> 을 고정 baseline 으로 두고, 그 위에서 조건식별로 <b>손절선, 각 TP 목표수익률/매도비율, 트레일링 트리거/드롭, profit_floor 트리거/플로어</b> 를 coordinate descent 로 최적화.
+      <br>⚠️ <b>simulator 3개 버그 수정 완료</b>: (1) quantity=1000 + partial_exits 누적 (2) 분 내 연속 TP 처리 (3) tp_exceeded 업데이트로 retracement 작동.
+      <br>⇢ 모든 이전 숫자 (v1, v2) 재계산됨.
+      <br><br>
+      <b>이전 보고서:</b> <a href="private-analysis.html">v1</a> · <a href="private-analysis-v2.html">v2</a>
+    </div>
+  </div>
+
+  <div class="warning">
+    ⚠️ <b>중요</b>: v1/v2 의 이전 숫자 ("T1 단독 +36.17%" 등) 는 simulator 버그 (TP1 도달 시 전량 매도로 처리) 로 인해 과대평가/과소평가 혼재. 버그 수정 후 <b>T1 baseline 실제 값은 +23.05%</b> 이며, 이 v3 의 최적화 결과가 현재 가장 정확한 값.
+  </div>
+
+  <section class="section">
+    <h2>🎯 핵심 결과</h2>
+    <div class="summary-grid" id="core-kpi"></div>
+    <h3 style="margin-top:20px">Robustness (Train/Test 분리)</h3>
+    <table id="robustness-table"></table>
+  </section>
+
+  <section class="section">
+    <h2>📈 Equity Curve 오버레이</h2>
+    <canvas id="curveChart" height="80"></canvas>
+  </section>
+
+  <section class="section">
+    <h2>📊 조건식별 성과 비교 (T1 baseline vs Optimized)</h2>
+    <table id="cond-perf-table"></table>
+  </section>
+
+  <section class="section">
+    <h2>⚙️ 조건식별 파라미터 변경</h2>
+    <div class="param-change-list" id="param-changes"></div>
+  </section>
+
+  <section class="section">
+    <h2>🔍 Coordinate Descent History</h2>
+    <p style="color:var(--muted);font-size:13px">각 조건식별로 초기값 → 순차 파라미터 최적화 궤적</p>
+    <div id="history-list"></div>
+  </section>
+
+  <section class="section">
+    <h2>💡 최종 권장 전략 JSON</h2>
+    <p style="color:var(--muted);font-size:13px">아래 값을 <code>strategy_private.json</code> 에 적용. <b>T1 time_window 는 별도로 <code>private.py on_signal</code> 에 구현 필요</b>.</p>
+    <pre id="json-output" style="background:var(--bg);border:1px solid var(--border);padding:16px;border-radius:6px;font-size:12px;overflow:auto;max-height:500px"></pre>
+  </section>
+</div>
+
+<script>
+let DATA = null;
+const CONDS = ["골든10분", "굿모닝", "세력감지"];
+
+async function load() {
+  DATA = await fetch('data/private_sim/variants_v3.json').then(r => r.json());
+  render();
+}
+
+function fmt(v, d=2) { return (v===null||v===undefined) ? '-' : v.toFixed(d); }
+
+function render() {
+  const m = DATA.meta;
+  document.getElementById('meta-line').textContent =
+    `${m.n_days}거래일 · ${m.optimization} · T1 filter 항상 활성 · 생성 ${new Date(m.generated_at).toLocaleString('ko-KR')}`;
+
+  renderCore();
+  renderCurve();
+  renderCondPerf();
+  renderParamChanges();
+  renderHistory();
+  renderJson();
+}
+
+function renderCore() {
+  const b = DATA.baseline.metrics;
+  const o = DATA.optimized.metrics;
+  const kpis = [
+    { label: 'T1 baseline PnL', value: fmt(b.total_pnl_pct)+'%', cls: b.total_pnl_pct >= 0 ? 'pos' : 'neg' },
+    { label: '최적화 PnL',       value: fmt(o.total_pnl_pct)+'%', cls: 'pos', delta: '+'+fmt(o.total_pnl_pct - b.total_pnl_pct)+'%p' },
+    { label: 'MDD',              value: fmt(o.mdd_pct)+'%',       cls: 'neg', delta: (o.mdd_pct - b.mdd_pct).toFixed(2)+'%p' },
+    { label: '승률',              value: fmt(o.winrate*100)+'%',   cls: '',    delta: '+'+fmt((o.winrate - b.winrate)*100)+'pp' },
+    { label: '거래 수',          value: o.n_trades,                cls: '',    delta: (o.n_trades - b.n_trades)+'건' },
+    { label: '최대 연속손실',    value: o.max_consec_loss,         cls: '',    delta: (o.max_consec_loss - b.max_consec_loss)+'회' },
+  ];
+  document.getElementById('core-kpi').innerHTML = kpis.map(k => `
+    <div class="big-kpi">
+      <div class="label">${k.label}</div>
+      <div class="value ${k.cls}">${k.value}</div>
+      ${k.delta ? `<div class="delta">${k.delta}</div>` : ''}
+    </div>
+  `).join('');
+
+  const r = DATA.robustness;
+  document.getElementById('robustness-table').innerHTML = `
+    <thead><tr><th>기간</th><th>T1 Baseline</th><th>Optimized</th><th>Δ</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Train (Feb ~ Mar)</td>
+        <td>${fmt(r.train_feb_mar.baseline.total_pnl_pct)}%</td>
+        <td class="pos">${fmt(r.train_feb_mar.optimized.total_pnl_pct)}%</td>
+        <td class="pos">+${fmt(r.train_feb_mar.optimized.total_pnl_pct - r.train_feb_mar.baseline.total_pnl_pct)}%p</td>
+      </tr>
+      <tr>
+        <td>Test (Apr, out-of-sample)</td>
+        <td>${fmt(r.test_apr.baseline.total_pnl_pct)}%</td>
+        <td class="pos">${fmt(r.test_apr.optimized.total_pnl_pct)}%</td>
+        <td class="pos">+${fmt(r.test_apr.optimized.total_pnl_pct - r.test_apr.baseline.total_pnl_pct)}%p</td>
+      </tr>
+    </tbody>
+  `;
+}
+
+function renderCurve() {
+  const bEc = DATA.baseline.equity_curve;
+  const oEc = DATA.optimized.equity_curve;
+  // align by union dates, carry forward
+  const allDates = Array.from(new Set([...bEc.map(r=>r.date), ...oEc.map(r=>r.date)])).sort();
+  const bMap = Object.fromEntries(bEc.map(r=>[r.date, r.cum_pnl]));
+  const oMap = Object.fromEntries(oEc.map(r=>[r.date, r.cum_pnl]));
+  let lb = 0, lo = 0;
+  const bArr = [], oArr = [];
+  allDates.forEach(d => {
+    if (d in bMap) lb = bMap[d];
+    if (d in oMap) lo = oMap[d];
+    bArr.push(lb); oArr.push(lo);
+  });
+  new Chart(document.getElementById('curveChart'), {
+    type: 'line',
+    data: {
+      labels: allDates,
+      datasets: [
+        { label: 'T1 Baseline',            data: bArr, borderColor: '#8a8f98', fill: false, tension: 0.1 },
+        { label: 'Optimized (v3)',         data: oArr, borderColor: '#4fd1c5', fill: false, tension: 0.1, borderWidth: 2.5 },
+      ]
+    },
+    options: { responsive: true, plugins: { tooltip: { mode: 'index', intersect: false } } }
+  });
+}
+
+function renderCondPerf() {
+  const bb = DATA.baseline.by_condition;
+  const oo = DATA.optimized.by_condition;
+  let html = `<thead><tr><th>조건식</th><th>거래</th><th>T1 PnL</th><th>Opt PnL</th><th>Δ PnL</th><th>T1 MDD</th><th>Opt MDD</th><th>Opt 승률</th></tr></thead><tbody>`;
+  CONDS.forEach(c => {
+    const b = bb[c], o = oo[c];
+    html += `<tr>
+      <td><b>${c}</b></td>
+      <td>${b.n_trades} → ${o.n_trades}</td>
+      <td>${fmt(b.total_pnl_pct)}%</td>
+      <td class="pos">${fmt(o.total_pnl_pct)}%</td>
+      <td class="${o.total_pnl_pct-b.total_pnl_pct>=0?'pos':'neg'}">${(o.total_pnl_pct-b.total_pnl_pct>=0?'+':'')}${fmt(o.total_pnl_pct-b.total_pnl_pct)}%p</td>
+      <td>${fmt(b.mdd_pct)}%</td>
+      <td>${fmt(o.mdd_pct)}%</td>
+      <td>${fmt(o.winrate*100)}%</td>
+    </tr>`;
+  });
+  html += '</tbody>';
+  document.getElementById('cond-perf-table').innerHTML = html;
+}
+
+function renderParamChanges() {
+  const bp = DATA.baseline.params;
+  const op = DATA.optimized.params;
+  const rows = [
+    ['stop_loss.first_only',                '손절선',           x => fmt(x*100)+'%'],
+    ['take_profit.first_only.0.profit',     'TP1 목표',         x => fmt(x*100)+'%'],
+    ['take_profit.first_only.0.sell_ratio', 'TP1 매도비율',     x => fmt(x*100,0)+'%'],
+    ['take_profit.first_only.1.profit',     'TP2 목표',         x => fmt(x*100)+'%'],
+    ['take_profit.first_only.1.sell_ratio', 'TP2 매도비율',     x => fmt(x*100,0)+'%'],
+    ['take_profit.first_only.2.profit',     'TP3 목표',         x => fmt(x*100)+'%'],
+    ['take_profit.first_only.2.sell_ratio', 'TP3 매도비율',     x => fmt(x*100,0)+'%'],
+    ['take_profit.first_only.3.profit',     'TP4 목표',         x => fmt(x*100)+'%'],
+    ['take_profit.first_only.3.sell_ratio', 'TP4 매도비율',     x => fmt(x*100,0)+'%'],
+    ['take_profit.trailing.trigger_profit', '트레일링 트리거',  x => fmt(x*100)+'%'],
+    ['take_profit.trailing.trailing_drop',  '트레일링 드롭',    x => fmt(x*100)+'%'],
+    ['profit_floor.trigger',                'profit_floor 트리거', x => fmt(x*100)+'%'],
+    ['profit_floor.floor',                  'profit_floor 플로어', x => fmt(x*100)+'%'],
+  ];
+
+  const getPath = (obj, path) => {
+    const parts = path.split('.');
+    let cur = obj;
+    for (const p of parts) {
+      if (/^\d+$/.test(p)) cur = cur[parseInt(p)];
+      else cur = cur[p];
+      if (cur === undefined) return undefined;
+    }
+    return cur;
+  };
+
+  const bb = DATA.baseline.by_condition;
+  const oo = DATA.optimized.by_condition;
+
+  let html = '';
+  CONDS.forEach(cond => {
+    const bCfg = bp[cond];
+    const oCfg = op[cond];
+    const bMet = bb[cond];
+    const oMet = oo[cond];
+    const delta = oMet.total_pnl_pct - bMet.total_pnl_pct;
+
+    html += `
+      <div class="param-change">
+        <div class="param-change-header">
+          <span class="param-change-cond">${cond}</span>
+          <span class="param-change-delta">
+            ${fmt(bMet.total_pnl_pct)}% → <b class="pos">${fmt(oMet.total_pnl_pct)}%</b>
+            (<b class="pos">+${fmt(delta)}%p</b>, n=${oMet.n_trades})
+          </span>
+        </div>
+        <div class="param-change-row header">
+          <div>파라미터</div>
+          <div>기존 값</div>
+          <div>최적화 값</div>
+        </div>
+    `;
+    rows.forEach(([path, label, fmtFn]) => {
+      const oldV = getPath(bCfg, path);
+      const newV = getPath(oCfg, path);
+      if (oldV === undefined || newV === undefined) return;
+      const changed = Math.abs(oldV - newV) > 1e-9;
+      html += `
+        <div class="param-change-row">
+          <div class="param-name">${label}</div>
+          <div class="param-old">${fmtFn(oldV)}</div>
+          <div class="${changed ? 'param-new' : 'unchanged'}">${changed ? fmtFn(newV) + ' ⬅' : '(변경 없음)'}</div>
+        </div>
+      `;
+    });
+    html += '</div>';
+  });
+  document.getElementById('param-changes').innerHTML = html;
+}
+
+function renderHistory() {
+  const pc = DATA.per_condition;
+  let html = '';
+  CONDS.forEach(cond => {
+    const hist = pc[cond].history;
+    html += `<h3 style="margin-top:20px">${cond}</h3><table><thead><tr><th>#</th><th>단계</th><th>파라미터</th><th>기존 → 신규</th><th>Score</th><th>PnL</th><th>MDD</th></tr></thead><tbody>`;
+    hist.forEach((h, i) => {
+      if (i === 0) {
+        html += `<tr><td>0</td><td>init</td><td>-</td><td>-</td><td>${fmt(h.score)}</td><td>${fmt(h.metrics.total_pnl_pct)}%</td><td>${fmt(h.metrics.mdd_pct)}%</td></tr>`;
+      } else {
+        html += `<tr><td>${i}</td><td>pass${h.pass}</td><td><code>${h.param}</code></td><td class="param-old">${h.old} → <span class="pos">${h.new}</span></td><td>${fmt(h.score)}</td><td class="pos">${fmt(h.metrics.total_pnl_pct)}%</td><td>${fmt(h.metrics.mdd_pct)}%</td></tr>`;
+      }
+    });
+    html += '</tbody></table>';
+  });
+  document.getElementById('history-list').innerHTML = html;
+}
+
+function renderJson() {
+  const out = { strategies: DATA.optimized.params };
+  document.getElementById('json-output').textContent = JSON.stringify(out, null, 2);
+}
+
+load().catch(err => {
+  document.getElementById('meta-line').textContent = '데이터 로드 실패: ' + err.message;
+  console.error(err);
+});
+</script>
+</body>
+</html>

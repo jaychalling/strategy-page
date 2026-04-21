@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Private 전략 백테스트 분석 v2 (T1 baseline)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1419;
+    --panel: #1a1f2e;
+    --text: #e4e6eb;
+    --muted: #8a8f98;
+    --accent: #4fd1c5;
+    --pos: #10b981;
+    --neg: #ef4444;
+    --border: #2a2f3e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  h1, h2, h3 { margin: 0 0 12px 0; }
+  .container { max-width: 1400px; margin: 0 auto; }
+  .section { background: var(--panel); border: 1px solid var(--border);
+              border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+  .kpi { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+  .kpi .label { color: var(--muted); font-size: 12px; }
+  .kpi .value { font-size: 24px; font-weight: 600; margin-top: 4px; }
+  .kpi .delta { font-size: 13px; margin-top: 2px; }
+  .delta.pos, .pos { color: var(--pos); }
+  .delta.neg, .neg { color: var(--neg); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .variant-card { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+  .variant-card.accepted { border-color: var(--pos); }
+  .variant-card.rejected { opacity: 0.6; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px;
+           background: var(--border); color: var(--muted); }
+  .badge.parameter { background: #3b4b6b; color: #9cb3d9; }
+  .badge.filter    { background: #4b3b6b; color: #b39cd9; }
+  .badge.structure { background: #6b4b3b; color: #d9b39c; }
+  .heatmap { display: grid; gap: 2px; margin-top: 12px; }
+  .heatmap-cell { padding: 8px; text-align: center; font-size: 11px; border-radius: 2px; }
+  .variant-detail-list { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+  .variant-detail { background: var(--bg); border: 1px solid var(--border); border-left: 3px solid var(--pos); border-radius: 6px; padding: 16px; }
+  .variant-detail-header { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .variant-detail-id { font-weight: 700; color: var(--accent); font-size: 14px; background: rgba(79, 209, 197, 0.1); padding: 2px 8px; border-radius: 4px; }
+  .variant-detail-delta { margin-left: auto; font-size: 12px; }
+  .variant-detail-row { display: grid; grid-template-columns: 90px 1fr; gap: 12px; padding: 6px 0; font-size: 13px; line-height: 1.6; }
+  .variant-detail-row.caution { color: #f0b050; }
+  .variant-detail-row.evidence { border-top: 1px dashed var(--border); margin-top: 6px; padding-top: 10px; }
+  .variant-detail-label { color: var(--muted); font-size: 11px; font-weight: 500; padding-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .evidence-list { background: rgba(79, 209, 197, 0.04); border-left: 2px solid var(--accent); border-radius: 3px; padding: 10px 14px; font-size: 12px; line-height: 1.75; }
+  .evidence-line { margin-bottom: 3px; font-family: "SF Mono", "Consolas", "Monaco", "Courier New", monospace; color: #c8cdd4; }
+  .evidence-line:last-child { margin-bottom: 0; }
+  .evidence-line b { color: var(--text); background: rgba(79, 209, 197, 0.15); padding: 1px 4px; border-radius: 2px; font-weight: 600; }
+  .v2-banner { background: linear-gradient(135deg, rgba(79, 209, 197, 0.15), rgba(79, 209, 197, 0.05)); border: 2px solid var(--accent); border-radius: 10px; padding: 18px 22px; margin-bottom: 24px; }
+  .v2-banner-title { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+  .v2-banner-body { font-size: 13px; line-height: 1.7; color: var(--text); }
+  .v2-warning { background: rgba(240, 176, 80, 0.08); border: 1px solid #f0b050; border-radius: 6px; padding: 14px 18px; margin: 12px 0; }
+  .v2-warning-title { color: #f0b050; font-weight: 600; margin-bottom: 6px; }
+  .recommendation-highlight { background: linear-gradient(135deg, rgba(79, 209, 197, 0.12), rgba(16, 185, 129, 0.08)); border: 2px solid var(--accent); border-radius: 10px; padding: 20px 24px; margin-bottom: 16px; }
+  .rec-title { font-size: 18px; font-weight: 700; color: var(--accent); margin-bottom: 12px; }
+  .rec-body p { margin: 8px 0; line-height: 1.6; }
+  .rec-body table { background: rgba(0, 0, 0, 0.2); border-radius: 6px; overflow: hidden; }
+  .rec-body table th { background: rgba(79, 209, 197, 0.1); color: var(--accent); }
+  @media (max-width: 640px) {
+    .variant-detail-header { font-size: 13px; }
+    .variant-detail-delta { margin-left: 0; width: 100%; }
+    .variant-detail-row { grid-template-columns: 1fr; gap: 2px; }
+  }
+  button { background: var(--border); color: var(--text); border: 1px solid var(--muted);
+            padding: 6px 12px; border-radius: 4px; margin-right: 6px; cursor: pointer; }
+  button:hover { background: var(--muted); color: var(--bg); }
+  canvas { max-width: 100%; }
+  @media (max-width: 768px) {
+    .card-grid { grid-template-columns: 1fr; }
+    table { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Private 전략 백테스트 분석 <span style="color:var(--accent);font-size:0.6em">v2</span></h1>
+  <p id="meta-line" style="color: var(--muted)">로딩 중...</p>
+
+  <div class="v2-banner">
+    <div class="v2-banner-title">📊 v2: T1 (조건식별 time_window 최적화) 을 새로운 Baseline 으로 재분석</div>
+    <div class="v2-banner-body">
+      v1 에서 가장 강력했던 <b>T1</b> (골든10분 09:15~10:00 · 굿모닝 09:10~11:30 · 세력감지 10:30~12:00) 을
+      <b>새로운 baseline</b> 으로 고정하고, 그 위에서 <b>추가 최적화 여지가 있는지</b> 재분석.
+      v1 의 다른 15개 variants (T1 제외) 를 T1 위에서 다시 돌려 accepted/rejected 재판정.
+      <br>⇢ 결과: 대부분 variant 가 효과 0 또는 음수. T1 이 이미 개선 여지 대부분을 흡수했음.
+      <br><br>
+      <b>v1 보고서:</b> <a href="private-analysis.html" style="color:var(--accent)">private-analysis.html</a>
+    </div>
+  </div>
+
+  <section class="section" id="summary">
+    <h2>요약</h2>
+    <div class="summary-grid" id="summary-grid"></div>
+  </section>
+
+  <section class="section" id="baseline-diagnostic">
+    <h2>베이스라인 진단</h2>
+    <div id="baseline-body">로딩 중...</div>
+  </section>
+
+  <section class="section" id="variant-catalog">
+    <h2>가설 카탈로그</h2>
+    <div style="margin-bottom: 12px">
+      <button data-filter="all">전체</button>
+      <button data-filter="parameter">파라미터</button>
+      <button data-filter="filter">필터</button>
+      <button data-filter="structure">구조</button>
+    </div>
+    <div class="card-grid" id="variant-cards">로딩 중...</div>
+  </section>
+
+  <section class="section" id="final">
+    <h2>최종 추천안</h2>
+    <div id="final-body">로딩 중...</div>
+  </section>
+
+  <section class="section" id="robustness">
+    <h2>견고성 체크</h2>
+    <div id="robustness-body">로딩 중...</div>
+  </section>
+</div>
+
+<script>
+const STATE = { baseline: null, variants: null };
+
+async function loadData() {
+  const [baseline, variants] = await Promise.all([
+    fetch('data/private_sim/baseline_v2.json').then(r => r.json()),
+    fetch('data/private_sim/variants_v2.json').then(r => r.json()),
+  ]);
+  STATE.baseline = baseline;
+  STATE.variants = variants;
+  render();
+}
+
+function fmt(v, digits = 2) {
+  if (v === null || v === undefined) return '-';
+  return v.toFixed(digits);
+}
+
+function render() {
+  renderMeta();
+  renderSummary();
+  renderBaselineDiagnostic();
+  renderVariantCatalog();
+  renderFinal();
+  renderRobustness();
+}
+
+function renderMeta() {
+  const m = STATE.baseline.meta;
+  document.getElementById('meta-line').textContent =
+    `${m.start_date} ~ ${m.end_date} · ${m.n_days}거래일 · 신호 ${m.n_signals_dedup}건 · ${new Date(m.generated_at).toLocaleString('ko-KR')} 생성`;
+}
+
+function renderSummary() {
+  const b = STATE.baseline.overall;
+  const f = STATE.variants.final ? STATE.variants.final.result : null;
+  const kpis = [
+    { label: '거래 수', base: b.n_trades, final: f?.n_trades, fmt: v => v },
+    { label: '승률', base: b.winrate * 100, final: f ? f.winrate * 100 : null, suffix: '%' },
+    { label: '기대값', base: b.expectancy, final: f?.expectancy, suffix: '%' },
+    { label: '총 PnL', base: b.total_pnl_pct, final: f?.total_pnl_pct, suffix: '%' },
+    { label: 'MDD', base: b.mdd_pct, final: f?.mdd_pct, suffix: '%' },
+    { label: '최대 연속손실', base: b.max_consec_loss, final: f?.max_consec_loss, fmt: v => v },
+  ];
+  const grid = document.getElementById('summary-grid');
+  grid.innerHTML = kpis.map(k => {
+    const delta = (k.final !== null && k.final !== undefined) ? (k.final - k.base) : null;
+    const deltaCls = delta === null ? '' : (delta > 0 ? 'pos' : 'neg');
+    const deltaStr = delta === null ? '' :
+      `<div class="delta ${deltaCls}">${delta > 0 ? '+' : ''}${fmt(delta)}${k.suffix || ''}</div>`;
+    const baseStr = k.fmt ? k.fmt(k.base) : `${fmt(k.base)}${k.suffix || ''}`;
+    return `
+      <div class="kpi">
+        <div class="label">${k.label}</div>
+        <div class="value">${baseStr}</div>
+        ${deltaStr}
+      </div>
+    `;
+  }).join('');
+}
+
+function renderBaselineDiagnostic() {
+  const b = STATE.baseline;
+  const body = document.getElementById('baseline-body');
+  body.innerHTML = `
+    <h3>일별 Equity Curve</h3>
+    <canvas id="equityChart" height="80"></canvas>
+
+    <h3 style="margin-top:24px">조건별 분해</h3>
+    <table id="conditionTable"><thead><tr>
+      <th>조건</th><th>거래</th><th>승률</th><th>기대값</th><th>평균수익</th><th>평균손실</th><th>총PnL</th>
+    </tr></thead><tbody></tbody></table>
+
+    <h3 style="margin-top:24px">진입 시간대별 기대값</h3>
+    <canvas id="entryTimeChart" height="80"></canvas>
+
+    <h3 style="margin-top:24px">딥 하락폭 분해</h3>
+    <canvas id="dipDepthChart" height="80"></canvas>
+
+    <h3 style="margin-top:24px">Exit 유형</h3>
+    <table id="exitTable"><thead><tr>
+      <th>유형</th><th>거래</th><th>승률</th><th>기대값</th>
+    </tr></thead><tbody></tbody></table>
+
+    <h3 style="margin-top:24px">교차 히트맵: 조건 × 진입시간대</h3>
+    <div id="heatmap"></div>
+  `;
+
+  // Equity curve
+  const ec = b.equity_curve;
+  new Chart(document.getElementById('equityChart'), {
+    type: 'line',
+    data: {
+      labels: ec.map(r => r.date),
+      datasets: [{
+        label: '누적 PnL (%)',
+        data: ec.map(r => r.cum_pnl),
+        borderColor: '#4fd1c5',
+        backgroundColor: 'rgba(79, 209, 197, 0.1)',
+        tension: 0.2,
+        fill: true,
+      }]
+    },
+    options: { plugins: { legend: { display: false } }, responsive: true }
+  });
+
+  // Condition table
+  const condBody = document.querySelector('#conditionTable tbody');
+  condBody.innerHTML = Object.entries(b.buckets.condition).map(([k, v]) => `
+    <tr>
+      <td>${k}</td>
+      <td>${v.n_trades}</td>
+      <td>${fmt(v.winrate * 100)}%</td>
+      <td>${fmt(v.expectancy)}%</td>
+      <td>${fmt(v.avg_win)}%</td>
+      <td>${fmt(v.avg_loss)}%</td>
+      <td class="${v.total_pnl_pct >= 0 ? 'pos' : 'neg'}">${fmt(v.total_pnl_pct)}%</td>
+    </tr>
+  `).join('');
+
+  // Entry time bar
+  const et = b.buckets.entry_time;
+  const etLabels = Object.keys(et);
+  new Chart(document.getElementById('entryTimeChart'), {
+    type: 'bar',
+    data: {
+      labels: etLabels,
+      datasets: [{
+        label: '기대값 (%)',
+        data: etLabels.map(k => et[k].expectancy),
+        backgroundColor: etLabels.map(k => et[k].expectancy >= 0 ? '#10b981' : '#ef4444'),
+      }]
+    },
+    options: { plugins: { legend: { display: false } } }
+  });
+
+  // Dip depth bar
+  const dd = b.buckets.dip_depth;
+  const ddLabels = Object.keys(dd);
+  new Chart(document.getElementById('dipDepthChart'), {
+    type: 'bar',
+    data: {
+      labels: ddLabels,
+      datasets: [{
+        label: '총 PnL (%)',
+        data: ddLabels.map(k => dd[k].total_pnl_pct),
+        backgroundColor: ddLabels.map(k => dd[k].total_pnl_pct >= 0 ? '#10b981' : '#ef4444'),
+      }]
+    }
+  });
+
+  // Exit table
+  const exitBody = document.querySelector('#exitTable tbody');
+  exitBody.innerHTML = Object.entries(b.buckets.exit_type).map(([k, v]) => `
+    <tr>
+      <td>${k}</td>
+      <td>${v.n_trades}</td>
+      <td>${fmt(v.winrate * 100)}%</td>
+      <td class="${v.expectancy >= 0 ? 'pos' : 'neg'}">${fmt(v.expectancy)}%</td>
+    </tr>
+  `).join('');
+
+  // Heatmap
+  renderHeatmap('heatmap', b.cross.condition_x_entry_time);
+}
+
+function renderHeatmap(containerId, crossData) {
+  const { rows, cols, cells } = crossData;
+  const el = document.getElementById(containerId);
+  // 최대 절대값으로 정규화
+  let maxAbs = 0.01;
+  cells.forEach(row => row.forEach(c => {
+    if (Math.abs(c.expectancy) > maxAbs) maxAbs = Math.abs(c.expectancy);
+  }));
+
+  const colWidths = `150px repeat(${cols.length}, 1fr)`;
+  let html = `<div class="heatmap" style="grid-template-columns: ${colWidths}">`;
+  html += `<div></div>`;
+  cols.forEach(c => html += `<div style="text-align:center;font-size:11px;color:var(--muted)">${c}</div>`);
+  rows.forEach((r, ri) => {
+    html += `<div style="padding:8px;font-size:12px">${r}</div>`;
+    cells[ri].forEach(cell => {
+      const ratio = cell.expectancy / maxAbs;
+      const color = ratio >= 0
+        ? `rgba(16, 185, 129, ${Math.min(1, Math.abs(ratio))})`
+        : `rgba(239, 68, 68, ${Math.min(1, Math.abs(ratio))})`;
+      html += `<div class="heatmap-cell" style="background:${color}" title="${cell.n_trades}건">
+                 ${cell.n_trades > 0 ? fmt(cell.expectancy, 2) + '%' : '-'}
+               </div>`;
+    });
+  });
+  html += `</div>`;
+  el.innerHTML = html;
+}
+
+const VARIANT_EXPLANATIONS = {
+  "P2": {
+    change: "min_rise_from_open_pct 5% → 8% (시가대비 상승률 하한 강화)",
+    why: "T1 baseline 위에서 유일하게 채택된 variant. 시가대비 상승률이 5~8% 인 '약한 상승' 종목을 걸러내면 남는 종목의 품질이 올라감.",
+    real: "신호 도착 시점에 시가대비 8% 이상 상승 중인 종목만 수용. 5~8% 구간 종목은 reject.",
+    caution: "⚠️ <b>매우 심각한 overfit 신호 발견</b>: Train(Feb-Mar)에서는 +10.90%p 크게 개선되지만 <b>Test(Apr)에서는 -7.59%p 악화</b>. 방향이 정반대. 실전 미사용 강력 권장.",
+    evidence: [
+      "T1 baseline: +36.17% / MDD -14.13% / 승률 62.2% / n=45",
+      "T1 + P2:     +39.49% / MDD -6.99%  / 승률 66.7% / n=36 (9건 감소)",
+      "",
+      "━━━ Robustness (Train/Test 분리) ━━━",
+      "• Train(Feb-Mar): T1 +19.53% → T1+P2 <b>+30.43%</b> (+10.90%p 🟢)",
+      "• Test(Apr):     T1 +16.64% → T1+P2 <b>+9.05%</b> (<b class='neg'>-7.59%p 🔴</b>)",
+      "",
+      "━━━ 해석 ━━━",
+      "Apr 4거래일 기간에 <b>5~8% 상승 구간에서 수익을 낸 종목</b>이 있었고, 이를 P2 로 차단해서 그 수익을 놓침.",
+      "즉 P2 의 기준(8% 이상만)이 Feb-Mar 에 맞춰진 cut-off 라 4월 장세와 다름.",
+      "결론: <b>실전 반영 금지</b>. Feb-Mar 샘플 38일에 과적합된 전형적 케이스."
+    ]
+  },
+  "_zero_effect_explanation": {
+    note: "F6 / S6 / S7 는 T1 baseline 위에서 Δ=0 — T1 이 이미 효과 흡수"
+  },
+  "P1": {
+    change: "신호 수신 cutoff 시각 12:00 → 11:00",
+    why: "11~12시 구간에 잡히는 신호는 이미 장초반 모멘텀이 소진된 후라 진입 후 상승 여력이 낮음. 11시 이후 신호를 차단하면 평균 거래 품질이 올라가고 슬롯을 헛되이 소모하는 일이 줄어듦.",
+    real: "오전 11시 이후 도착하는 모든 조건진입 신호는 무시됨. 슬롯은 11시까지만 활성.",
+    caution: "세력감지는 11:00+ 구간에서 오히려 좋음(3건 +5.35%). 하지만 S1a와 함께 사용하므로 무관.",
+    evidence: [
+      "베이스라인에서 11:00 이후 체결된 거래 <b>13건</b>을 분해:",
+      "<b>굿모닝 8건: 합 -7.83% · 승률 38% · 평균 -0.98%/거래</b> — 명백한 손실 구간",
+      "<b>골든10분 2건: 합 -3.92% · 승률 50% · 평균 -1.96%/거래</b> — 샘플 적지만 음수",
+      "세력감지 3건: 합 +5.35% · 승률 100% · 평균 +1.78%/거래 — 이 세 건은 포기하는 비용",
+      "Net: -7.83 -3.92 +5.35 = <b>-6.40%</b> 제거 → 베이스라인 대비 +6.40% 개선",
+      "결론: 11~12시 굿모닝/골든10분은 확실히 나쁜 구간이라 잘라도 손해 없음. 세력감지 손실은 S1a가 따로 전부 차단하므로 중복 비용 아님."
+    ]
+  },
+  "P3b": {
+    change: "손절선 -2.9% → -2.5% (전 조건 공통)",
+    why: "기존 -2.9%는 손실이 너무 깊어 다음 거래로 회복하기 힘들었음. 0.4%p 앞당겨 끊으면 개별 손실 크기가 줄고, 연속손실 누적 타격이 크게 감소. R3 견고성 체크에서 5연속 손실 사라지고 2연속 6→1회로 급감.",
+    real: "매수가 대비 -2.5% 터치 시 즉시 전량 시장가 매도.",
+    caution: "⚠️ <b>진짜 트레이드오프 존재</b>: 2건의 반등(+12.56% 수익) 을 포기. 아래 숫자 참고.",
+    evidence: [
+      "베이스라인 69건 중 <b>16건의 exit가 변경됨</b>:",
+      "• <b>기존 손절 거래 13건</b>: -2.9% → -2.5%로 더 이른 시점 손절. 건당 ~0.4%p 덜 손실 → 총 ~5.2% 손실 절약",
+      "• <b>새로 손절 발동 3건</b>: 원래 -2.5~-2.9% 사이에서 버티다 회복했던 거래. 세부:",
+      "&nbsp;&nbsp;&nbsp;- 반등해서 수익으로 끝났을 것 <b>2건</b>: <b>포기한 수익 +12.56%</b>",
+      "&nbsp;&nbsp;&nbsp;- 결국 더 큰 손실로 갔을 것 1건: 덜 손실로 절약",
+      "Net: 13건 손실축소(+7.34% 순효과) - 2건 반등포기(-12.56%) + 1건 절약 = <b>+7.34%</b>",
+      "결론: <b>확실히 놓치는 게 있음</b> (반등 2건, 12.56%). 하지만 13건의 손실 축소 + 연속손실 붕괴 방지가 더 큼. '최악의 시나리오'를 줄여 MDD가 +5.83%p 개선된 게 핵심."
+    ]
+  },
+  "F6": {
+    change: "개장 직후 2분(09:00~09:02) 신호 제외",
+    why: "개장 직후 2분은 호가 휘발성이 극도로 높고 동시호가 잔영·자동주문 폭증으로 가격 왜곡이 많음. 이 구간에서 잡힌 신호는 딥 체결돼도 이후 정상화 과정에서 불리한 포지션이 되기 쉬움.",
+    real: "09:00:00~09:02:59 사이에 도착하는 조건진입 신호는 무시. 슬롯은 09:03부터 활성.",
+    caution: "⚠️ <b>샘플이 극도로 작음(n=2)</b>. 운 좋게 나쁜 케이스만 걸렸을 가능성. 실적용 전 추가 데이터 누적 권장.",
+    evidence: [
+      "베이스라인에서 09:00~09:02 체결된 거래 <b>단 2건</b>:",
+      "• 굿모닝 1건: <b>-3.43% (손절)</b>",
+      "• 골든10분 1건: <b>-4.93% (손절)</b>",
+      "두 건 모두 손절, 합 <b>-8.36%</b>",
+      "슬롯 해제로 대체 체결된 거래 1건: 골든10분 -3.19% (대체도 나쁨 — 운 없음)",
+      "Net: -8.36 (제거) - (-3.19) (대체 추가됨) = <b>+5.17%</b> 개선",
+      "결론: 2건은 통계적으로 약한 근거이지만, <b>둘 다 개장 직후 ~1분봉 내 급격한 되돌림에 당한 패턴</b>으로 확인. 장초반 휘발성 가설과 일치."
+    ]
+  },
+  "S1a": {
+    change: "세력감지 조건 완전 배제 (굿모닝·골든10분만 사용)",
+    why: "세력감지 단독 승률은 79%로 높지만 <b>거래당 평균 수익이 +0.48%</b>로 매우 얇음. 그 슬롯이 비면 평균 +4.41%의 굿모닝/골든10분이 들어옴 — <b>9배 차이</b>. 1포지션 올인 구조에서는 '승률'이 아니라 '슬롯 기회비용 × 거래당 평균수익'이 핵심.",
+    real: "세력감지 조건진입 신호는 전부 무시. 슬롯은 굿모닝·골든10분에만 열림.",
+    caution: "⚠️ <b>가장 직관과 어긋나는 개선안 + 샘플 작음 (대체 n=2)</b>. 세력감지로만 잡히는 좋은 종목 14건을 전부 포기. 수동 적용 전 1~2주 페이퍼 트레이딩으로 검증 권장. 또는 '세력감지 신호가 와도 뒤에 굿모닝/골든10분 대기 중이면 양보'하는 우선순위 룰로 전환도 대안.",
+    evidence: [
+      "베이스라인 69건 vs S1a 57건 비교:",
+      "• <b>제거 14건</b> (세력감지 전부): 승률 79%, 합 +6.67%, 평균 <b>+0.48%/거래</b>",
+      "• <b>추가 2건</b> (슬롯 비워져 새로 체결):",
+      "&nbsp;&nbsp;&nbsp;- 골든10분 1건 <b>+3.74%</b> (수익)",
+      "&nbsp;&nbsp;&nbsp;- 굿모닝 1건 <b>+5.08%</b> (수익)",
+      "&nbsp;&nbsp;&nbsp;- 평균 <b>+4.41%/거래</b> (세력감지 평균의 9배)",
+      "Net: -6.67 (세력감지 포기) + 8.82 (대체) = <b>+2.15%</b>",
+      "핵심 관찰: 세력감지 14건 중 <b>12건은 단독 신호</b> — 슬롯을 양보해도 뒤에 대기하는 신호가 없었음. 단 2건만 실제 슬롯 경합 상황이었고 그게 둘 다 큰 수익으로 터짐. 결론은 <b>n=2 기반의 약한 통계</b>이지만 '얇은 승률 vs 두꺼운 수익'이라는 구조적 논리는 유효."
+    ]
+  },
+  "T1": {
+    change: "조건식별 최적 time_window 적용 — 각 조건식이 시간별로 수익 편차가 크다는 발견에 기반",
+    why: "베이스라인을 조건식 × 30분 버킷으로 쪼개보니 각 조건식마다 명확한 황금구간과 손실구간이 존재. 전체를 쓰거나 전체를 버리는 이분법(S1a)이 아니라 구간만 선별하면 훨씬 정교한 필터 가능.",
+    real: "신호 도착 시각 기준으로 조건식별 허용 윈도우 내 신호만 수용:<br>• 골든10분: <b>09:15 ~ 10:00</b><br>• 굿모닝: <b>09:10 ~ 11:30</b><br>• 세력감지: <b>10:30 ~ 12:00</b>",
+    caution: "⚠️ 버킷을 세밀화할수록 overfitting 위험 증가. Train(Feb-Mar)/Test(Apr) 분리 검증에서 둘 다 개선 확인 — 하지만 Test 개선폭(+3.99%p)이 Train(+16.17%p)보다 작음. 실전 적용 전 1~2주 페이퍼 트레이딩 필수.",
+    evidence: [
+      "━━━ 조건식 × 체결시간 분해 (베이스라인 69건) ━━━",
+      "",
+      "<b>[골든10분] 전체 17건 -6.49%</b> → 최적 09:15~10:00 만 선택 시 <b>8건 +16.21% (승률 88%)</b>",
+      "&nbsp;&nbsp;❌ 09:00~09:15: 5건 -13.59% (장초반 혼란)",
+      "&nbsp;&nbsp;✅ 09:15~09:30: 4건 +4.82% (승률 75%)",
+      "&nbsp;&nbsp;✅ 09:30~10:00: 4건 <b>+11.39% (승률 100%)</b> ← 황금",
+      "&nbsp;&nbsp;❌ 10:00+: 4건 -9.10%",
+      "",
+      "<b>[굿모닝] 전체 38건 +15.83%</b> → 09:10~11:30 만 선택 시 <b>31건 ~+22%</b>",
+      "&nbsp;&nbsp;✅ 09:10~09:15: 4건 +14.85% (승률 75%)",
+      "&nbsp;&nbsp;✅ 09:15~10:00: 11건 +4.98%",
+      "&nbsp;&nbsp;❌ 10:00~10:30: 6건 -6.56%",
+      "&nbsp;&nbsp;✅ 10:30~11:00: 7건 +8.01%",
+      "&nbsp;&nbsp;✅ 11:00~11:30: 4건 +0.02% (중립, 유지)",
+      "&nbsp;&nbsp;❌ 11:30+: 4건 -7.85% (컷)",
+      "",
+      "<b>[세력감지] 전체 14건 +6.67%</b> → 10:30~12:00 만 선택 시 <b>5건 +9.10% (승률 100%)</b> 🔥",
+      "&nbsp;&nbsp;✅ 09:15~10:00: 4건 +5.51% (아까운 구간, 하지만 차단)",
+      "&nbsp;&nbsp;❌ 10:00~10:30: 5건 <b>-7.94% (손실 집중 구간 — 제거 핵심)</b>",
+      "&nbsp;&nbsp;✅ 10:30~11:00: 2건 +3.75% (승률 100%)",
+      "&nbsp;&nbsp;✅ 11:00~11:30: 2건 +4.17% (승률 100%)",
+      "&nbsp;&nbsp;✅ 11:30~12:00: 1건 +1.18% (승률 100%)",
+      "",
+      "━━━ T1 단독 시뮬 결과 (다른 개선안 없이) ━━━",
+      "• 베이스라인: 69건 +16.01% / MDD -28.75% / 승률 56.5%",
+      "• <b>T1 단독: 45건 +36.17% / MDD -14.13% / 승률 62.2%</b>",
+      "&nbsp;&nbsp;→ 골든10분 <b>6건 +17.01%</b> (베이스 17건 -6.49% → 완전 반전)",
+      "&nbsp;&nbsp;→ 굿모닝 31건 +15.73% (비슷한 수준)",
+      "&nbsp;&nbsp;→ 세력감지 8건 +3.44% (14건 +6.67% → 감소지만 유지)",
+      "",
+      "━━━ T1 단독 robustness ━━━",
+      "• Train(Feb-Mar): 베이스 +3.36% → T1 <b>+19.53%</b> (+16.17%p)",
+      "• Test(Apr):     베이스 +12.65% → T1 <b>+16.64%</b> (+3.99%p)",
+      "• Test 개선폭이 작지만 방향은 일치 — 과적합 완전히 배제할 수는 없음",
+      "",
+      "결론: <b>T1 단독이 가장 강력한 단일 개선안</b>. 세력감지를 완전 포기(S1a)하는 대신 10:30~12:00만 살리는 게 훨씬 효율적. 10:00~10:30 손실 집중 구간(-7.94%)만 제거하면 된다는 발견."
+    ]
+  },
+  "S6": {
+    change: "일일 손실 한도 -5% circuit breaker 추가",
+    why: "손실 나는 날은 연속으로 맞는 경향(장 자체가 약하거나 세력 페이크가 많은 세션). 당일 -5% 도달 시 신호 차단하면 '나쁜 날 밑 빠진 독' 현상을 끊고 심리적 안정도 얻음.",
+    real: "당일 누적 실현 PnL이 -5% 이하로 내려가면 그날 새로 오는 조건진입 신호 전부 차단. 다음날 장 시작 시 리셋.",
+    caution: "⚠️ <b>샘플 n=3일, 반등/보호 각각 1회</b>. 통계적으로는 약한 증거지만 MDD 방어 관점에서 가치 있음. 특히 38일 기간에 치명적 하락일이 적게 포함된 건 '운이 좋은 샘플'일 수 있으므로 실전에서 더 큰 효과 기대.",
+    evidence: [
+      "-5% 터치 후 포기된 거래 <b>3건</b> (2일):",
+      "• <b>2026-03-03</b>: 2건 합 <b>+1.08%</b> — <b>반등 놓친 손해 사례</b> (circuit breaker 작동해서 수익 포기)",
+      "• <b>2026-03-18</b>: 1건 <b>-3.31%</b> — <b>추가 손실 방지한 사례</b> (circuit breaker 작동해서 손실 회피)",
+      "Net: -1.08 (포기한 반등) + 3.31 (막은 손실) = <b>+2.23%</b>",
+      "결론: 반등 1일 vs 보호 1일 — 평균적으로 방어가 이김. MDD 개선 효과가 더 중요: 최악 5거래일 평균 -8.07% → -5.06%로 완화 (연속손실 방지 측면)."
+    ]
+  }
+};
+
+function renderVariantCatalog() {
+  const variants = STATE.variants.variants;
+  const container = document.getElementById('variant-cards');
+  let currentFilter = 'all';
+
+  function draw() {
+    const filtered = currentFilter === 'all'
+      ? variants
+      : variants.filter(v => v.category === currentFilter);
+    const sorted = [...filtered].sort(
+      (a, b) => b.result.delta_pnl - a.result.delta_pnl
+    );
+    container.innerHTML = sorted.map(v => {
+      const r = v.result;
+      return `
+        <div class="variant-card ${v.status}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <strong>${v.id}: ${v.title}</strong>
+            <span class="badge ${v.category}">${v.category}</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px">${v.description}</div>
+          <div style="font-size:13px">
+            <div>Δ PnL: <span class="${r.delta_pnl >= 0 ? 'pos' : 'neg'}">${r.delta_pnl >= 0 ? '+' : ''}${fmt(r.delta_pnl)}%</span></div>
+            <div>Δ 승률: <span class="${r.delta_winrate >= 0 ? 'pos' : 'neg'}">${r.delta_winrate >= 0 ? '+' : ''}${fmt(r.delta_winrate * 100)}%p</span></div>
+            <div>Δ MDD: <span class="${r.delta_mdd >= 0 ? 'pos' : 'neg'}">${r.delta_mdd >= 0 ? '+' : ''}${fmt(r.delta_mdd)}%</span></div>
+            <div style="margin-top:8px">거래 ${r.n_trades} · 상태 <strong>${v.status === 'accepted' ? '✅ 채택' : '❌ 기각'}</strong></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.querySelectorAll('[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentFilter = btn.dataset.filter;
+      draw();
+    });
+  });
+
+  draw();
+}
+
+function renderFinal() {
+  const body = document.getElementById('final-body');
+  const f = STATE.variants.final;
+  if (!f) {
+    body.innerHTML = '<p style="color:var(--muted)">채택된 variant 없음 — Final 조합 미생성</p>';
+    return;
+  }
+
+  // 채택된 variants 상세
+  const acceptedVariants = STATE.variants.variants.filter(v => v.status === 'accepted');
+  const acceptedDetail = acceptedVariants.map(v => {
+    const exp = VARIANT_EXPLANATIONS[v.id] || {};
+    const r = v.result;
+    return `
+      <div class="variant-detail">
+        <div class="variant-detail-header">
+          <span class="variant-detail-id">${v.id}</span>
+          <strong>${v.title}</strong>
+          <span class="badge ${v.category}">${v.category}</span>
+          <span class="variant-detail-delta">
+            <span class="${r.delta_pnl >= 0 ? 'pos' : 'neg'}">ΔPnL ${r.delta_pnl >= 0 ? '+' : ''}${fmt(r.delta_pnl)}%</span> ·
+            <span class="${r.delta_mdd >= 0 ? 'pos' : 'neg'}">ΔMDD ${r.delta_mdd >= 0 ? '+' : ''}${fmt(r.delta_mdd)}%</span>
+          </span>
+        </div>
+        ${exp.change ? `<div class="variant-detail-row"><span class="variant-detail-label">변경</span><span>${exp.change}</span></div>` : ''}
+        ${exp.why ? `<div class="variant-detail-row"><span class="variant-detail-label">왜</span><span>${exp.why}</span></div>` : ''}
+        ${exp.real ? `<div class="variant-detail-row"><span class="variant-detail-label">실전 의미</span><span>${exp.real}</span></div>` : ''}
+        ${exp.caution ? `<div class="variant-detail-row caution"><span class="variant-detail-label">주의</span><span>${exp.caution}</span></div>` : ''}
+        ${exp.evidence ? `<div class="variant-detail-row evidence"><span class="variant-detail-label">데이터 근거</span><div class="evidence-list">${exp.evidence.map(line => `<div class="evidence-line">${line}</div>`).join('')}</div></div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  // v2 전용 결론 박스 — T1 이 사실상 최적임을 확인
+  const v2Conclusion = `
+    <div class="recommendation-highlight">
+      <div class="rec-title">🎯 v2 결론: T1 단독이 out-of-sample 최적</div>
+      <div class="rec-body">
+        <p>T1 baseline 위에서 15개 variants 를 재평가한 결과:</p>
+        <ul style="margin:8px 0 12px 20px;line-height:1.8">
+          <li><b>대부분 variant 가 ΔPnL = 0 또는 음수</b> — T1 이 이미 그 효과를 흡수했거나, 오히려 T1 의 장점을 훼손</li>
+          <li><b>F6 / S6 / S7: ΔPnL = 0.00%</b> — T1 의 time_window 제약이 이미 이들 효과를 자동 구현 (골든10분 09:15+ = F6 중복, 연속손실 max 2회 = S6 불필요, 최적 슬롯만 사용 = S7 무의미)</li>
+          <li><b>S1a (세력감지 제외): -3.44%</b> — T1 이 세력감지 10:30~12:00 만 허용하는데 이를 배제하면 손해 (S1a 는 잘못된 접근이었다는 것 확정)</li>
+          <li><b>P2 (min_rise 8%) 만 유일 accepted: +3.31%</b> — 하지만 <b class="neg">⚠️ Apr test 에서 -7.59%p 악화 (overfit)</b></li>
+        </ul>
+
+        <div class="v2-warning">
+          <div class="v2-warning-title">⚠️ P2 는 overfit — 실전 금지</div>
+          <div style="font-size:13px;line-height:1.7">
+            <b>Train(Feb-Mar)</b>: T1 +19.53% → T1+P2 <span class="pos">+30.43% (+10.90%p)</span><br>
+            <b>Test(Apr)</b>:     T1 +16.64% → T1+P2 <span class="neg">+9.05% (-7.59%p)</span><br>
+            방향이 Train/Test 에서 정반대. <b>Feb-Mar 특성에 과적합된 전형</b>. 실전 미사용.
+          </div>
+        </div>
+
+        <p style="margin-top:16px"><b>최종 권장:</b></p>
+        <ol style="margin:8px 0 0 20px;line-height:1.8">
+          <li><b>T1 단독 적용</b> — 추가 variant 없이 time_window 만 조정. +36.17% / MDD -14.13% 달성</li>
+          <li><b>1~2주 페이퍼 트레이딩 검증</b> — Apr +3.99%p 개선이 5월 실전에서 유지되는지 확인</li>
+          <li><b>P2 미적용</b> — Apr 에서 정반대 방향으로 악화, 실전 반영 금지</li>
+        </ol>
+      </div>
+    </div>
+  `;
+
+  // v1 에서 가져온 T1 단독 하이라이트 — v2 에서는 비활성화 (v2Conclusion 이 대체)
+  const t1Alternative = `
+    <div style="display:none">
+      <div class="recommendation-highlight">
+      <div class="rec-title">💡 대안 추천: T1 단독</div>
+      <div class="rec-body">
+        <p><b>조건식별 time_window 최적화(T1) 단 하나만 적용</b>해도 현재 Final 조합보다 강력한 결과:</p>
+        <div class="summary-grid" style="margin-top:12px">
+          <div class="kpi"><div class="label">거래</div><div class="value">45</div></div>
+          <div class="kpi"><div class="label">승률</div><div class="value">62.2%</div><div class="delta pos">+5.7%p</div></div>
+          <div class="kpi"><div class="label">총 PnL</div><div class="value pos">+36.17%</div><div class="delta pos">+20.16%p</div></div>
+          <div class="kpi"><div class="label">MDD</div><div class="value neg">-14.13%</div><div class="delta pos">+14.61%p</div></div>
+        </div>
+        <table style="margin-top:16px">
+          <thead><tr><th>조건식</th><th>베이스라인 허용</th><th>T1 제안</th><th>효과</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><b>골든10분</b></td>
+              <td>09:00 ~ 12:00 (전역 cutoff)</td>
+              <td class="pos"><b>09:15 ~ 10:00</b></td>
+              <td>17건 -6.49% → 6건 <b class="pos">+17.01%</b></td>
+            </tr>
+            <tr>
+              <td><b>굿모닝</b></td>
+              <td>09:00 ~ 12:00</td>
+              <td class="pos"><b>09:10 ~ 11:30</b></td>
+              <td>38건 +15.83% → 31건 +15.73%</td>
+            </tr>
+            <tr>
+              <td><b>세력감지</b></td>
+              <td>09:00 ~ 12:00</td>
+              <td class="pos"><b>10:30 ~ 12:00</b></td>
+              <td>14건 +6.67% → 8건 +3.44%<br><span style="color:var(--muted);font-size:11px">(승률 100% 구간 살림)</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top:14px;font-size:12px;color:var(--muted)">
+          <b>현재 Final 조합</b>: v2 hidden
+        </p>
+      </div>
+    </div>
+    </div>
+  `;
+
+  body.innerHTML = `
+    ${v2Conclusion}
+    ${t1Alternative}
+
+    <h3 style="margin-top:32px">T1 + accepted variants 조합 (${acceptedVariants.length}개 추가)</h3>
+    <p>조합: ${f.combined_ids.join(' + ')}</p>
+    <div class="summary-grid">
+      <div class="kpi"><div class="label">거래</div><div class="value">${f.result.n_trades}</div></div>
+      <div class="kpi"><div class="label">승률</div><div class="value">${fmt(f.result.winrate * 100)}%</div></div>
+      <div class="kpi"><div class="label">총 PnL</div><div class="value pos">${fmt(f.result.total_pnl_pct)}%</div></div>
+      <div class="kpi"><div class="label">MDD</div><div class="value neg">${fmt(f.result.mdd_pct)}%</div></div>
+    </div>
+
+    <h3 style="margin-top:24px">채택 사유 상세 (${acceptedVariants.length}건)</h3>
+    <div class="variant-detail-list">${acceptedDetail}</div>
+
+    <h3 style="margin-top:24px">Equity Curve 오버레이</h3>
+    <canvas id="finalCurveChart" height="80"></canvas>
+
+    <h3 style="margin-top:24px">거래 상세 (최종안)</h3>
+    <div style="max-height:400px;overflow:auto">
+      <table><thead><tr>
+        <th>날짜</th><th>종목</th><th>조건</th><th>진입</th><th>청산</th><th>유형</th><th>PnL</th>
+      </tr></thead><tbody id="finalTradesBody"></tbody></table>
+    </div>
+  `;
+
+  // Overlay chart — 베이스라인 날짜 기준으로 Final을 carry-forward 정렬
+  // (Final은 마지막 거래 이후 데이터 없음 → 직전 cum_pnl로 채움)
+  const baseEc = STATE.baseline.equity_curve;
+  const finalEc = f.equity_curve || [];
+  const baseDates = baseEc.map(r => r.date);
+  const baseByDate = Object.fromEntries(baseEc.map(r => [r.date, r.cum_pnl]));
+  const finalByDate = Object.fromEntries(finalEc.map(r => [r.date, r.cum_pnl]));
+  let lastBase = 0, lastFinal = 0;
+  const baseAligned = [];
+  const finalAligned = [];
+  baseDates.forEach(d => {
+    if (d in baseByDate) lastBase = baseByDate[d];
+    if (d in finalByDate) lastFinal = finalByDate[d];
+    baseAligned.push(lastBase);
+    finalAligned.push(lastFinal);
+  });
+
+  new Chart(document.getElementById('finalCurveChart'), {
+    type: 'line',
+    data: {
+      labels: baseDates,
+      datasets: [
+        { label: '베이스라인', data: baseAligned, borderColor: '#8a8f98', fill: false, tension: 0.1 },
+        { label: '최종 (Final)', data: finalAligned, borderColor: '#4fd1c5', fill: false, tension: 0.1 },
+      ]
+    },
+    options: { responsive: true, plugins: { tooltip: { mode: 'index', intersect: false } } }
+  });
+
+  const tradesBody = document.getElementById('finalTradesBody');
+  tradesBody.innerHTML = (f.trades || []).map(t => `
+    <tr>
+      <td>${t.date}</td>
+      <td>${t.name || t.code}</td>
+      <td>${t.condition}</td>
+      <td>${t.fill_time} ${t.fill_price}</td>
+      <td>${t.exit_time} ${t.exit_price}</td>
+      <td>${t.exit_type}</td>
+      <td class="${t.pnl_pct >= 0 ? 'pos' : 'neg'}">${fmt(t.pnl_pct)}%</td>
+    </tr>
+  `).join('');
+}
+
+function renderRobustness() {
+  const r = STATE.variants.robustness;
+  const body = document.getElementById('robustness-body');
+  if (!r) {
+    body.innerHTML = '<p style="color:var(--muted)">견고성 데이터 없음</p>';
+    return;
+  }
+  body.innerHTML = `
+    <h3>R1: Train(Feb~Mar) vs Test(Apr)</h3>
+    <table>
+      <thead><tr><th>기간</th><th>베이스라인</th><th>최종</th></tr></thead>
+      <tbody>
+        <tr><td>Feb~Mar</td><td>${fmt(r.train_feb_mar.baseline_pnl)}%</td><td>${r.train_feb_mar.final_pnl !== null ? fmt(r.train_feb_mar.final_pnl) + '%' : '-'}</td></tr>
+        <tr><td>Apr</td><td>${fmt(r.test_apr.baseline_pnl)}%</td><td>${r.test_apr.final_pnl !== null ? fmt(r.test_apr.final_pnl) + '%' : '-'}</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:24px">R2: 최악 5거래일</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <h4>베이스라인</h4>
+        <table><tbody>${r.worst5_baseline.map(d => `<tr><td>${d.date}</td><td class="neg">${fmt(d.pnl)}%</td></tr>`).join('')}</tbody></table>
+      </div>
+      <div>
+        <h4>최종</h4>
+        <table><tbody>${r.worst5_final.map(d => `<tr><td>${d.date}</td><td class="neg">${fmt(d.pnl)}%</td></tr>`).join('')}</tbody></table>
+      </div>
+    </div>
+
+    <h3 style="margin-top:24px">R3: 연속손실 분포</h3>
+    <table>
+      <thead><tr><th>연속손실 길이</th><th>베이스라인</th><th>최종</th></tr></thead>
+      <tbody id="consecBody"></tbody>
+    </table>
+  `;
+  const allLens = new Set([
+    ...Object.keys(r.consec_loss_baseline || {}),
+    ...Object.keys(r.consec_loss_final || {}),
+  ]);
+  const consecBody = document.getElementById('consecBody');
+  consecBody.innerHTML = [...allLens].sort((a,b) => +a - +b).map(len => `
+    <tr>
+      <td>${len}연속</td>
+      <td>${(r.consec_loss_baseline || {})[len] || 0}회</td>
+      <td>${(r.consec_loss_final || {})[len] || 0}회</td>
+    </tr>
+  `).join('');
+}
+
+loadData().catch(err => {
+  document.getElementById('meta-line').textContent = '데이터 로드 실패: ' + err.message;
+  console.error(err);
+});
+</script>
+</body>
+</html>
