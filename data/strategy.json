@@ -43,7 +43,7 @@
       },
       "intensity_floor": { "threshold": 81, "duration_seconds": 30 }
     },
-    "골든11": {
+    "종일용": {
       "time_window": { "start": "09:10", "end": "11:00" },
       "price_range": { "min": 1400, "max": 135000 },
       "buy_amount_1": 1800000,
