@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-24T15:54:19.422703+09:00",
+  "updated": "2026-04-27T16:01:56.565270+09:00",
   "daily": [
     {
       "date": "2026-02-10",
@@ -252,6 +252,13 @@
       "count": 9,
       "wins": 3,
       "cumulative": 1150276
+    },
+    {
+      "date": "2026-04-27",
+      "profit": 673355,
+      "count": 6,
+      "wins": 5,
+      "cumulative": 1823631
     }
   ],
   "strategies": [
@@ -265,11 +272,11 @@
     },
     {
       "condition": "골든10분",
-      "count": 15,
-      "wins": 6,
-      "win_rate": 40.0,
-      "total_profit": -141337,
-      "avg_pct": 0.09
+      "count": 17,
+      "wins": 8,
+      "win_rate": 47.1,
+      "total_profit": -46082,
+      "avg_pct": 0.39
     },
     {
       "condition": "골든11",
@@ -281,19 +288,19 @@
     },
     {
       "condition": "굿모닝",
-      "count": 20,
-      "wins": 11,
-      "win_rate": 55.0,
-      "total_profit": 2104107,
-      "avg_pct": 6.66
+      "count": 23,
+      "wins": 14,
+      "win_rate": 60.9,
+      "total_profit": 2740627,
+      "avg_pct": 6.35
     },
     {
       "condition": "세력감지",
-      "count": 67,
+      "count": 68,
       "wins": 40,
-      "win_rate": 59.7,
-      "total_profit": -197431,
-      "avg_pct": -0.91
+      "win_rate": 58.8,
+      "total_profit": -255851,
+      "avg_pct": -0.95
     },
     {
       "condition": "종일용",
@@ -305,9 +312,9 @@
     }
   ],
   "signal_summary": {
-    "total": 489,
-    "real_trade": 92,
-    "virtual": 397,
+    "total": 523,
+    "real_trade": 100,
+    "virtual": 423,
     "close_profit": 0,
     "close_profit_rate": 0.0
   }
