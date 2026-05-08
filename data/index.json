@@ -1,7 +1,25 @@
 {
-  "updated": "2026-05-04T15:56:57.143459+09:00",
-  "total_signals": 600,
+  "updated": "2026-05-08T15:58:58.234897+09:00",
+  "total_signals": 671,
   "dates": [
+    {
+      "date": "2026-05-08",
+      "total": 19,
+      "real": 5,
+      "profit": 0
+    },
+    {
+      "date": "2026-05-07",
+      "total": 23,
+      "real": 4,
+      "profit": 0
+    },
+    {
+      "date": "2026-05-06",
+      "total": 29,
+      "real": 8,
+      "profit": 0
+    },
     {
       "date": "2026-05-04",
       "total": 18,
