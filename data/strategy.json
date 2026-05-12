@@ -16,8 +16,8 @@
   "strategies": {
     "굿모닝": {
       "time_window": {
-        "start": "09:00",
-        "end": "13:49"
+        "start": "09:05",
+        "end": "09:44"
       },
       "price_range": {
         "min": 2000,
@@ -151,8 +151,8 @@
     },
     "골든10분": {
       "time_window": {
-        "start": "09:00",
-        "end": "13:29"
+        "start": "09:35",
+        "end": "10:09"
       },
       "price_range": {
         "min": 2000,
