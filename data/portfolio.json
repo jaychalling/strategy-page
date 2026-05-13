@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-12T15:58:42.786292+09:00",
+  "updated": "2026-05-13T16:13:13.702469+09:00",
   "daily": [
     {
       "date": "2026-02-10",
@@ -315,6 +315,13 @@
       "count": 1,
       "wins": 1,
       "cumulative": 1263769
+    },
+    {
+      "date": "2026-05-13",
+      "profit": -104448,
+      "count": 2,
+      "wins": 1,
+      "cumulative": 1159321
     }
   ],
   "strategies": [
@@ -352,10 +359,10 @@
     },
     {
       "condition": "세력감지",
-      "count": 77,
-      "wins": 48,
-      "win_rate": 62.3,
-      "total_profit": -198748,
+      "count": 79,
+      "wins": 49,
+      "win_rate": 62.0,
+      "total_profit": -303196,
       "avg_pct": -0.74
     },
     {
@@ -368,9 +375,9 @@
     }
   ],
   "signal_summary": {
-    "total": 693,
-    "real_trade": 134,
-    "virtual": 559,
+    "total": 706,
+    "real_trade": 135,
+    "virtual": 571,
     "close_profit": 0,
     "close_profit_rate": 0.0
   }

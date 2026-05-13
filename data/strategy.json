@@ -256,7 +256,10 @@
         "amount": 3000000
       },
       "stop_loss": {
-        "first_only": -0.029,
+        "first_only": {
+          "before_tp": -0.029,
+          "after_tp": -0.017
+        },
         "after_second": -0.029
       },
       "take_profit": {
@@ -307,7 +310,6 @@
       },
       "retracement_rules": {
         "first_only": {
-          "1": "all",
           "2": "all",
           "3": "all",
           "4": "all"
