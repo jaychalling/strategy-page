@@ -46,7 +46,7 @@
       "take_profit": {
         "first_only": [
           {
-            "profit": 0.034,
+            "profit": 0.029,
             "sell_ratio": 0.25
           },
           {
